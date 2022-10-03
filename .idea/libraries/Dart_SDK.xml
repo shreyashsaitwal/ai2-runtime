@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="Dart SDK">
+    <CLASSES>
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/async" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/cli" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/collection" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/convert" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/core" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/developer" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/ffi" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/html" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/indexed_db" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/io" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/isolate" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/js" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/js_util" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/math" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/mirrors" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/svg" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/typed_data" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/web_audio" />
+      <root url="file://$USER_HOME$/scoop/apps/dart/current/lib/web_gl" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
