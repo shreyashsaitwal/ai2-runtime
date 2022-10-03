@@ -2,6 +2,8 @@
 
 plugins {
     id("com.android.library")
+    id("maven-publish")
+    id("signing")
 }
 
 android {
@@ -25,6 +27,13 @@ android {
 
     lint {
         abortOnError = false
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
 
@@ -65,3 +74,56 @@ dependencies {
     implementation(fileTree("libs"))
 }
 
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name = "OSSRH"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = project.properties["ossrh.username"] as String
+                    password = project.properties["ossrh.password"] as String
+                }
+            }
+        }
+
+        publications {
+            create<MavenPublication>("maven") {
+                artifactId = "runtime"
+                groupId = "io.github.shreyashsaitwal.rush"
+                version = "nb190a-rc01"
+                from(components["release"])
+
+                pom {
+                    name.set("AI2 runtime")
+                    description.set("App Inventor runtime module tailored for extensions built with Rush.")
+                    url.set("https://github.com/shreyashsaitwal/ai2-runtime")
+
+                    licenses {
+                        license {
+                            name.set("Apache License, Version 2.0")
+                            url.set("https://raw.githubusercontent.com/shreyashsaitwal/ai2-runtime/main/LICENSE")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set("MIT App Inventor authors")
+                            name.set("mit-appinventor-authors")
+                        }
+                    }
+
+                    scm {
+                        connection.set("scm:git:git://github.com/shreyashsaitwal/ai2-runtime.git")
+                        developerConnection.set("scm:git:ssh://github.com/shreyashsaitwal/ai2-runtime.git")
+                        url.set("https://github.com/shreyashsaitwal/rush-cli")
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        sign(publishing.publications["maven"])
+    }
+}
