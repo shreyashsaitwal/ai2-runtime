@@ -6,6 +6,9 @@ plugins {
     id("signing")
 }
 
+group = "io.github.shreyashsaitwal.rush"
+version = "nb190b-rc01"
+
 android {
     compileSdk = 32
 
@@ -69,7 +72,7 @@ dependencies {
     implementation("com.google.apis:google-api-services-sheets:v4-rev604-1.25.0")
     implementation("com.google.apis:google-api-services-fusiontables:v1-rev20171117-1.26.0")
 
-    implementation("io.github.shreyashsaitwal.rush:annotations:2.0.0-beta07")
+    implementation("io.github.shreyashsaitwal.rush:annotations:2.0.0-rc01")
 
     implementation(fileTree("libs"))
 }
@@ -90,8 +93,6 @@ afterEvaluate {
         publications {
             create<MavenPublication>("maven") {
                 artifactId = "runtime"
-                groupId = "io.github.shreyashsaitwal.rush"
-                version = "nb190a-rc01"
                 from(components["release"])
 
                 pom {
