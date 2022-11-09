@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.shreyashsaitwal.rush"
-version = "nb190b-rc01"
+version = "nb190b"
 
 android {
     compileSdk = 32
@@ -43,10 +43,7 @@ android {
 repositories {
     google()
     mavenCentral()
-    maven {
-        url = uri("https://jitpack.io")
-    }
-    jcenter() // For "org.webrtc:google-webrtc:1.0.23995"
+    mavenLocal()
 }
 
 dependencies {
@@ -60,11 +57,9 @@ dependencies {
     implementation("redis.clients:jedis:3.1.0")
     implementation("com.caverock:androidsvg:1.2.1")
     implementation("com.firebase:firebase-client-android:2.5.2")
-    implementation("org.webrtc:google-webrtc:1.0.23995")
     implementation("org.twitter4j:twitter4j-core:3.0.5")
 
     implementation("org.pepstock:charba:2.5")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     implementation("com.google.protobuf:protobuf-java:3.0.0")
     implementation("com.google.api-client:google-api-client:1.22.0")
@@ -72,7 +67,7 @@ dependencies {
     implementation("com.google.apis:google-api-services-sheets:v4-rev604-1.25.0")
     implementation("com.google.apis:google-api-services-fusiontables:v1-rev20171117-1.26.0")
 
-    implementation("io.github.shreyashsaitwal.rush:annotations:2.0.0-rc01")
+    implementation("io.github.shreyashsaitwal.rush:annotations:2.0.0")
 
     implementation(fileTree("libs"))
 }
