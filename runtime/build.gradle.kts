@@ -7,14 +7,14 @@ plugins {
 }
 
 group = "io.github.shreyashsaitwal.rush"
-version = "nb190b"
+version = "nb190b.1"
 
 android {
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         minSdk = 16
-        targetSdk = 32
+        targetSdk = 33
     }
 
     buildTypes {
@@ -67,7 +67,7 @@ dependencies {
     implementation("com.google.apis:google-api-services-sheets:v4-rev604-1.25.0")
     implementation("com.google.apis:google-api-services-fusiontables:v1-rev20171117-1.26.0")
 
-    implementation("io.github.shreyashsaitwal.rush:annotations:2.0.0")
+    implementation("io.github.shreyashsaitwal.rush:annotations:2.0.1")
 
     implementation(fileTree("libs"))
 }
