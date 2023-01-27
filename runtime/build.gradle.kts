@@ -79,8 +79,8 @@ afterEvaluate {
                 name = "OSSRH"
                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = project.properties["ossrh.username"] as String
-                    password = project.properties["ossrh.password"] as String
+                    username = project.properties["ossrh.username"] as String?
+                    password = project.properties["ossrh.password"] as String?
                 }
             }
         }
