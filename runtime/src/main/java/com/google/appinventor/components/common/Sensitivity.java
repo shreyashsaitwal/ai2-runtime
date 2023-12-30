@@ -12,30 +12,30 @@ import java.util.Map;
  * Defines a Sensitivity type used by the AccelerometerSensor.
  */
 public enum Sensitivity implements OptionList<Integer> {
-    Weak(1),
-    Moderate(2),
-    Strong(3);
+  Weak(1),
+  Moderate(2),
+  Strong(3);
 
-    private static final Map<Integer, Sensitivity> lookup = new HashMap<>();
+  private final int value;
 
-    static {
-        for (Sensitivity sensitivity : Sensitivity.values()) {
-            lookup.put(sensitivity.toUnderlyingValue(), sensitivity);
-        }
+  Sensitivity(int sensitivity) {
+    this.value = sensitivity;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, Sensitivity> lookup = new HashMap<>();
+
+  static {
+    for (Sensitivity sensitivity : Sensitivity.values()) {
+      lookup.put(sensitivity.toUnderlyingValue(), sensitivity);
     }
+  }
 
-    private final int value;
-
-    Sensitivity(int sensitivity) {
-        this.value = sensitivity;
-    }
-
-    public static Sensitivity fromUnderlyingValue(Integer sensitivity) {
-        return lookup.get(sensitivity);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static Sensitivity fromUnderlyingValue(Integer sensitivity) {
+    return lookup.get(sensitivity);
+  }
 }
 

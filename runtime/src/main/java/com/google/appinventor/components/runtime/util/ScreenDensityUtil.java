@@ -18,112 +18,113 @@ import java.lang.reflect.Method;
 
 /**
  * Helper methods for computing scaled sizes for screen compatibility mode
+ *
  */
 public final class ScreenDensityUtil {
 
-    // Much of this compatibility scaling code/constant is taken
-    // from the Android source code.
-    public static final int DEFAULT_NORMAL_SHORT_DIMENSION = 320;
-    public static final float MAXIMUM_ASPECT_RATIO = (854f / 480f);
-    private static final String LOG_TAG = "ScreenDensityUtil";
+  private static final String LOG_TAG = "ScreenDensityUtil";
 
+  // Much of this compatibility scaling code/constant is taken
+  // from the Android source code.
+  public static final int DEFAULT_NORMAL_SHORT_DIMENSION = 320;
+  public static final float MAXIMUM_ASPECT_RATIO = (854f/480f);
 
-    private ScreenDensityUtil() {
+  private ScreenDensityUtil() {
+  }
+
+  /**
+   * Compute the scaling for applications runs under compatibility mode.
+   * This code is partially taken from CompatibilityInfo.java from the Android 5.0 source
+   *
+   * @param context Context in the screen to get the density of
+   * @return Returns the scaling factor for the window.
+   */
+  public static float computeCompatibleScaling(Context context) {
+    DisplayMetrics dm = context.getResources().getDisplayMetrics();
+
+    Point rawDims = new Point();
+    getRawScreenDim(context, rawDims);
+
+    int width = rawDims.x;
+    int height = rawDims.y;
+
+    int shortSize, longSize;
+    if (width < height) {
+      shortSize = width;
+      longSize = height;
+    } else {
+      shortSize = height;
+      longSize = width;
+    }
+    int newShortSize = (int)(DEFAULT_NORMAL_SHORT_DIMENSION * dm.density + 0.5f);
+    float aspect = ((float)longSize) / shortSize;
+    if (aspect > MAXIMUM_ASPECT_RATIO) {
+      aspect = MAXIMUM_ASPECT_RATIO;
+    }
+    int newLongSize = (int)(newShortSize * aspect + 0.5f);
+    int newWidth, newHeight;
+    if (width < height) {
+      newWidth = newShortSize;
+      newHeight = newLongSize;
+    } else {
+      newWidth = newLongSize;
+      newHeight = newShortSize;
     }
 
-    /**
-     * Compute the scaling for applications runs under compatibility mode.
-     * This code is partially taken from CompatibilityInfo.java from the Android 5.0 source
-     *
-     * @param context Context in the screen to get the density of
-     * @return Returns the scaling factor for the window.
-     */
-    public static float computeCompatibleScaling(Context context) {
-        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+    float sw = width/(float)newWidth;
+    float sh = height/(float)newHeight;
 
-        Point rawDims = new Point();
-        getRawScreenDim(context, rawDims);
+    return Math.max(1, Math.min(Math.min(sw, sh), MAXIMUM_ASPECT_RATIO));
+  }
 
-        int width = rawDims.x;
-        int height = rawDims.y;
+  /**
+   * Determine the actual size of the screen in pixels.
+   * Inspired by http://stackoverflow.com/a/17512853/135135
+   *
+   * @param context context to get screen size of.
+   * @param outSize Set to the real size of the display.
+   */
+  private static void getRawScreenDim(Context context, Point outSize) {
 
-        int shortSize, longSize;
-        if (width < height) {
-            shortSize = width;
-            longSize = height;
-        } else {
-            shortSize = height;
-            longSize = width;
+    final DisplayMetrics metrics = new DisplayMetrics();
+    final WindowManager wm = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+    Display display = wm.getDefaultDisplay();
+
+    int sdkLevel = SdkLevel.getLevel();
+    if (sdkLevel >= SdkLevel.LEVEL_NOUGAT) {
+      // Needed for multi-window support
+      display.getMetrics(metrics);
+      outSize.x = metrics.widthPixels;
+      outSize.y = metrics.heightPixels;
+    } else if (sdkLevel >= SdkLevel.LEVEL_JELLYBEAN_MR1) {
+      // On API level 17, a public method was added to get the actual sizes
+      JellybeanUtil.getRealSize(display, outSize);
+    } else if ( sdkLevel > SdkLevel.LEVEL_GINGERBREAD_MR1){
+      // Before API level 17, the realsize method did not exist
+      // We use reflection instead to access some hidden methods
+      // Does not work for 3.x, will just error
+      try {
+        Method getRawH = Display.class.getMethod("getRawHeight");
+        Method getRawW = Display.class.getMethod("getRawWidth");
+        try {
+          outSize.x = (Integer) getRawW.invoke(display);
+          outSize.y = (Integer) getRawH.invoke(display);
+        } catch (IllegalArgumentException e) {
+          Log.e(LOG_TAG, "Error reading raw screen size", e);
+        } catch (IllegalAccessException e) {
+          Log.e(LOG_TAG, "Error reading raw screen size", e);
+        } catch (InvocationTargetException e) {
+          Log.e(LOG_TAG, "Error reading raw screen size", e);
         }
-        int newShortSize = (int) (DEFAULT_NORMAL_SHORT_DIMENSION * dm.density + 0.5f);
-        float aspect = ((float) longSize) / shortSize;
-        if (aspect > MAXIMUM_ASPECT_RATIO) {
-            aspect = MAXIMUM_ASPECT_RATIO;
-        }
-        int newLongSize = (int) (newShortSize * aspect + 0.5f);
-        int newWidth, newHeight;
-        if (width < height) {
-            newWidth = newShortSize;
-            newHeight = newLongSize;
-        } else {
-            newWidth = newLongSize;
-            newHeight = newShortSize;
-        }
-
-        float sw = width / (float) newWidth;
-        float sh = height / (float) newHeight;
-
-        return Math.max(1, Math.min(Math.min(sw, sh), MAXIMUM_ASPECT_RATIO));
+      } catch (NoSuchMethodException e) {
+        Log.e(LOG_TAG, "Error reading raw screen size", e);
+      }
+    } else {
+      // The raw height and width functions were added after verison 10
+      // Before that, the methods actually returned the raw values
+      outSize.x = display.getWidth();
+      outSize.y = display.getHeight();
     }
 
-    /**
-     * Determine the actual size of the screen in pixels.
-     * Inspired by http://stackoverflow.com/a/17512853/135135
-     *
-     * @param context context to get screen size of.
-     * @param outSize Set to the real size of the display.
-     */
-    private static void getRawScreenDim(Context context, Point outSize) {
-
-        final DisplayMetrics metrics = new DisplayMetrics();
-        final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-
-        int sdkLevel = SdkLevel.getLevel();
-        if (sdkLevel >= SdkLevel.LEVEL_NOUGAT) {
-            // Needed for multi-window support
-            display.getMetrics(metrics);
-            outSize.x = metrics.widthPixels;
-            outSize.y = metrics.heightPixels;
-        } else if (sdkLevel >= SdkLevel.LEVEL_JELLYBEAN_MR1) {
-            // On API level 17, a public method was added to get the actual sizes
-            JellybeanUtil.getRealSize(display, outSize);
-        } else if (sdkLevel > SdkLevel.LEVEL_GINGERBREAD_MR1) {
-            // Before API level 17, the realsize method did not exist
-            // We use reflection instead to access some hidden methods
-            // Does not work for 3.x, will just error
-            try {
-                Method getRawH = Display.class.getMethod("getRawHeight");
-                Method getRawW = Display.class.getMethod("getRawWidth");
-                try {
-                    outSize.x = (Integer) getRawW.invoke(display);
-                    outSize.y = (Integer) getRawH.invoke(display);
-                } catch (IllegalArgumentException e) {
-                    Log.e(LOG_TAG, "Error reading raw screen size", e);
-                } catch (IllegalAccessException e) {
-                    Log.e(LOG_TAG, "Error reading raw screen size", e);
-                } catch (InvocationTargetException e) {
-                    Log.e(LOG_TAG, "Error reading raw screen size", e);
-                }
-            } catch (NoSuchMethodException e) {
-                Log.e(LOG_TAG, "Error reading raw screen size", e);
-            }
-        } else {
-            // The raw height and width functions were added after verison 10
-            // Before that, the methods actually returned the raw values
-            outSize.x = display.getWidth();
-            outSize.y = display.getHeight();
-        }
-
-    }
+  }
 }

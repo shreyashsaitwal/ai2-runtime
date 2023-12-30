@@ -6,197 +6,206 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.NxtSensorMode;
 import com.google.appinventor.components.common.NxtSensorType;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
+import android.os.Handler;
 
 /**
  * ![NXT component icon](images/legoMindstormsNxt.png)
- * <p>
+ *
  * A component that provides a high-level interface to a touch sensor on a LEGO
  * MINDSTORMS NXT robot.
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class NxtTouchSensor extends LegoMindstormsNxtSensor implements Deleteable {
+/* @DesignerComponent(version = YaVersion.NXT_TOUCHSENSOR_COMPONENT_VERSION,
+    description = "A component that provides a high-level interface to a touch sensor on a " +
+    "LEGO MINDSTORMS NXT robot.",
+    category = ComponentCategory.LEGOMINDSTORMS,
+    nonVisible = true,
+    iconName = "images//legoMindstormsNxt.png") */
+/* @SimpleObject
+ */public class NxtTouchSensor extends LegoMindstormsNxtSensor implements Deleteable {
 
-    private static final String DEFAULT_SENSOR_PORT = "1";
-    private final Runnable sensorReader;
-    private Handler handler;
-    private State previousState;
-    private boolean pressedEventEnabled;
-    private boolean releasedEventEnabled;
-    /**
-     * Creates a new NxtTouchSensor component.
-     */
-    public NxtTouchSensor(ComponentContainer container) {
-        super(container, "NxtTouchSensor");
-        handler = new Handler();
-        previousState = State.UNKNOWN;
-        sensorReader = new Runnable() {
-            public void run() {
-                if (bluetooth != null && bluetooth.IsConnected()) {
-                    SensorValue<Boolean> sensorValue = getPressedValue("");
-                    if (sensorValue.valid) {
-                        State currentState = sensorValue.value ? State.PRESSED : State.RELEASED;
+  private enum State { UNKNOWN, PRESSED, RELEASED }
+  private static final String DEFAULT_SENSOR_PORT = "1";
 
-                        if (currentState != previousState) {
-                            if (currentState == State.PRESSED && pressedEventEnabled) {
-                                Pressed();
-                            }
-                            if (currentState == State.RELEASED && releasedEventEnabled) {
-                                Released();
-                            }
-                        }
+  private Handler handler;
+  private State previousState;
+  private final Runnable sensorReader;
+  private boolean pressedEventEnabled;
+  private boolean releasedEventEnabled;
 
-                        previousState = currentState;
-                    }
-                }
-                if (isHandlerNeeded()) {
-                    handler.post(sensorReader);
-                }
+  /**
+   * Creates a new NxtTouchSensor component.
+   */
+  public NxtTouchSensor(ComponentContainer container) {
+    super(container, "NxtTouchSensor");
+    handler = new Handler();
+    previousState = State.UNKNOWN;
+    sensorReader = new Runnable() {
+      public void run() {
+        if (bluetooth != null && bluetooth.IsConnected()) {
+          SensorValue<Boolean> sensorValue = getPressedValue("");
+          if (sensorValue.valid) {
+            State currentState = sensorValue.value ? State.PRESSED : State.RELEASED;
+
+            if (currentState != previousState) {
+              if (currentState == State.PRESSED && pressedEventEnabled) {
+                Pressed();
+              }
+              if (currentState == State.RELEASED && releasedEventEnabled) {
+                Released();
+              }
             }
-        };
 
-        SensorPort(DEFAULT_SENSOR_PORT);
-        PressedEventEnabled(false);
-        ReleasedEventEnabled(false);
-    }
-
-    @Override
-    protected void initializeSensor(String functionName) {
-        setInputMode(functionName, port, NxtSensorType.Touch, NxtSensorMode.Boolean);
-    }
-
-    /**
-     * Specifies the sensor port that the sensor is connected to.
-     * **Must be set in the Designer.**
-     */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_SENSOR_PORT,
-            defaultValue = DEFAULT_SENSOR_PORT)
-    @SimpleProperty(userVisible = false)
-    public void SensorPort(String sensorPortLetter) {
-        setSensorPort(sensorPortLetter);
-    }
-
-    @SimpleFunction(description = "Returns true if the touch sensor is pressed.")
-    public boolean IsPressed() {
-        String functionName = "IsPressed";
-        if (!checkBluetooth(functionName)) {
-            return false;
+            previousState = currentState;
+          }
         }
-
-        SensorValue<Boolean> sensorValue = getPressedValue(functionName);
-        if (sensorValue.valid) {
-            return sensorValue.value;
+        if (isHandlerNeeded()) {
+          handler.post(sensorReader);
         }
+      }
+    };
 
-        // invalid response
-        return false;
+    SensorPort(DEFAULT_SENSOR_PORT);
+    PressedEventEnabled(false);
+    ReleasedEventEnabled(false);
+  }
+
+  @Override
+  protected void initializeSensor(String functionName) {
+    setInputMode(functionName, port, NxtSensorType.Touch, NxtSensorMode.Boolean);
+  }
+
+  /**
+   * Specifies the sensor port that the sensor is connected to.
+   * **Must be set in the Designer.**
+   */
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_SENSOR_PORT,
+      defaultValue = DEFAULT_SENSOR_PORT) */
+  /* @SimpleProperty(userVisible = false) */
+  public void SensorPort(String sensorPortLetter) {
+    setSensorPort(sensorPortLetter);
+  }
+
+  /* @SimpleFunction(description = "Returns true if the touch sensor is pressed.") */
+  public boolean IsPressed() {
+    String functionName = "IsPressed";
+    if (!checkBluetooth(functionName)) {
+      return false;
     }
 
-    private SensorValue<Boolean> getPressedValue(String functionName) {
-        byte[] returnPackage = getInputValues(functionName, port);
-        if (returnPackage != null) {
-            boolean valid = getBooleanValueFromBytes(returnPackage, 4);
-            if (valid) {
-                int scaledValue = getSWORDValueFromBytes(returnPackage, 12);
-                return new SensorValue<Boolean>(true, (scaledValue != 0));
-            }
-        }
-
-        // invalid response
-        return new SensorValue<Boolean>(false, null);
+    SensorValue<Boolean> sensorValue = getPressedValue(functionName);
+    if (sensorValue.valid) {
+      return sensorValue.value;
     }
 
-    /**
-     * Returns whether the Pressed event should fire when the touch sensor is
-     * pressed.
-     */
-    @SimpleProperty(description = "Whether the Pressed event should fire when the touch sensor is" +
-            " pressed.")
-    public boolean PressedEventEnabled() {
-        return pressedEventEnabled;
+    // invalid response
+    return false;
+  }
+
+  private SensorValue<Boolean> getPressedValue(String functionName) {
+    byte[] returnPackage = getInputValues(functionName, port);
+    if (returnPackage != null) {
+      boolean valid = getBooleanValueFromBytes(returnPackage, 4);
+      if (valid) {
+        int scaledValue = getSWORDValueFromBytes(returnPackage, 12);
+        return new SensorValue<Boolean>(true, (scaledValue != 0));
+      }
     }
 
-    /**
-     * Specifies whether the Pressed event should fire when the touch sensor is
-     * pressed.
-     */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
-    public void PressedEventEnabled(boolean enabled) {
-        boolean handlerWasNeeded = isHandlerNeeded();
+    // invalid response
+    return new SensorValue<Boolean>(false, null);
+  }
 
-        pressedEventEnabled = enabled;
+  /**
+   * Returns whether the Pressed event should fire when the touch sensor is
+   * pressed.
+   */
+  /* @SimpleProperty(description = "Whether the Pressed event should fire when the touch sensor is" +
+      " pressed.",
+      category = PropertyCategory.BEHAVIOR) */
+  public boolean PressedEventEnabled() {
+    return pressedEventEnabled;
+  }
 
-        boolean handlerIsNeeded = isHandlerNeeded();
-        if (handlerWasNeeded && !handlerIsNeeded) {
-            handler.removeCallbacks(sensorReader);
-        }
-        if (!handlerWasNeeded && handlerIsNeeded) {
-            previousState = State.UNKNOWN;
-            handler.post(sensorReader);
-        }
+  /**
+   * Specifies whether the Pressed event should fire when the touch sensor is
+   * pressed.
+   */
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+  /* @SimpleProperty
+   */public void PressedEventEnabled(boolean enabled) {
+    boolean handlerWasNeeded = isHandlerNeeded();
+
+    pressedEventEnabled = enabled;
+
+    boolean handlerIsNeeded = isHandlerNeeded();
+    if (handlerWasNeeded && !handlerIsNeeded) {
+      handler.removeCallbacks(sensorReader);
     }
-
-    @SimpleEvent(description = "Touch sensor has been pressed.")
-    public void Pressed() {
-        EventDispatcher.dispatchEvent(this, "Pressed");
+    if (!handlerWasNeeded && handlerIsNeeded) {
+      previousState = State.UNKNOWN;
+      handler.post(sensorReader);
     }
+  }
 
-    /**
-     * Returns whether the Released event should fire when the touch sensor is
-     * released.
-     */
-    @SimpleProperty(description = "Whether the Released event should fire when the touch sensor is" +
-            " released.")
-    public boolean ReleasedEventEnabled() {
-        return releasedEventEnabled;
+  /* @SimpleEvent(description = "Touch sensor has been pressed.") */
+  public void Pressed() {
+    EventDispatcher.dispatchEvent(this, "Pressed");
+  }
+
+  /**
+   * Returns whether the Released event should fire when the touch sensor is
+   * released.
+   */
+  /* @SimpleProperty(description = "Whether the Released event should fire when the touch sensor is" +
+      " released.",
+      category = PropertyCategory.BEHAVIOR) */
+  public boolean ReleasedEventEnabled() {
+    return releasedEventEnabled;
+  }
+
+  /**
+   * Specifies whether the Released event should fire when the touch sensor is
+   * released.
+   */
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+  /* @SimpleProperty
+   */public void ReleasedEventEnabled(boolean enabled) {
+    boolean handlerWasNeeded = isHandlerNeeded();
+
+    releasedEventEnabled = enabled;
+
+    boolean handlerIsNeeded = isHandlerNeeded();
+    if (handlerWasNeeded && !handlerIsNeeded) {
+      handler.removeCallbacks(sensorReader);
     }
-
-    /**
-     * Specifies whether the Released event should fire when the touch sensor is
-     * released.
-     */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
-    public void ReleasedEventEnabled(boolean enabled) {
-        boolean handlerWasNeeded = isHandlerNeeded();
-
-        releasedEventEnabled = enabled;
-
-        boolean handlerIsNeeded = isHandlerNeeded();
-        if (handlerWasNeeded && !handlerIsNeeded) {
-            handler.removeCallbacks(sensorReader);
-        }
-        if (!handlerWasNeeded && handlerIsNeeded) {
-            previousState = State.UNKNOWN;
-            handler.post(sensorReader);
-        }
+    if (!handlerWasNeeded && handlerIsNeeded) {
+      previousState = State.UNKNOWN;
+      handler.post(sensorReader);
     }
+  }
 
-    @SimpleEvent(description = "Touch sensor has been released.")
-    public void Released() {
-        EventDispatcher.dispatchEvent(this, "Released");
-    }
+  /* @SimpleEvent(description = "Touch sensor has been released.") */
+  public void Released() {
+    EventDispatcher.dispatchEvent(this, "Released");
+  }
 
-    private boolean isHandlerNeeded() {
-        return pressedEventEnabled || releasedEventEnabled;
-    }
+  private boolean isHandlerNeeded() {
+    return pressedEventEnabled || releasedEventEnabled;
+  }
 
-    @Override
-    public void onDelete() {
-        handler.removeCallbacks(sensorReader);
-        super.onDelete();
-    }
+  // Deleteable implementation
 
-    // Deleteable implementation
-
-    private enum State {UNKNOWN, PRESSED, RELEASED}
+  @Override
+  public void onDelete() {
+    handler.removeCallbacks(sensorReader);
+    super.onDelete();
+  }
 }

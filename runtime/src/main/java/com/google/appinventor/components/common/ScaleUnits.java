@@ -12,28 +12,28 @@ import java.util.Map;
  * Defines a ScaleUnits type used by the Map component.
  */
 public enum ScaleUnits implements OptionList<Integer> {
-    Metric(1),
-    Imperial(2);
+  Metric(1),
+  Imperial(2);
 
-    private static final Map<Integer, ScaleUnits> lookup = new HashMap<>();
+  private final Integer value;
 
-    static {
-        for (ScaleUnits unit : ScaleUnits.values()) {
-            lookup.put(unit.toUnderlyingValue(), unit);
-        }
+  ScaleUnits(Integer value) {
+    this.value = value;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, ScaleUnits> lookup = new HashMap<>();
+
+  static {
+    for (ScaleUnits unit : ScaleUnits.values()) {
+      lookup.put(unit.toUnderlyingValue(), unit);
     }
+  }
 
-    private final Integer value;
-
-    ScaleUnits(Integer value) {
-        this.value = value;
-    }
-
-    public static ScaleUnits fromUnderlyingValue(Integer unit) {
-        return lookup.get(unit);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static ScaleUnits fromUnderlyingValue(Integer unit) {
+    return lookup.get(unit);
+  }
 }

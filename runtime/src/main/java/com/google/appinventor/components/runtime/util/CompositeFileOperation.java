@@ -3,59 +3,63 @@ package com.google.appinventor.components.runtime.util;
 import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.Form;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public abstract class CompositeFileOperation extends FileOperation
-        implements Iterable<CompositeFileOperation.FileOperand> {
+    implements Iterable<CompositeFileOperation.FileOperand> {
 
-    private final List<FileOperand> files = new ArrayList<>();
-    private final Set<String> permissions = new HashSet<>();
-    private boolean needsExternalStorage = false;
-    public CompositeFileOperation(Form form, Component component, String method, boolean async) {
-        super(form, component, method, async);
+  public static class FileOperand {
+    private final String file;
+    private final FileAccessMode mode;
+
+    FileOperand(String file, FileAccessMode mode) {
+      this.file = file;
+      this.mode = mode;
     }
 
-    public void addFile(FileScope scope, String fileName, FileAccessMode mode) {
-        FileOperand operand = new FileOperand(FileUtil.resolveFileName(form, fileName, scope), mode);
-        files.add(operand);
-        permissions.add(FileUtil.getNeededPermission(form, fileName, mode));
-        needsExternalStorage |= FileUtil.isExternalStorageUri(form, operand.file);
+    public String getFile() {
+      return file;
     }
 
-    @Override
-    public List<String> getPermissions() {
-        return new ArrayList<>(permissions);
+    public FileAccessMode getMode() {
+      return mode;
     }
+  }
 
-    @Override
-    protected abstract void performOperation();
+  private final List<FileOperand> files = new ArrayList<>();
+  private final Set<String> permissions = new HashSet<>();
+  private boolean needsExternalStorage = false;
 
-    @Override
-    protected boolean needsExternalStorage() {
-        return needsExternalStorage;
-    }
+  public CompositeFileOperation(Form form, Component component, String method, boolean async) {
+    super(form, component, method, async);
+  }
 
-    @Override
-    public Iterator<FileOperand> iterator() {
-        return files.iterator();
-    }
+  public void addFile(FileScope scope, String fileName, FileAccessMode mode) {
+    FileOperand operand = new FileOperand(FileUtil.resolveFileName(form, fileName, scope), mode);
+    files.add(operand);
+    permissions.add(FileUtil.getNeededPermission(form, fileName, mode));
+    needsExternalStorage |= FileUtil.isExternalStorageUri(form, operand.file);
+  }
 
-    public static class FileOperand {
-        private final String file;
-        private final FileAccessMode mode;
+  @Override
+  public List<String> getPermissions() {
+    return new ArrayList<>(permissions);
+  }
 
-        FileOperand(String file, FileAccessMode mode) {
-            this.file = file;
-            this.mode = mode;
-        }
+  @Override
+  protected abstract void performOperation();
 
-        public String getFile() {
-            return file;
-        }
+  @Override
+  protected boolean needsExternalStorage() {
+    return needsExternalStorage;
+  }
 
-        public FileAccessMode getMode() {
-            return mode;
-        }
-    }
+  @Override
+  public Iterator<FileOperand> iterator() {
+    return files.iterator();
+  }
 }

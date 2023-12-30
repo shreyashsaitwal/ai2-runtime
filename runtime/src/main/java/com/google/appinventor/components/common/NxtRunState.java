@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * Defines a NxtRunState type used by the NxtDirectCommands component.
- *
+ * 
  * <p>Info attained from:
  * http://kio4.com/b4a/programas/Appendix%202-LEGO%20MINDSTORMS%20NXT%20Direct%20commands.pdf
  * http://www.ni.com/pdf/manuals/372574c.pdf
@@ -18,31 +18,31 @@ import java.util.Map;
  * https://www.mindstorms.rwth-aachen.de/documents/downloads/doc/version-4.07/help/NXT_SetInputMode.html
  */
 public enum NxtRunState implements OptionList<Integer> {
-    Disabled(0x00),
-    @Default
-    Running(0x20),
-    RampUp(0x10),
-    RampDown(0x40);
+  Disabled(0x00),
+  @Default
+  Running(0x20),
+  RampUp(0x10),
+  RampDown(0x40);
 
-    private static final Map<Integer, NxtRunState> lookup = new HashMap<>();
+  private final int value;
 
-    static {
-        for (NxtRunState state : NxtRunState.values()) {
-            lookup.put(state.toUnderlyingValue(), state);
-        }
+  NxtRunState(int state) {
+    this.value = state;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, NxtRunState> lookup = new HashMap<>();
+
+  static {
+    for (NxtRunState state : NxtRunState.values()) {
+      lookup.put(state.toUnderlyingValue(), state);
     }
+  }
 
-    private final int value;
-
-    NxtRunState(int state) {
-        this.value = state;
-    }
-
-    public static NxtRunState fromUnderlyingValue(Integer state) {
-        return lookup.get(state);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static NxtRunState fromUnderlyingValue(Integer state) {
+    return lookup.get(state);
+  }
 }

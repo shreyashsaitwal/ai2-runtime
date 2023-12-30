@@ -19,87 +19,87 @@ import org.osmdroid.views.MapView;
 
 public class ZoomControlView extends LinearLayout {
 
-    private final MapView parent;
-    private final Button zoomIn;
-    private final Button zoomOut;
+  private final MapView parent;
+  private final Button zoomIn;
+  private final Button zoomOut;
 
-    private float density;
+  private float density;
 
-    public ZoomControlView(MapView parent) {
-        super(parent.getContext());
+  public ZoomControlView(MapView parent) {
+    super(parent.getContext());
 
-        density = parent.getContext().getResources().getDisplayMetrics().density;
+    density = parent.getContext().getResources().getDisplayMetrics().density;
 
-        this.parent = parent;
-        this.setOrientation(LinearLayout.VERTICAL);
-        zoomIn = new Button(parent.getContext());
-        zoomOut = new Button(parent.getContext());
-        initButton(zoomIn, "+");
-        initButton(zoomOut, "−");
-        zoomIn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ZoomControlView.this.parent.getController().zoomIn();
-            }
-        });
-        zoomOut.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ZoomControlView.this.parent.getController().zoomOut();
-            }
-        });
+    this.parent = parent;
+    this.setOrientation(LinearLayout.VERTICAL);
+    zoomIn = new Button(parent.getContext());
+    zoomOut = new Button(parent.getContext());
+    initButton(zoomIn, "+");
+    initButton(zoomOut, "−");
+    zoomIn.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        ZoomControlView.this.parent.getController().zoomIn();
+      }
+    });
+    zoomOut.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        ZoomControlView.this.parent.getController().zoomOut();
+      }
+    });
 
-        ViewUtil.setBackgroundDrawable(zoomIn, getZoomInDrawable(density));
-        ViewUtil.setBackgroundDrawable(zoomOut, getZoomOutDrawable(density));
+    ViewUtil.setBackgroundDrawable(zoomIn, getZoomInDrawable(density));
+    ViewUtil.setBackgroundDrawable(zoomOut, getZoomOutDrawable(density));
 
-        int[][] states = new int[][]{
-                new int[]{-android.R.attr.state_enabled},
-                new int[]{android.R.attr.state_enabled}
-        };
-        int[] colors = new int[]{
-                Color.LTGRAY,
-                Color.BLACK
-        };
-        zoomIn.setTextColor(new ColorStateList(states, colors));
-        zoomOut.setTextColor(new ColorStateList(states, colors));
+    int[][] states = new int[][] {
+        new int[] {-android.R.attr.state_enabled },
+        new int[] { android.R.attr.state_enabled }
+    };
+    int[] colors = new int[] {
+        Color.LTGRAY,
+        Color.BLACK
+    };
+    zoomIn.setTextColor(new ColorStateList(states, colors));
+    zoomOut.setTextColor(new ColorStateList(states, colors));
 
-        addView(zoomIn);
-        addView(zoomOut);
+    addView(zoomIn);
+    addView(zoomOut);
 
-        this.setPadding((int) (12 * density), (int) (12 * density), 0, 0);
-        updateButtons();
-    }
+    this.setPadding((int)(12 * density), (int)(12 * density), 0, 0);
+    updateButtons();
+  }
 
-    private static Drawable getZoomInDrawable(float density) {
-        final int R = (int) (4 * density);
-        ShapeDrawable drawable = new ShapeDrawable(new RoundRectShape(new float[]{R, R, R, R, 0, 0, 0, 0}, null, null));
-        drawable.getPaint().setColor(Color.WHITE);
-        return drawable;
-    }
+  /**
+   * Update the state of the zoom buttons based on the current map tile layer and its zoom level.
+   */
+  @SuppressWarnings("WeakerAccess")
+  public final void updateButtons() {
+    zoomIn.setEnabled(parent.canZoomIn());
+    zoomOut.setEnabled(parent.canZoomOut());
+  }
 
-    private static Drawable getZoomOutDrawable(float density) {
-        final int R = (int) (4 * density);
-        ShapeDrawable drawable = new ShapeDrawable(new RoundRectShape(new float[]{0, 0, 0, 0, R, R, R, R}, null, null));
-        drawable.getPaint().setColor(Color.WHITE);
-        return drawable;
-    }
+  private void initButton(Button button, String text) {
+    button.setText(text);
+    button.setTextSize(22);
+    button.setPadding(0, 0, 0, 0);
+    button.setWidth((int)(30 * density));
+    button.setHeight((int)(30 * density));
+    button.setSingleLine();
+    button.setGravity(Gravity.CENTER);
+  }
 
-    /**
-     * Update the state of the zoom buttons based on the current map tile layer and its zoom level.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public final void updateButtons() {
-        zoomIn.setEnabled(parent.canZoomIn());
-        zoomOut.setEnabled(parent.canZoomOut());
-    }
+  private static Drawable getZoomInDrawable(float density) {
+    final int R = (int)(4 * density);
+    ShapeDrawable drawable = new ShapeDrawable(new RoundRectShape(new float[] { R, R, R, R, 0, 0, 0, 0 }, null, null));
+    drawable.getPaint().setColor(Color.WHITE);
+    return drawable;
+  }
 
-    private void initButton(Button button, String text) {
-        button.setText(text);
-        button.setTextSize(22);
-        button.setPadding(0, 0, 0, 0);
-        button.setWidth((int) (30 * density));
-        button.setHeight((int) (30 * density));
-        button.setSingleLine();
-        button.setGravity(Gravity.CENTER);
-    }
+  private static Drawable getZoomOutDrawable(float density) {
+    final int R = (int)(4 * density);
+    ShapeDrawable drawable = new ShapeDrawable(new RoundRectShape(new float[] { 0, 0, 0, 0, R, R, R, R }, null, null));
+    drawable.getPaint().setColor(Color.WHITE);
+    return drawable;
+  }
 }

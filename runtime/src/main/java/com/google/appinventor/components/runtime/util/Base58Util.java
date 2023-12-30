@@ -15,10 +15,10 @@
  */
 
 package com.google.appinventor.components.runtime.util;
-
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+
+import java.io.IOException;
 
 /**
  * Base58 is a way to encode Bitcoin addresses (or arbitrary data) as alphanumeric strings.
@@ -48,7 +48,6 @@ public class Base58Util {
     public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
     private static final char ENCODED_ZERO = ALPHABET[0];
     private static final int[] INDEXES = new int[128];
-
     static {
         Arrays.fill(INDEXES, -1);
         for (int i = 0; i < ALPHABET.length; i++) {
@@ -148,7 +147,7 @@ public class Base58Util {
             throw new IllegalArgumentException(from + " > " + to);
         byte[] copy = new byte[newLength];
         System.arraycopy(original, from, copy, 0,
-                Math.min(original.length - from, newLength));
+                         Math.min(original.length - from, newLength));
         return copy;
     }
 
@@ -157,11 +156,11 @@ public class Base58Util {
      * in the specified base, by the given divisor. The given number is modified in-place
      * to contain the quotient, and the return value is the remainder.
      *
-     * @param number     the number to divide
+     * @param number the number to divide
      * @param firstDigit the index within the array of the first non-zero digit
-     *                   (this is used for optimization by skipping the leading zeros)
-     * @param base       the base in which the number's digits are represented (up to 256)
-     * @param divisor    the number to divide by (up to 256)
+     *        (this is used for optimization by skipping the leading zeros)
+     * @param base the base in which the number's digits are represented (up to 256)
+     * @param divisor the number to divide by (up to 256)
      * @return the remainder of the division operation
      */
     private static byte divmod(byte[] number, int firstDigit, int base, int divisor) {

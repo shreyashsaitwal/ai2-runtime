@@ -12,29 +12,29 @@ import java.util.Map;
  * Defines a MapType type used by the Map component.
  */
 public enum MapType implements OptionList<Integer> {
-    Road(1),
-    Aerial(2),
-    Terrain(3);
+  Road(1),
+  Aerial(2),
+  Terrain(3);
 
-    private static final Map<Integer, MapType> lookup = new HashMap<>();
+  private final Integer value;
 
-    static {
-        for (MapType type : MapType.values()) {
-            lookup.put(type.toUnderlyingValue(), type);
-        }
+  MapType(Integer value) {
+    this.value = value;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, MapType> lookup = new HashMap<>();
+
+  static {
+    for (MapType type : MapType.values()) {
+      lookup.put(type.toUnderlyingValue(), type);
     }
+  }
 
-    private final Integer value;
-
-    MapType(Integer value) {
-        this.value = value;
-    }
-
-    public static MapType fromUnderlyingValue(Integer type) {
-        return lookup.get(type);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static MapType fromUnderlyingValue(Integer type) {
+    return lookup.get(type);
+  }
 }

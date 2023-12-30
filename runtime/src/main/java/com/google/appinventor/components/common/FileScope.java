@@ -15,55 +15,55 @@ import java.util.Map;
  * @author ewpatton@mit.edu (Evan W. Patton)
  */
 public enum FileScope implements OptionList<String> {
-    /**
-     * Operations should occur in the app-specific directory on the "external" storage. This is the
-     * default. Since app-specific storage is only supported on SDK 8 and later, this should behave
-     * as App Inventor prior to release nb186.
-     */
-    App,
+  /**
+   * Operations should occur in the app-specific directory on the "external" storage. This is the
+   * default. Since app-specific storage is only supported on SDK 8 and later, this should behave
+   * as App Inventor prior to release nb186.
+   */
+  App,
 
-    /**
-     * Operations should occur against app assets. This can only be used in read operations. Any
-     * write operations attempted on assets should throw an error.
-     */
-    Asset,
+  /**
+   * Operations should occur against app assets. This can only be used in read operations. Any
+   * write operations attempted on assets should throw an error.
+   */
+  Asset,
 
-    /**
-     * Operations should occur on the files in the app's private cache directory.
-     */
-    Cache,
+  /**
+   * Operations should occur on the files in the app's private cache directory.
+   */
+  Cache,
 
-    /**
-     * Operations should occur using legacy logic (pre-nb186). This may break on newer Android
-     * versions and make apps incompatible with Google Play Store guidelines.
-     */
-    Legacy,
+  /**
+   * Operations should occur using legacy logic (pre-nb186). This may break on newer Android
+   * versions and make apps incompatible with Google Play Store guidelines.
+   */
+  Legacy,
 
-    /**
-     * Operations should occur on files in the app's private data directory.
-     */
-    Private,
+  /**
+   * Operations should occur on files in the app's private data directory.
+   */
+  Private,
 
-    /**
-     * Operations should occur on files in the shared media directories. Examples of shared
-     * directories include Downloads and Music.
-     */
-    Shared;
+  /**
+   * Operations should occur on files in the shared media directories. Examples of shared
+   * directories include Downloads and Music.
+   */
+  Shared;
 
-    private static final Map<String, FileScope> LOOKUP = new HashMap<>();
+  private static final Map<String, FileScope> LOOKUP = new HashMap<>();
 
-    static {
-        for (FileScope scope : values()) {
-            LOOKUP.put(scope.toUnderlyingValue(), scope);
-        }
+  static {
+    for (FileScope scope : values()) {
+      LOOKUP.put(scope.toUnderlyingValue(), scope);
     }
+  }
 
-    public static FileScope fromUnderlyingValue(String scope) {
-        return LOOKUP.get(scope);
-    }
+  public static FileScope fromUnderlyingValue(String scope) {
+    return LOOKUP.get(scope);
+  }
 
-    @Override
-    public String toUnderlyingValue() {
-        return name();
-    }
+  @Override
+  public String toUnderlyingValue() {
+    return name();
+  }
 }

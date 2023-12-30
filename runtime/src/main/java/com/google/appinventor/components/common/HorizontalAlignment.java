@@ -13,29 +13,29 @@ import java.util.Map;
  * and Marker.
  */
 public enum HorizontalAlignment implements OptionList<Integer> {
-    Left(1),
-    Center(3), // Yes this is correct.
-    Right(2);
+  Left(1),
+  Center(3), // Yes this is correct.
+  Right(2);
 
-    private static final Map<Integer, HorizontalAlignment> lookup = new HashMap<>();
+  private final int value;
 
-    static {
-        for (HorizontalAlignment alignment : HorizontalAlignment.values()) {
-            lookup.put(alignment.toUnderlyingValue(), alignment);
-        }
+  HorizontalAlignment(int value) {
+    this.value = value;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, HorizontalAlignment> lookup = new HashMap<>();
+
+  static {
+    for (HorizontalAlignment alignment : HorizontalAlignment.values()) {
+      lookup.put(alignment.toUnderlyingValue(), alignment);
     }
+  }
 
-    private final int value;
-
-    HorizontalAlignment(int value) {
-        this.value = value;
-    }
-
-    public static HorizontalAlignment fromUnderlyingValue(Integer alignment) {
-        return lookup.get(alignment);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static HorizontalAlignment fromUnderlyingValue(Integer alignment) {
+    return lookup.get(alignment);
+  }
 }

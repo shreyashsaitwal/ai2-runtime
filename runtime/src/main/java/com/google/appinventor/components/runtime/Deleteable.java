@@ -13,5 +13,5 @@ package com.google.appinventor.components.runtime;
  * @author markf@google.com (Mark Friedman)
  */
 public interface Deleteable {
-    void onDelete();
+  void onDelete();
 }

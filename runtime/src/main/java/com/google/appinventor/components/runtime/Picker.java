@@ -6,70 +6,70 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.content.Intent;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
 import com.google.appinventor.components.runtime.util.AnimationUtil;
+import android.content.Intent;
 
 /**
  * Abstract superclass for all of the "Picker" components.
+ *
  */
-public abstract class Picker extends ButtonBase implements ActivityResultListener {
-    protected final ComponentContainer container;
+/* @SimpleObject
+ */public abstract class Picker extends ButtonBase implements ActivityResultListener {
+  protected final ComponentContainer container;
 
-    /* Used to identify the call to startActivityForResult. Will be passed back into the
-    resultReturned() callback method. */
-    protected int requestCode;
+  /* Used to identify the call to startActivityForResult. Will be passed back into the
+  resultReturned() callback method. */
+  protected int requestCode;
 
-    public Picker(ComponentContainer container) {
-        super(container);
-        this.container = container;
+  public Picker(ComponentContainer container) {
+    super(container);
+    this.container = container;
+  }
+
+  /**
+   *  Provides the Intent used to launch the picker activity.
+   */
+  protected abstract Intent getIntent();
+
+  @Override
+  public void click() {
+    BeforePicking();
+    if (requestCode == 0) { // only need to register once
+      requestCode = container.$form().registerForActivityResult(this);
     }
+    container.$context().startActivityForResult(getIntent(), requestCode);
+    String openAnim = container.$form().OpenScreenAnimation();
+    AnimationUtil.ApplyOpenScreenAnimation(container.$context(), openAnim);
+  }
 
-    /**
-     * Provides the Intent used to launch the picker activity.
-     */
-    protected abstract Intent getIntent();
+  // Functions
 
-    @Override
-    public void click() {
-        BeforePicking();
-        if (requestCode == 0) { // only need to register once
-            requestCode = container.$form().registerForActivityResult(this);
-        }
-        container.$context().startActivityForResult(getIntent(), requestCode);
-        String openAnim = container.$form().OpenScreenAnimation();
-        AnimationUtil.ApplyOpenScreenAnimation(container.$context(), openAnim);
-    }
+  /**
+   * Opens the `%type%`, as though the user clicked on it.
+   */
+  /* @SimpleFunction(description = "Opens the %type%, as though the user clicked on it.") */
+  public void Open() {
+    click();
+  }
 
-    // Functions
+  // Events
 
-    /**
-     * Opens the `%type%`, as though the user clicked on it.
-     */
-    @SimpleFunction(description = "Opens the %type%, as though the user clicked on it.")
-    public void Open() {
-        click();
-    }
+  /**
+   * Event to raise when the `%type%` is clicked or the picker is shown
+   * using the {@link #Open()} method.  This event occurs before the picker is displayed, and
+   * can be used to prepare the picker before it is shown.
+   */
+  /* @SimpleEvent
+   */public void BeforePicking() {
+    EventDispatcher.dispatchEvent(this, "BeforePicking");
+  }
 
-    // Events
-
-    /**
-     * Event to raise when the `%type%` is clicked or the picker is shown
-     * using the {@link #Open()} method.  This event occurs before the picker is displayed, and
-     * can be used to prepare the picker before it is shown.
-     */
-    @SimpleEvent
-    public void BeforePicking() {
-        EventDispatcher.dispatchEvent(this, "BeforePicking");
-    }
-
-    /**
-     * Event to be raised after the `%type%` activity returns its
-     * result and the properties have been filled in.
-     */
-    @SimpleEvent
-    public void AfterPicking() {
-        EventDispatcher.dispatchEvent(this, "AfterPicking");
-    }
+  /**
+   * Event to be raised after the `%type%` activity returns its
+   * result and the properties have been filled in.
+   */
+  /* @SimpleEvent
+   */public void AfterPicking() {
+    EventDispatcher.dispatchEvent(this, "AfterPicking");
+  }
 }

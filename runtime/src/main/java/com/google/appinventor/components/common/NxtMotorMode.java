@@ -18,31 +18,31 @@ import java.util.Map;
  * https://www.mindstorms.rwth-aachen.de/documents/downloads/doc/version-4.07/help/NXT_SetInputMode.html
  */
 public enum NxtMotorMode implements OptionList<Integer> {
-    On(0x01),
-    Brake(0x02),  // Allows for electronic breaking, which improves accuracy of motor output.
-    @Default
-    Regulated(0x04),  // Allows regulation based on the regulationMode property.
-    Coast(0x00);  // Motors will rotate freely.
+  On(0x01),
+  Brake(0x02),  // Allows for electronic breaking, which improves accuracy of motor output.
+  @Default
+  Regulated(0x04),  // Allows regulation based on the regulationMode property.
+  Coast(0x00);  // Motors will rotate freely.
 
-    private static final Map<Integer, NxtMotorMode> lookup = new HashMap<>();
+  private final int value;
 
-    static {
-        for (NxtMotorMode mode : NxtMotorMode.values()) {
-            lookup.put(mode.toUnderlyingValue(), mode);
-        }
+  NxtMotorMode(int mode) {
+    this.value = mode;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, NxtMotorMode> lookup = new HashMap<>();
+
+  static {
+    for (NxtMotorMode mode : NxtMotorMode.values()) {
+      lookup.put(mode.toUnderlyingValue(), mode);
     }
+  }
 
-    private final int value;
-
-    NxtMotorMode(int mode) {
-        this.value = mode;
-    }
-
-    public static NxtMotorMode fromUnderlyingValue(Integer mode) {
-        return lookup.get(mode);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static NxtMotorMode fromUnderlyingValue(Integer mode) {
+    return lookup.get(mode);
+  }
 }

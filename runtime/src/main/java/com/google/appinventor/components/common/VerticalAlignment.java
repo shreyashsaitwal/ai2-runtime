@@ -13,30 +13,30 @@ import java.util.Map;
  * and Marker.
  */
 public enum VerticalAlignment implements OptionList<Integer> {
-    Top(1),
-    Center(2),
-    Bottom(3);
+  Top(1),
+  Center(2),
+  Bottom(3);
 
-    private static final Map<Integer, VerticalAlignment> lookup = new HashMap<>();
+  private final int value;
 
-    static {
-        for (VerticalAlignment alignment : VerticalAlignment.values()) {
-            lookup.put(alignment.toUnderlyingValue(), alignment);
-        }
+  VerticalAlignment(int value) {
+    this.value = value;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, VerticalAlignment> lookup = new HashMap<>();
+
+  static {
+    for (VerticalAlignment alignment : VerticalAlignment.values()) {
+      lookup.put(alignment.toUnderlyingValue(), alignment);
     }
+  }
 
-    private final int value;
-
-    VerticalAlignment(int value) {
-        this.value = value;
-    }
-
-    public static VerticalAlignment fromUnderlyingValue(Integer alignment) {
-        return lookup.get(alignment);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static VerticalAlignment fromUnderlyingValue(Integer alignment) {
+    return lookup.get(alignment);
+  }
 }
 

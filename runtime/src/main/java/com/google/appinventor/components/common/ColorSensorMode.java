@@ -12,35 +12,35 @@ import java.util.Map;
  * Defines a ColorSensorMode type used by the Lego Ev3 color sensor.
  */
 public enum ColorSensorMode implements OptionList<String> {
-    Reflected("reflected", 0),
-    Ambient("ambient", 1),
-    Color("color", 2);
+  Reflected("reflected", 0),
+  Ambient("ambient", 1),
+  Color("color", 2);
 
-    private static final Map<String, ColorSensorMode> lookup = new HashMap<>();
+  private final String value;
+  private final int intValue;
 
-    static {
-        for (ColorSensorMode mode : ColorSensorMode.values()) {
-            lookup.put(mode.toUnderlyingValue(), mode);
-        }
+  ColorSensorMode(String mode, int intMode) {
+    this.value = mode;
+    this.intValue = intMode;
+  }
+
+  public String toUnderlyingValue() {
+    return value;
+  }
+
+  public Integer toInt() {
+    return this.intValue;
+  }
+
+  private static final Map<String, ColorSensorMode> lookup = new HashMap<>();
+
+  static {
+    for (ColorSensorMode mode : ColorSensorMode.values()) {
+      lookup.put(mode.toUnderlyingValue(), mode);
     }
+  }
 
-    private final String value;
-    private final int intValue;
-
-    ColorSensorMode(String mode, int intMode) {
-        this.value = mode;
-        this.intValue = intMode;
-    }
-
-    public static ColorSensorMode fromUnderlyingValue(String mode) {
-        return lookup.get(mode);
-    }
-
-    public String toUnderlyingValue() {
-        return value;
-    }
-
-    public Integer toInt() {
-        return this.intValue;
-    }
+  public static ColorSensorMode fromUnderlyingValue(String mode) {
+    return lookup.get(mode);
+  }
 }

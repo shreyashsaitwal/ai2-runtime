@@ -10,19 +10,20 @@ package com.google.appinventor.components.runtime.util;
  * transform the result of an asynchronous operation while passing through any error or failure
  * states to the original callback.
  *
+ * @author ewpatton
+ *
  * @param <S> Source (original) type expected by the callback
  * @param <T> Target type that the source result will be transformed into
- * @author ewpatton
  */
 public abstract class AsyncCallbackFacade<S, T> implements AsyncCallbackPair<S> {
-    protected final AsyncCallbackPair<T> callback;
+  protected final AsyncCallbackPair<T> callback;
 
-    public AsyncCallbackFacade(AsyncCallbackPair<T> target) {
-        this.callback = target;
-    }
+  public AsyncCallbackFacade(AsyncCallbackPair<T> target) {
+    this.callback = target;
+  }
 
-    @Override
-    public void onFailure(String message) {
-        this.callback.onFailure(message);
-    }
+  @Override
+  public void onFailure(String message) {
+    this.callback.onFailure(message);
+  }
 }

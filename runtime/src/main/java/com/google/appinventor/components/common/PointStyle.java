@@ -9,36 +9,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum PointStyle implements OptionList<Integer> {
-    Circle(0),
-    Square(1),
-    Triangle(2),
-    Cross(3),
-    X(4);
+  Circle(0),
+  Square(1),
+  Triangle(2),
+  Cross(3),
+  X(4);
 
-    private static final Map<Integer, PointStyle> LOOKUP = new HashMap<>();
+  private static final Map<Integer, PointStyle> LOOKUP = new HashMap<>();
 
-    static {
-        for (PointStyle style : values()) {
-            LOOKUP.put(style.toUnderlyingValue(), style);
-        }
+  static {
+    for (PointStyle style : values()) {
+      LOOKUP.put(style.toUnderlyingValue(), style);
     }
+  }
 
-    private final int value;
+  private final int value;
 
-    PointStyle(int value) {
-        this.value = value;
-    }
+  PointStyle(int value) {
+    this.value = value;
+  }
 
-    public static PointStyle fromUnderlyingValue(Integer value) {
-        return LOOKUP.get(value);
-    }
+  @Override
+  public Integer toUnderlyingValue() {
+    return value;
+  }
 
-    public static PointStyle fromUnderlyingValue(String value) {
-        return fromUnderlyingValue(Integer.parseInt(value));
-    }
+  public static PointStyle fromUnderlyingValue(Integer value) {
+    return LOOKUP.get(value);
+  }
 
-    @Override
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static PointStyle fromUnderlyingValue(String value) {
+    return fromUnderlyingValue(Integer.parseInt(value));
+  }
 }

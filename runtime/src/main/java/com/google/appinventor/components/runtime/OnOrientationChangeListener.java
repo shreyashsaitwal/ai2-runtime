@@ -9,5 +9,5 @@ package com.google.appinventor.components.runtime;
  * Listener for distributing the Activity onOrientationChange() method to interested components.
  */
 public interface OnOrientationChangeListener {
-    public void onOrientationChange();
+  public void onOrientationChange();
 }

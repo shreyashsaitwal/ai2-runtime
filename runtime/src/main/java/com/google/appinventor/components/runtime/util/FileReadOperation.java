@@ -5,6 +5,7 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import android.net.Uri;
 import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.Form;
@@ -25,42 +26,45 @@ import java.io.InputStream;
  */
 public class FileReadOperation extends FileStreamOperation<InputStream> {
 
-    /**
-     * Create a new FileReadOperation.
-     *
-     * @param form      the Form object to use as a Context and to ask for permissions, if needed
-     * @param component the Component requesting the file operation
-     * @param method    the method of {@code component} requesting the file operation
-     * @param fileName  the name of the file to be accessed, using the File semantics
-     * @param scope     permission mode to use for locating the file and asking permissions
-     * @param async     true if the operation should be performed on a separate thread to prevent
-     *                  blocking the UI thread
-     */
-    public FileReadOperation(Form form, Component component, String method, String fileName,
-                             FileScope scope, boolean async) {
-        super(form, component, method, fileName, scope, FileAccessMode.READ, async);
-    }
+  /**
+   * Create a new FileReadOperation.
+   *
+   * @param form the Form object to use as a Context and to ask for permissions, if needed
+   * @param component the Component requesting the file operation
+   * @param method the method of {@code component} requesting the file operation
+   * @param fileName the name of the file to be accessed, using the File semantics
+   * @param scope permission mode to use for locating the file and asking permissions
+   * @param async true if the operation should be performed on a separate thread to prevent
+   *              blocking the UI thread
+   */
+  public FileReadOperation(Form form, Component component, String method, String fileName,
+      FileScope scope, boolean async) {
+    super(form, component, method, fileName, scope, FileAccessMode.READ, async);
+  }
 
-    @Override
-    protected boolean process(InputStream stream) throws IOException {
-        return process(IOUtils.readStream(stream));
-    }
+  @Override
+  protected boolean process(InputStream stream) throws IOException {
+    return process(IOUtils.readStream(stream));
+  }
 
-    /**
-     * Process the contents of the file as a byte array. The default implementation does nothing.
-     * Subclasses should override this method or {@link #process(InputStream)} if they need special
-     * handling of the stream beyond reading the entire contents into a buffer.
-     *
-     * @param contents the contents of the file
-     * @return true if the stream should be closed by the caller, or false if the implementation
-     * has taken ownership of the stream.
-     */
-    public boolean process(@SuppressWarnings("unused") byte[] contents) {
-        return true;
-    }
+  /**
+   * Process the contents of the file as a byte array. The default implementation does nothing.
+   * Subclasses should override this method or {@link #process(InputStream)} if they need special
+   * handling of the stream beyond reading the entire contents into a buffer.
+   *
+   * @param contents the contents of the file
+   * @return true if the stream should be closed by the caller, or false if the implementation
+   *     has taken ownership of the stream.
+   */
+  public boolean process(@SuppressWarnings("unused") byte[] contents) {
+    return true;
+  }
 
-    @Override
-    protected InputStream openFile() throws IOException {
-        return FileUtil.openForReading(form, scopedFile);
+  @Override
+  protected InputStream openFile() throws IOException {
+    if (scopedFile.getFileName().startsWith("content:")) {
+      return form.getContentResolver().openInputStream(Uri.parse(scopedFile.getFileName()));
     }
+    return FileUtil.openForReading(form, scopedFile);
+  }
 }

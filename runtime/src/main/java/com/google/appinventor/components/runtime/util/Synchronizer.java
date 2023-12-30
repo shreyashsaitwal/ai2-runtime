@@ -10,71 +10,71 @@ package com.google.appinventor.components.runtime.util;
  * and await the result (blocking the UI Thread :-().
  */
 public class Synchronizer<T> {
-    private volatile boolean finished = false;
-    private T result;
-    private String errorMessage;
-    private Throwable error;
+  private volatile boolean finished = false;
+  private T result;
+  private String errorMessage;
+  private Throwable error;
 
-    /**
-     * Wait for a result to be reported to the Synchronizer.
-     */
-    public synchronized void waitfor() {
-        while (!finished) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                // Will attempt to try again...
-            }
-        }
+  /**
+   * Wait for a result to be reported to the Synchronizer.
+   */
+  public synchronized void waitfor() {
+    while (!finished) {
+      try {
+        wait();
+      } catch (InterruptedException e) {
+        // Will attempt to try again...
+      }
     }
+  }
 
-    /**
-     * Wake the thread(s) waiting for a result from the Synchronizer.
-     *
-     * @param result the result of the computation
-     */
-    public synchronized void wakeup(T result) {
-        finished = true;
-        this.result = result;
-        notifyAll();
-    }
+  /**
+   * Wake the thread(s) waiting for a result from the Synchronizer.
+   *
+   * @param result the result of the computation
+   */
+  public synchronized void wakeup(T result) {
+    finished = true;
+    this.result = result;
+    notifyAll();
+  }
 
-    /**
-     * Report an error to any thread(s) waiting on the Synchronizer.
-     *
-     * @param error an error message to report to the original thread
-     */
-    public synchronized void error(String error) {
-        finished = true;
-        this.errorMessage = error;
-        notifyAll();
-    }
+  /**
+   * Report an error to any thread(s) waiting on the Synchronizer.
+   *
+   * @param error an error message to report to the original thread
+   */
+  public synchronized void error(String error) {
+    finished = true;
+    this.errorMessage = error;
+    notifyAll();
+  }
 
-    /**
-     * Report a Throwable (e.g., an exception) to any thread(s) waiting on the Synchronizer.
-     *
-     * @param error a throwable caught during processing
-     */
-    public synchronized void caught(Throwable error) {
-        finished = true;
-        this.error = error;
-        notifyAll();
-    }
+  /**
+   * Report a Throwable (e.g., an exception) to any thread(s) waiting on the Synchronizer.
+   *
+   * @param error a throwable caught during processing
+   */
+  public synchronized void caught(Throwable error) {
+    finished = true;
+    this.error = error;
+    notifyAll();
+  }
 
-    public T getResult() {
-        return result;
-    }
+  public T getResult() {
+    return result;
+  }
 
-    public String getError() {
-        return errorMessage;
-    }
+  public String getError() {
+    return errorMessage;
+  }
 
-    public Throwable getThrowable() {
-        return error;
-    }
+  public Throwable getThrowable() {
+    return error;
+  }
 
-    @Override
-    public String toString() {
-        return "Synchronizer(" + result + ", " + error + ", " + errorMessage + ")";
-    }
+  @Override
+  public String toString() {
+    return "Synchronizer(" + result + ", " + error + ", " + errorMessage + ")";
+  }
 }

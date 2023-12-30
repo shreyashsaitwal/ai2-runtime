@@ -6,7 +6,6 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.NxtSensorPort;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 
@@ -16,58 +15,59 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public abstract class LegoMindstormsNxtSensor extends LegoMindstormsNxtBase {
-    protected NxtSensorPort port;
+/* @SimpleObject
+ */public abstract class LegoMindstormsNxtSensor extends LegoMindstormsNxtBase {
+  static class SensorValue<T> {
+    final boolean valid;
+    final T value;
+    SensorValue(boolean valid, T value) {
+      this.valid = valid;
+      this.value = value;
+    }
+  }
 
-    /**
-     * Creates a new LegoMindstormsNxtSensor.
-     */
-    protected LegoMindstormsNxtSensor(ComponentContainer container, String logTag) {
-        super(container, logTag);
+  protected NxtSensorPort port;
+
+  /**
+   * Creates a new LegoMindstormsNxtSensor.
+   */
+  protected LegoMindstormsNxtSensor(ComponentContainer container, String logTag) {
+    super(container, logTag);
+  }
+
+  /**
+   * Returns the sensor port that the sensor is connected to.
+   */
+  /* @SimpleProperty(description = "The sensor port that the sensor is connected to.",
+      category = PropertyCategory.BEHAVIOR, userVisible = false) */
+  public String SensorPort() {
+    return port.toUnderlyingValue();
+  }
+
+  // Since different kinds of sensors need to have a different defaultValue for the SensorPort
+  // property, the SensorPort property setter method must be defined in each subclass.
+  public abstract void SensorPort(String sensorPortLetter);
+
+  protected final void setSensorPort(String sensorPortLetter) {
+    String functionName = "SensorPort";
+    // Make sure sensorPortLetter is a valid NxtSensorPort.
+    NxtSensorPort port = NxtSensorPort.fromUnderlyingValue(sensorPortLetter);
+    if (port == null) {
+      form.dispatchErrorOccurredEvent(this, functionName,
+          ErrorMessages.ERROR_NXT_INVALID_SENSOR_PORT, sensorPortLetter);
+      return;
     }
 
-    /**
-     * Returns the sensor port that the sensor is connected to.
-     */
-    @SimpleProperty(description = "The sensor port that the sensor is connected to.", userVisible = false)
-    public String SensorPort() {
-        return port.toUnderlyingValue();
+    this.port = port;
+    if (bluetooth != null && bluetooth.IsConnected()) {
+      initializeSensor(functionName);
     }
+  }
 
-    // Since different kinds of sensors need to have a different defaultValue for the SensorPort
-    // property, the SensorPort property setter method must be defined in each subclass.
-    public abstract void SensorPort(String sensorPortLetter);
+  @Override
+  public void afterConnect(BluetoothConnectionBase bluetoothConnection) {
+    initializeSensor("Connect");
+  }
 
-    protected final void setSensorPort(String sensorPortLetter) {
-        String functionName = "SensorPort";
-        // Make sure sensorPortLetter is a valid NxtSensorPort.
-        NxtSensorPort port = NxtSensorPort.fromUnderlyingValue(sensorPortLetter);
-        if (port == null) {
-            form.dispatchErrorOccurredEvent(this, functionName,
-                    ErrorMessages.ERROR_NXT_INVALID_SENSOR_PORT, sensorPortLetter);
-            return;
-        }
-
-        this.port = port;
-        if (bluetooth != null && bluetooth.IsConnected()) {
-            initializeSensor(functionName);
-        }
-    }
-
-    @Override
-    public void afterConnect(BluetoothConnectionBase bluetoothConnection) {
-        initializeSensor("Connect");
-    }
-
-    protected abstract void initializeSensor(String functionName);
-
-    static class SensorValue<T> {
-        final boolean valid;
-        final T value;
-
-        SensorValue(boolean valid, T value) {
-            this.valid = valid;
-            this.value = value;
-        }
-    }
+  protected abstract void initializeSensor(String functionName);
 }

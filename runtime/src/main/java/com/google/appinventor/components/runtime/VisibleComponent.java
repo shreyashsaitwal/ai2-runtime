@@ -6,72 +6,74 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleProperty;
-
 /**
  * Superclass of visible components in the runtime libraries.
  * <p>
  * Defines standard properties and events.
+ *
  */
-public abstract class VisibleComponent implements Component {
-    protected VisibleComponent() {
-    }
+/* @SimpleObject
+ */public abstract class VisibleComponent implements Component {
+  protected VisibleComponent() {
+  }
 
-    /**
-     * Width property getter method.
-     *
-     * @return width property used by the layout
-     */
-    @SimpleProperty(
-    )
-    public abstract int Width();
+  /**
+   * Width property getter method.
+   *
+   * @return  width property used by the layout
+   */
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+  public abstract int Width();
 
-    /**
-     * Width property setter method.
-     *
-     * @param width width property used by the layout
-     */
-    @SimpleProperty
-    public abstract void Width(int width);
+  /**
+   * Width property setter method.
+   *
+   * @param width  width property used by the layout
+   */
+  /* @SimpleProperty
+   */public abstract void Width(int width);
 
-    /**
-     * Width property setter method.
-     * <p>
-     * This version takes a percentage of the parent
-     * component's width as its input.
-     *
-     * @param wPercent width as a percent of its parent
-     */
-    @SimpleProperty(
-    )
-    public abstract void WidthPercent(int wPercent);
+  /**
+   * Width property setter method.
+   *
+   * This version takes a percentage of the parent
+   * component's width as its input.
+   *
+   * @param wPercent width as a percent of its parent
+   *
+   */
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+  public abstract void WidthPercent(int wPercent);
 
-    /**
-     * Height property getter method.
-     *
-     * @return height property used by the layout
-     */
-    @SimpleProperty(
-    )
-    public abstract int Height();
+  /**
+   * Height property getter method.
+   *
+   * @return  height property used by the layout
+   */
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+  public abstract int Height();
 
-    /**
-     * Height property setter method.
-     *
-     * @param height height property used by the layout
-     */
-    @SimpleProperty
-    public abstract void Height(int height);
+  /**
+   * Height property setter method.
+   *
+   * @param height  height property used by the layout
+   */
+  /* @SimpleProperty
+   */public abstract void Height(int height);
 
-    /**
-     * Height property setter method.
-     * <p>
-     * This version takes a percentage of the parent
-     * component's height as its input.
-     *
-     * @param hPercent width as a percent of the height of its parent
-     */
-    @SimpleProperty(
-    )
-    public abstract void HeightPercent(int hPercent);
+  /**
+   * Height property setter method.
+   *
+   * This version takes a percentage of the parent
+   * component's height as its input.
+   *
+   * @param hPercent width as a percent of the height of its parent
+   *
+   */
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+  public abstract void HeightPercent(int hPercent);
 }

@@ -8,5 +8,5 @@ package com.google.appinventor.components.runtime.util;
  * @author Evan W. Patton (ewpatton@mit.edu)
  */
 public interface Continuation<T> {
-    void call(T value);
+  void call(T value);
 }

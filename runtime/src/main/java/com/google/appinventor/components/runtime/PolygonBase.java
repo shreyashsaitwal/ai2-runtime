@@ -12,8 +12,9 @@ import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureVisit
  * An abstract class to override properties relevant to any polygonal map features. Note that Circle
  * is included in this hierarchy because OSMDroid draws circles as 60-sided polygons.
  */
-public abstract class PolygonBase extends MapFeatureBaseWithFill {
-    public PolygonBase(MapFactory.MapFeatureContainer container, MapFeatureVisitor<Double> distanceComputation) {
-        super(container, distanceComputation);
-    }
+/* @SimpleObject
+ */public abstract class PolygonBase extends MapFeatureBaseWithFill {
+  public PolygonBase(MapFactory.MapFeatureContainer container, MapFeatureVisitor<Double> distanceComputation) {
+    super(container, distanceComputation);
+  }
 }

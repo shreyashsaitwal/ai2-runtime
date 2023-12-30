@@ -15,20 +15,20 @@ import java.io.File;
 
 public final class NougatUtil {
 
-    private static final String LOG_TAG = NougatUtil.class.getSimpleName();
+  private static final String LOG_TAG = NougatUtil.class.getSimpleName();
 
-    private NougatUtil() {
-    }
+  private NougatUtil() {
+  }
 
-    public static Uri getPackageUri(Form form, File apk) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            // Use file: URI on versions of Android older the Nougat
-            return Uri.fromFile(apk);
-        } else {
-            // File provider used for SDK 24+ to get a content: URI
-            String packageName = form.$context().getPackageName();
-            Log.d(LOG_TAG, "packageName = " + packageName);
-            return FileProvider.getUriForFile(form.$context(), packageName + ".provider", apk);
-        }
+  public static Uri getPackageUri(Form form, File apk) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+      // Use file: URI on versions of Android older the Nougat
+      return Uri.fromFile(apk);
+    } else {
+      // File provider used for SDK 24+ to get a content: URI
+      String packageName = form.$context().getPackageName();
+      Log.d(LOG_TAG, "packageName = " + packageName);
+      return FileProvider.getUriForFile(form.$context(), packageName + ".provider", apk);
     }
+  }
 }

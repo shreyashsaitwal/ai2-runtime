@@ -9,6 +9,8 @@ package com.google.appinventor.components.runtime.errors;
 /**
  * Runtime error indicating an array access with an index that is outside of
  * the array bounds.
+ *
  */
-public class ArrayIndexOutOfBoundsError extends RuntimeError {
+/* @SimpleObject
+ */public class ArrayIndexOutOfBoundsError extends RuntimeError {
 }

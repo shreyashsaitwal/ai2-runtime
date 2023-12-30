@@ -12,28 +12,28 @@ import java.util.Map;
  * Defines a StartedStatus type used by the PhoneCall component.
  */
 public enum StartedStatus implements OptionList<Integer> {
-    Incoming(1),
-    Outgoing(2);
+  Incoming(1),
+  Outgoing(2);
 
-    private static final Map<Integer, StartedStatus> lookup = new HashMap<>();
+  private final int value;
 
-    static {
-        for (StartedStatus status : StartedStatus.values()) {
-            lookup.put(status.toUnderlyingValue(), status);
-        }
+  StartedStatus(int status) {
+    this.value = status;
+  }
+
+  public Integer toUnderlyingValue() {
+    return value;
+  }
+
+  private static final Map<Integer, StartedStatus> lookup = new HashMap<>();
+
+  static {
+    for (StartedStatus status : StartedStatus.values()) {
+      lookup.put(status.toUnderlyingValue(), status);
     }
+  }
 
-    private final int value;
-
-    StartedStatus(int status) {
-        this.value = status;
-    }
-
-    public static StartedStatus fromUnderlyingValue(Integer status) {
-        return lookup.get(status);
-    }
-
-    public Integer toUnderlyingValue() {
-        return value;
-    }
+  public static StartedStatus fromUnderlyingValue(Integer status) {
+    return lookup.get(status);
+  }
 }

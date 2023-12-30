@@ -13,5 +13,5 @@ package com.google.appinventor.components.runtime;
  */
 
 public interface OnStopListener {
-    public void onStop();
+  public void onStop();
 }

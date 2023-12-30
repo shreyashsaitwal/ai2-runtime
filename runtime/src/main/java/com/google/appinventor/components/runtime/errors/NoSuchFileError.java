@@ -8,15 +8,17 @@ package com.google.appinventor.components.runtime.errors;
 
 /**
  * Runtime error indicating that no file for the given name could be found.
+ *
  */
-public class NoSuchFileError extends RuntimeError {
+/* @SimpleObject
+ */public class NoSuchFileError extends RuntimeError {
 
-    /**
-     * Creates a new error.
-     *
-     * @param message detailed message
-     */
-    public NoSuchFileError(String message) {
-        super(message);
-    }
+  /**
+   * Creates a new error.
+   *
+   * @param message  detailed message
+   */
+  public NoSuchFileError(String message) {
+    super(message);
+  }
 }

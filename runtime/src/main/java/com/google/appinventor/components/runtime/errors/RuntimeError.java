@@ -8,48 +8,50 @@ package com.google.appinventor.components.runtime.errors;
 
 /**
  * Superclass of all Simple runtime errors.
+ *
  */
-public abstract class RuntimeError extends RuntimeException {
+/* @SimpleObject
+ */public abstract class RuntimeError extends RuntimeException {
 
-    /**
-     * Creates a runtime error.
-     */
-    protected RuntimeError() {
+  /**
+   * Creates a runtime error.
+   */
+  protected RuntimeError() {
+  }
+
+  /**
+   * Creates a runtime error with a more detailed error message.
+   *
+   * @param message  detailed error message
+   */
+  protected RuntimeError(String message) {
+    super(message);
+  }
+
+  /**
+   * Converts a Java {@link Throwable} into a Simple runtime error.
+   *
+   * @param throwable  Java throwable to be converted (may be a Simple runtime
+   *                   error already)
+   * @return  Simple runtime error
+   */
+  public static RuntimeError convertToRuntimeError(Throwable throwable) {
+    if (throwable instanceof RuntimeError) {
+      return (RuntimeError) throwable;
     }
 
-    /**
-     * Creates a runtime error with a more detailed error message.
-     *
-     * @param message detailed error message
-     */
-    protected RuntimeError(String message) {
-        super(message);
+    // Conversions of Java exceptions
+    if (throwable instanceof ArrayIndexOutOfBoundsException) {
+      return new ArrayIndexOutOfBoundsError();
+    }
+    if (throwable instanceof IllegalArgumentException) {
+      return new IllegalArgumentError();
+    }
+    if (throwable instanceof NullPointerException) {
+      return new UninitializedInstanceError();
     }
 
-    /**
-     * Converts a Java {@link Throwable} into a Simple runtime error.
-     *
-     * @param throwable Java throwable to be converted (may be a Simple runtime
-     *                  error already)
-     * @return Simple runtime error
-     */
-    public static RuntimeError convertToRuntimeError(Throwable throwable) {
-        if (throwable instanceof RuntimeError) {
-            return (RuntimeError) throwable;
-        }
-
-        // Conversions of Java exceptions
-        if (throwable instanceof ArrayIndexOutOfBoundsException) {
-            return new ArrayIndexOutOfBoundsError();
-        }
-        if (throwable instanceof IllegalArgumentException) {
-            return new IllegalArgumentError();
-        }
-        if (throwable instanceof NullPointerException) {
-            return new UninitializedInstanceError();
-        }
-
-        // TODO(user): needs to be implemented
-        throw new UnsupportedOperationException(throwable);
-    }
+    // TODO(user): needs to be implemented
+    throw new UnsupportedOperationException(throwable);
+  }
 }

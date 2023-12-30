@@ -5,24 +5,37 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.ComponentConstants;
+import com.google.appinventor.components.common.YaVersion;
 
 /**
  * A formatting element in which to place components that should be displayed one below another.
  * (The first child component is stored on top, the second beneath it, etc.) If you wish to have
  * components displayed next to one another, use {@link HorizontalScrollArrangement} instead.
- * <p>
+ *
  * This version is scrollable.
  *
  * @author sharon@google.com (Sharon Perl)
  * @author jis@mit.edu (Jeffrey I. Schiller)
+ *
  */
 
-public class VerticalScrollArrangement extends HVArrangement {
+/* @DesignerComponent(version = YaVersion.VERTICALSCROLLARRANGEMENT_COMPONENT_VERSION,
+    description = "<p>A formatting element in which to place components " +
+    "that should be displayed one below another.  (The first child component " +
+    "is stored on top, the second beneath it, etc.)  If you wish to have " +
+    "components displayed next to one another, use " +
+    "<code>HorizontalArrangement<//code> instead.<//p><p> " +
+    "This version is scrollable",
+    category = ComponentCategory.LAYOUT,
+    iconName = "images//vertical.png") */
+/* @SimpleObject
+ */public class VerticalScrollArrangement extends HVArrangement {
 
-    public VerticalScrollArrangement(ComponentContainer container) {
-        super(container, ComponentConstants.LAYOUT_ORIENTATION_VERTICAL,
-                ComponentConstants.SCROLLABLE_ARRANGEMENT);
-    }
+  public VerticalScrollArrangement(ComponentContainer container) {
+    super(container, ComponentConstants.LAYOUT_ORIENTATION_VERTICAL,
+      ComponentConstants.SCROLLABLE_ARRANGEMENT);
+  }
 
 }

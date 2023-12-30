@@ -8,6 +8,8 @@ package com.google.appinventor.components.runtime;
 
 /**
  * Marker interface for Simple sensor components.
+ *
  */
-public interface SensorComponent extends Component {
+/* @SimpleObject
+ */public interface SensorComponent extends Component {
 }

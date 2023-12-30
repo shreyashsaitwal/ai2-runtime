@@ -14,5 +14,5 @@ import android.view.Menu;
  * @author lizlooney@google.com (Liz Looney)
  */
 public interface OnCreateOptionsMenuListener {
-    public void onCreateOptionsMenu(Menu menu);
+  public void onCreateOptionsMenu(Menu menu);
 }

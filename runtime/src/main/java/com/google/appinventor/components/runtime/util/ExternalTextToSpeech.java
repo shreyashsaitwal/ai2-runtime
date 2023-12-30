@@ -6,11 +6,12 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import com.google.appinventor.components.runtime.ActivityResultListener;
+import com.google.appinventor.components.runtime.ComponentContainer;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.speech.tts.TextToSpeech;
-import com.google.appinventor.components.runtime.ActivityResultListener;
-import com.google.appinventor.components.runtime.ComponentContainer;
 
 import java.util.Locale;
 
@@ -27,77 +28,85 @@ import java.util.Locale;
 
 public class ExternalTextToSpeech implements ITextToSpeech, ActivityResultListener {
 
-    private static final String TTS_INTENT = "com.google.tts.makeBagel";
-    private final ComponentContainer container;
-    private final TextToSpeechCallback callback;
-    /* Used to identify the call to startActivityForResult. Will be passed back
-       into the resultReturned() callback method. */
-    private int requestCode;
+  private static final String TTS_INTENT = "com.google.tts.makeBagel";
 
-    public ExternalTextToSpeech(ComponentContainer container,
-                                TextToSpeechCallback callback) {
-        this.container = container;
-        this.callback = callback;
+  /* Used to identify the call to startActivityForResult. Will be passed back
+     into the resultReturned() callback method. */
+  private int requestCode;
+
+  private final ComponentContainer container;
+
+  private final TextToSpeechCallback callback;
+
+  public ExternalTextToSpeech(ComponentContainer container,
+                              TextToSpeechCallback callback) {
+    this.container = container;
+    this.callback = callback;
+  }
+
+  @Override
+  public void speak(String message, Locale loc) {
+    Intent intent = new Intent(TTS_INTENT);
+    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+    intent.putExtra("message", message);
+    intent.putExtra("language", loc.getISO3Language());
+    intent.putExtra("country", loc.getISO3Country());
+    if (requestCode == 0) {
+      requestCode = container.$form().registerForActivityResult(this);
     }
+    container.$context().startActivityForResult(intent, requestCode);
+  }
 
-    @Override
-    public void speak(String message, Locale loc) {
-        Intent intent = new Intent(TTS_INTENT);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.putExtra("message", message);
-        intent.putExtra("language", loc.getISO3Language());
-        intent.putExtra("country", loc.getISO3Country());
-        if (requestCode == 0) {
-            requestCode = container.$form().registerForActivityResult(this);
-        }
-        container.$context().startActivityForResult(intent, requestCode);
-    }
+  @Override
+  public void onDestroy() {
+    // nothing to do
+  }
 
-    @Override
-    public void onDestroy() {
-        // nothing to do
-    }
+  @Override
+  public void onStop() {
+    // nothing to do
+  }
 
-    @Override
-    public void onStop() {
-        // nothing to do
-    }
+  @Override
+  public void onResume() {
+    // nothing to do
+  }
 
-    @Override
-    public void onResume() {
-        // nothing to do
-    }
-
-    @Override
+  @Override
     public void setPitch(float pitch) {
         // nothing to do
     }
 
     @Override
     public void setSpeechRate(float speechRate) {
-        // nothing to do
-    }
+    // nothing to do
+  }
 
-    @Override
-    public void resultReturned(int requestCode, int resultCode, Intent data) {
-        boolean isSuccess = (requestCode == this.requestCode) && (resultCode == Activity.RESULT_OK);
-        if (isSuccess) {
-            callback.onSuccess();
-        } else {
-            callback.onFailure();
-        }
+  @Override
+  public void resultReturned(int requestCode, int resultCode, Intent data) {
+    boolean isSuccess = (requestCode == this.requestCode) && (resultCode == Activity.RESULT_OK);
+    if (isSuccess) {
+      callback.onSuccess();
+    } else {
+      callback.onFailure();
     }
+  }
 
-    // External TextToSpeech is obsolete, so we'll just report that no languages are available
-    // In reality, we won't call this from TextToSpeech in pre-Gingerbread systems
-    public int isLanguageAvailable(Locale loc) {
-        return TextToSpeech.LANG_MISSING_DATA;
-    }
+  @Override
+  public void stop() {
+    // Not supported on external
+  }
 
-    // this is a dummy.  We'll never use this for external TTS engines
-    public boolean isInitialized() {
-        return true;
-    }
+  // External TextToSpeech is obsolete, so we'll just report that no languages are available
+  // In reality, we won't call this from TextToSpeech in pre-Gingerbread systems
+  public int isLanguageAvailable(Locale loc) {
+    return TextToSpeech.LANG_MISSING_DATA;
+  }
+
+// this is a dummy.  We'll never use this for external TTS engines
+  public boolean isInitialized() {
+    return true;
+  }
 }

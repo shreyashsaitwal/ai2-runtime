@@ -14,5 +14,5 @@ package com.google.appinventor.components.runtime;
  */
 
 public interface OnClearListener {
-    public void onClear();
+  public void onClear();
 }

@@ -8,6 +8,8 @@ package com.google.appinventor.components.runtime.errors;
 
 /**
  * Runtime error indicating an unknown file handle.
+ *
  */
-public class UnknownFileHandleError extends RuntimeError {
+/* @SimpleObject
+ */public class UnknownFileHandleError extends RuntimeError {
 }
