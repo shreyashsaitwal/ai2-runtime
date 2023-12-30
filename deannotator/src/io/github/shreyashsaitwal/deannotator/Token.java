@@ -1,4 +1,4 @@
-package io.github.shreyashsaitwal;
+package io.github.shreyashsaitwal.deannotator;
 
 public class Token {
 

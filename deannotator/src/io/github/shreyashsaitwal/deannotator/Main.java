@@ -1,4 +1,4 @@
-package io.github.shreyashsaitwal;
+package io.github.shreyashsaitwal.deannotator;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package io.github.shreyashsaitwal;
+package io.github.shreyashsaitwal.deannotator;
 
 /**
  * Automated deannotator that removes all block annotations from App Inventor runtime component
