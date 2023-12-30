@@ -5,7 +5,7 @@ package xyz.kumaraswamy.deannotator;
  * source files
  * Author: Kumaraswamy BG
  *
- *
+ * Github: https://github.com/XomaDev/Deannotator
  */
 public class Parser {
 
