@@ -5,7 +5,9 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleFunction;
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
 import com.google.appinventor.components.runtime.util.Ev3Constants;
@@ -19,7 +21,14 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3Commands extends LegoMindstormsEv3Base {
+/* @DesignerComponent(version = YaVersion.EV3_COMMANDS_COMPONENT_VERSION,
+                   description = "A component that provides a low-level interface to a LEGO MINDSTORMS EV3 " +
+                                 "robot, with functions to send system or direct commands to EV3 robots.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3Commands extends LegoMindstormsEv3Base {
 
     /**
      * Creates a new Ev3Commands component.
@@ -31,7 +40,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Keep the EV3 brick from shutdown for a period of time.
      */
-    @SimpleFunction(description = "Keep the EV3 brick from shutdown for a period of time.")
+    /* @SimpleFunction(description = "Keep the EV3 brick from shutdown for a period of time.") */
     public void KeepAlive(int minutes) {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
 
@@ -53,7 +62,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the battery voltage.
      */
-    @SimpleFunction(description = "Get the battery voltage.")
+    /* @SimpleFunction(description = "Get the battery voltage.") */
     public double GetBatteryVoltage() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_READ,
@@ -75,7 +84,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the battery current.
      */
-    @SimpleFunction(description = "Get the battery current.")
+    /* @SimpleFunction(description = "Get the battery current.") */
     public double GetBatteryCurrent() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_READ,
@@ -97,7 +106,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the OS version on EV3.
      */
-    @SimpleFunction(description = "Get the OS version on EV3.")
+    /* @SimpleFunction(description = "Get the OS version on EV3.") */
     public String GetOSVersion() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_READ,
@@ -121,7 +130,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the OS build on EV3.
      */
-    @SimpleFunction(description = "Get the OS build on EV3.")
+    /* @SimpleFunction(description = "Get the OS build on EV3.") */
     public String GetOSBuild() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.UIReadSubcode.GET_OS_VERS,
@@ -146,7 +155,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the firmware version on EV3.
      */
-    @SimpleFunction(description = "Get the firmware version on EV3.")
+    /* @SimpleFunction(description = "Get the firmware version on EV3.") */
     public String GetFirmwareVersion() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_READ,
@@ -171,7 +180,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the firmware build on EV3.
      */
-    @SimpleFunction(description = "Get the firmware build on EV3.")
+    /* @SimpleFunction(description = "Get the firmware build on EV3.") */
     public String GetFirmwareBuild() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_READ,
@@ -195,7 +204,7 @@ public class Ev3Commands extends LegoMindstormsEv3Base {
     /**
      * Get the hardware version of EV3.
      */
-    @SimpleFunction(description = "Get the hardware version of EV3.")
+    /* @SimpleFunction(description = "Get the hardware version of EV3.") */
     public String GetHardwareVersion() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_READ,

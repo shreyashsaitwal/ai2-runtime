@@ -12,20 +12,10 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Vibrator;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.errors.PermissionException;
-import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.FroyoUtil;
-import com.google.appinventor.components.runtime.util.MediaUtil;
-import com.google.appinventor.components.runtime.util.SdkLevel;
+import com.google.appinventor.components.runtime.util.*;
 
 import java.io.IOException;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
 // TODO: This implementation does nothing about releasing the Media
 // Player resources when the application stops.  This needs to be handled
@@ -57,6 +47,24 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
  * @internaldoc Multimedia component that plays audio and optionally
  * vibrates.  It is built on top of {@link android.media.MediaPlayer}.
  */
+/* @DesignerComponent(version = YaVersion.PLAYER_COMPONENT_VERSION,
+    description = "Multimedia component that plays audio and " +
+        "controls phone vibration.  The name of a multimedia field is " +
+        "specified in the <code>Source<//code> property, which can be set in " +
+        "the Designer or in the Blocks Editor.  The length of time for a " +
+        "vibration is specified in the Blocks Editor in milliseconds " +
+        "(thousandths of a second).\n" +
+        "<p>For supported audio formats, see " +
+        "<a href=\"http:////developer.android.com//guide//appendix//media-formats.html\"" +
+        " target=\"_blank\">Android Supported Media Formats<//a>.<//p>\n" +
+        "<p>This component is best for long sound files, such as songs, " +
+        "while the <code>Sound<//code> component is more efficient for short " +
+        "files, such as sound effects.<//p>",
+    category = ComponentCategory.MEDIA,
+    nonVisible = true,
+    iconName = "images//player.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.VIBRATE, android.permission.INTERNET") */
 public final class Player extends AndroidNonvisibleComponent
         implements Component, OnCompletionListener, OnPauseListener, OnResumeListener, OnDestroyListener, OnStopListener, Deleteable {
 
@@ -129,8 +137,8 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Returns the path to the audio source
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String Source() {
         return sourcePath;
     }
@@ -142,23 +150,22 @@ public final class Player extends AndroidNonvisibleComponent
      * @internaldoc See {@link MediaUtil#determineMediaSource} for information about what
      * a path can be.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
-            defaultValue = "")
-    @SimpleProperty
-    public void Source(String path) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+      defaultValue = "") */
+    /* @SimpleProperty
+     *//* @UsesPermissions({READ_EXTERNAL_STORAGE, READ_MEDIA_AUDIO}) */
+    public void Source(/* @Asset  */String path) {
         final String tempPath = (path == null) ? "" : path;
-        if (MediaUtil.isExternalFile(form, tempPath)
-                && form.isDeniedPermission(READ_EXTERNAL_STORAGE)) {
-            form.askPermission(READ_EXTERNAL_STORAGE, new PermissionResultHandler() {
-                @Override
-                public void HandlePermissionResponse(String permission, boolean granted) {
-                    if (granted) {
-                        Player.this.Source(tempPath);
-                    } else {
-                        form.dispatchPermissionDeniedEvent(Player.this, "Source", permission);
-                    }
+        if (TiramisuUtil.requestAudioPermissions(form, path, new PermissionResultHandler() {
+            @Override
+            public void HandlePermissionResponse(String permission, boolean granted) {
+                if (granted) {
+                    Player.this.Source(tempPath);
+                } else {
+                    form.dispatchPermissionDeniedEvent(Player.this, "Source", permission);
                 }
-            });
+            }
+        })) {
             return;
         }
 
@@ -218,8 +225,9 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Reports whether the media is playing.
      */
-    @SimpleProperty(
-            description = "Reports whether the media is playing")
+  /* @SimpleProperty(
+      description = "Reports whether the media is playing",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean IsPlaying() {
         if (playerState == State.PREPARED || playerState == State.PLAYING) {
             return player.isPlaying();
@@ -230,9 +238,10 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Reports whether the playing should loop.
      */
-    @SimpleProperty(
-            description = "If true, the player will loop when it plays. Setting Loop while the player " +
-                    "is playing will affect the current playing.")
+  /* @SimpleProperty(
+      description = "If true, the player will loop when it plays. Setting Loop while the player " +
+          "is playing will affect the current playing.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Loop() {
         return loop;
     }
@@ -243,10 +252,11 @@ public final class Player extends AndroidNonvisibleComponent
      *
      * @param shouldLoop determines if the playing should loop
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void Loop(boolean shouldLoop) {
         // set the desired looping right now if the player is prepared.
         if (playerState == State.PREPARED || playerState == State.PLAYING || playerState == State.PAUSED_BY_USER) {
@@ -262,11 +272,12 @@ public final class Player extends AndroidNonvisibleComponent
      *
      * @param vol the desired volume level
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-            defaultValue = "50")
-    @SimpleProperty(
-            description = "Sets the volume to a number between 0 and 100")
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = "50") */
+  /* @SimpleProperty(
+      description = "Sets the volume to a number between 0 and 100",
+      category = PropertyCategory.BEHAVIOR) */
     public void Volume(int vol) {
         if (playerState == State.PREPARED || playerState == State.PLAYING || playerState == State.PAUSED_BY_USER) {
             if (vol > 100 || vol < 0) {
@@ -282,10 +293,11 @@ public final class Player extends AndroidNonvisibleComponent
      *
      * @return playOnlyInForeground
      */
-    @SimpleProperty(
-            description = "If true, the player will pause playing when leaving the current screen; " +
-                    "if false (default option), the player continues playing" +
-                    " whenever the current screen is displaying or not.")
+  /* @SimpleProperty(
+      description = "If true, the player will pause playing when leaving the current screen; " +
+          "if false (default option), the player continues playing"+
+          " whenever the current screen is displaying or not.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean PlayOnlyInForeground() {
         return playOnlyInForeground;
     }
@@ -297,10 +309,11 @@ public final class Player extends AndroidNonvisibleComponent
      *
      * @param shouldForeground determines whether plays only in foreground or always.
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void PlayOnlyInForeground(boolean shouldForeground) {
         playOnlyInForeground = shouldForeground;
     }
@@ -309,7 +322,8 @@ public final class Player extends AndroidNonvisibleComponent
      * Plays the media.  If it was previously paused, the playing is resumed.
      * If it was previously stopped, it starts from the beginning.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Start() {
         if (audioFocusSupported && !focusOn) {
             requestPermanentFocus();
@@ -325,7 +339,8 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Suspends playing the media if it is playing.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Pause() {
         if (player == null) return; //Do nothing if the player is not
         boolean wasPlaying = player.isPlaying();
@@ -354,7 +369,8 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Stops playing the media and seeks to the beginning of the song.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Stop() {
         if (audioFocusSupported && focusOn) {
             abandonFocus();
@@ -381,15 +397,17 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Vibrates for specified number of milliseconds.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Vibrate(long milliseconds) {
         vibe.vibrate(milliseconds);
     }
 
     //  TODO: Reconsider whether vibrate should be here or in a separate component.
 
-    @SimpleEvent(description = "The PlayerError event is no longer used. " +
-            "Please use the Screen.ErrorOccurred event instead.")
+    /* @SimpleEvent(description = "The PlayerError event is no longer used. " +
+        "Please use the Screen.ErrorOccurred event instead.",
+        userVisible = false) */
     public void PlayerError(String message) {
     }
 
@@ -417,7 +435,8 @@ public final class Player extends AndroidNonvisibleComponent
     /**
      * Indicates that the media has reached the end
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void Completed() {
         //Once you've finished playback be sure to call abandonAudioFocus() according to Android developer reference.
         if (audioFocusSupported && focusOn) {
@@ -431,8 +450,8 @@ public final class Player extends AndroidNonvisibleComponent
      * This event is signaled when another player has started (and the current player is playing or
      * paused, but not stopped).
      */
-    @SimpleEvent(description = "This event is signaled when another player has started" +
-            " (and the current player is playing or paused, but not stopped).")
+  /* @SimpleEvent(description = "This event is signaled when another player has started" +
+      " (and the current player is playing or paused, but not stopped).") */
     public void OtherPlayerStarted() {
         EventDispatcher.dispatchEvent(this, "OtherPlayerStarted");
     }

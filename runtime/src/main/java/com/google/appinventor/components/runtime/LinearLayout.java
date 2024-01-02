@@ -6,14 +6,16 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentConstants;
+
 import android.content.Context;
 import android.view.ViewGroup;
-import com.google.appinventor.components.common.ComponentConstants;
 
 /**
  * Linear layout for placing components horizontally or vertically.
  */
-public final class LinearLayout implements Layout {
+/* @SimpleObject
+ */public final class LinearLayout implements Layout {
 
     private final android.widget.LinearLayout layoutManager;
 

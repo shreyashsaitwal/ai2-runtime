@@ -6,33 +6,60 @@
 package com.google.appinventor.components.runtime.util;
 
 import android.content.Context;
+
 import android.util.Log;
+
 import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.ReplForm;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.webrtc.*;
-import org.webrtc.DataChannel.Buffer;
-import org.webrtc.PeerConnection.Observer;
-import org.webrtc.PeerConnection.*;
+import com.google.appinventor.components.runtime.util.AsynchUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.util.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.TreeSet;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.StringEntity;
+
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import org.webrtc.DataChannel.Buffer;
+import org.webrtc.DataChannel;
+import org.webrtc.IceCandidate;
+import org.webrtc.MediaConstraints;
+import org.webrtc.MediaStream;
+import org.webrtc.PeerConnection.ContinualGatheringPolicy;
+import org.webrtc.PeerConnection.IceConnectionState;
+import org.webrtc.PeerConnection.IceGatheringState;
+import org.webrtc.PeerConnection.Observer;
+import org.webrtc.PeerConnection.RTCConfiguration;
+import org.webrtc.PeerConnection.SignalingState;
+import org.webrtc.PeerConnection;
+import org.webrtc.PeerConnectionFactory;
+import org.webrtc.RtpReceiver;
+import org.webrtc.SdpObserver;
+import org.webrtc.SessionDescription;
 
 public class WebRTCNativeMgr {
 
@@ -200,7 +227,7 @@ public class WebRTCNativeMgr {
 
     public WebRTCNativeMgr(String rendezvousServer, String rendezvousResult) {
         this.rendezvousServer = rendezvousServer;
-        if (/*rendezvousResult.isEmpty() || */rendezvousResult.startsWith("OK")) {
+        if (rendezvousResult.isEmpty() || rendezvousResult.startsWith("OK")) {
             /* Provide a default when the rendezvous server doesn't provide one */
             rendezvousResult = "{\"rendezvous2\" : \"" + YaVersion.RENDEZVOUS_SERVER + "\"," +
                     "\"iceservers\" : " +
@@ -238,16 +265,16 @@ public class WebRTCNativeMgr {
         this.form = form;
         rCode = code;
         /* Initialize WebRTC globally */
-//        PeerConnectionFactory.initializeAndroidGlobals(context, false);
+        PeerConnectionFactory.initializeAndroidGlobals(context, false);
         /* Setup factory options */
         PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
         /* Create the factory */
-//        PeerConnectionFactory factory = new PeerConnectionFactory(options);
+        PeerConnectionFactory factory = new PeerConnectionFactory(options);
         /* Create the peer connection using the iceServers we received in the constructor */
         RTCConfiguration rtcConfig = new RTCConfiguration(iceServers);
         rtcConfig.continualGatheringPolicy = ContinualGatheringPolicy.GATHER_CONTINUALLY;
-//        peerConnection = factory.createPeerConnection(rtcConfig, new MediaConstraints(),
-//                observer);
+        peerConnection = factory.createPeerConnection(rtcConfig, new MediaConstraints(),
+                observer);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

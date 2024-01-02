@@ -5,6 +5,7 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import android.net.Uri;
 import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.Form;
@@ -61,6 +62,9 @@ public class FileReadOperation extends FileStreamOperation<InputStream> {
 
     @Override
     protected InputStream openFile() throws IOException {
+        if (scopedFile.getFileName().startsWith("content:")) {
+            return form.getContentResolver().openInputStream(Uri.parse(scopedFile.getFileName()));
+        }
         return FileUtil.openForReading(form, scopedFile);
     }
 }

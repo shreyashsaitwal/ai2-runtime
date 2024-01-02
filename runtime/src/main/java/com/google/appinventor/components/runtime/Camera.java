@@ -14,9 +14,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.runtime.util.*;
 
 import java.io.File;
@@ -36,6 +33,17 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * [`Picture`](userinterface.html#Image.Picture) property of an [`Image`](userinterface.html3Image)
  * component.
  */
+/* @DesignerComponent(version = YaVersion.CAMERA_COMPONENT_VERSION,
+   description = "A component to take a picture using the device's camera. " +
+        "After the picture is taken, the name of the file on the phone " +
+        "containing the picture is available as an argument to the " +
+        "AfterPicture event. The file name can be used, for example, to set " +
+        "the Picture property of an Image component.",
+   category = ComponentCategory.MEDIA,
+   nonVisible = true,
+   iconName = "images//camera.png") */
+/* @SimpleObject
+ *//* @UsesPermissions({CAMERA}) */
 public class Camera extends AndroidNonvisibleComponent
         implements ActivityResultListener, Component {
 
@@ -86,7 +94,7 @@ public class Camera extends AndroidNonvisibleComponent
      * @return {@code true} indicates front-facing is to be used, {@code false} will open default
      */
     @Deprecated
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean UseFront() {
         return useFront;
     }
@@ -99,9 +107,9 @@ public class Camera extends AndroidNonvisibleComponent
     @Deprecated
     // Hide the deprecated property from the Designer
     //  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty(description = "Specifies whether the front-facing camera should be used (when available). "
-            + "If the device does not have a front-facing camera, this option will be ignored "
-            + "and the camera will open normally.")
+  /* @SimpleProperty(description = "Specifies whether the front-facing camera should be used (when available). "
+    + "If the device does not have a front-facing camera, this option will be ignored "
+    + "and the camera will open normally.") */
     public void UseFront(boolean front) {
         useFront = front;
     }
@@ -111,7 +119,8 @@ public class Camera extends AndroidNonvisibleComponent
      *
      * @internaldoc If useFront is true, adds an extra to the intent that requests the front-facing camera.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void TakePicture() {
         final ScopedFile target = FileUtil.getScopedPictureFile(form, "jpg");
         if (!havePermission) {
@@ -240,7 +249,8 @@ public class Camera extends AndroidNonvisibleComponent
      * Called after the picture is taken. The text argument `image` is the path that can be used to
      * locate the image on the phone.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void AfterPicture(String image) {
         EventDispatcher.dispatchEvent(this, "AfterPicture", image);
     }

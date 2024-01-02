@@ -6,12 +6,12 @@
 package com.google.appinventor.components.runtime;
 
 import android.os.Handler;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.AsyncCallbackPair;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -50,6 +51,15 @@ import java.net.URL;
 // and say what Android system permissions it requires.
 //
 
+/* @DesignerComponent(version = YaVersion.MEDIASTORE_COMPONENT_VERSION,
+    description = "Non-visible component that communicates with a Web service and stores media " +
+        "files.",
+    category = ComponentCategory.INTERNAL,
+    nonVisible = true,
+    iconName = "images//mediastore.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
+/* @UsesLibraries("httpmime.jar") */
 public final class MediaStore extends AndroidNonvisibleComponent implements Component {
     private static final String LOG_TAG_COMPONENT = "MediaStore: ";
     protected final ComponentContainer componentContainer;
@@ -71,7 +81,7 @@ public final class MediaStore extends AndroidNonvisibleComponent implements Comp
     /**
      * Returns the URL of the MediaStore web service.
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public String ServiceURL() {
         return serviceURL;
     }
@@ -80,9 +90,10 @@ public final class MediaStore extends AndroidNonvisibleComponent implements Comp
      * Specifies the URL of the  Web service.
      * The default value is the App Inventor MediaStore service running on App Engine.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "http://ai-mediaservice.appspot.com")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "http:////ai-mediaservice.appspot.com") */
+    /* @SimpleProperty
+     */
     public void ServiceURL(String url) {
         serviceURL = url;
     }
@@ -92,7 +103,8 @@ public final class MediaStore extends AndroidNonvisibleComponent implements Comp
      *
      * @param mediafile The value to store.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void PostMedia(String mediafile) throws FileNotFoundException {
         AsyncCallbackPair<String> myCallback = new AsyncCallbackPair<String>() {
             public void onSuccess(final String response) {
@@ -183,7 +195,8 @@ public final class MediaStore extends AndroidNonvisibleComponent implements Comp
      *
      * @param url the value that was returned.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void MediaStored(String url) {
         EventDispatcher.dispatchEvent(this, "MediaStored", url);
     }
@@ -193,7 +206,8 @@ public final class MediaStore extends AndroidNonvisibleComponent implements Comp
      *
      * @param message the error message
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void WebServiceError(String message) {
         EventDispatcher.dispatchEvent(this, "WebServiceError", message);
     }

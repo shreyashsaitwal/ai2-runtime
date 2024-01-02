@@ -7,14 +7,13 @@
 package com.google.appinventor.components.runtime;
 
 import android.content.Intent;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
 import com.google.appinventor.components.runtime.util.AnimationUtil;
 
 /**
  * Abstract superclass for all of the "Picker" components.
  */
-public abstract class Picker extends ButtonBase implements ActivityResultListener {
+/* @SimpleObject
+ */public abstract class Picker extends ButtonBase implements ActivityResultListener {
     protected final ComponentContainer container;
 
     /* Used to identify the call to startActivityForResult. Will be passed back into the
@@ -47,7 +46,7 @@ public abstract class Picker extends ButtonBase implements ActivityResultListene
     /**
      * Opens the `%type%`, as though the user clicked on it.
      */
-    @SimpleFunction(description = "Opens the %type%, as though the user clicked on it.")
+    /* @SimpleFunction(description = "Opens the %type%, as though the user clicked on it.") */
     public void Open() {
         click();
     }
@@ -59,7 +58,8 @@ public abstract class Picker extends ButtonBase implements ActivityResultListene
      * using the {@link #Open()} method.  This event occurs before the picker is displayed, and
      * can be used to prepare the picker before it is shown.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void BeforePicking() {
         EventDispatcher.dispatchEvent(this, "BeforePicking");
     }
@@ -68,7 +68,8 @@ public abstract class Picker extends ButtonBase implements ActivityResultListene
      * Event to be raised after the `%type%` activity returns its
      * result and the properties have been filled in.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void AfterPicking() {
         EventDispatcher.dispatchEvent(this, "AfterPicking");
     }

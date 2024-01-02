@@ -6,6 +6,11 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import com.google.appinventor.components.runtime.Form;
+import com.google.appinventor.components.runtime.VideoPlayer;
+import com.google.appinventor.components.runtime.errors.PermissionException;
+import com.google.appinventor.components.runtime.util.SdkLevel;
+
 import android.R;
 import android.app.Dialog;
 import android.media.MediaPlayer;
@@ -22,9 +27,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.VideoView;
-import com.google.appinventor.components.runtime.Form;
-import com.google.appinventor.components.runtime.VideoPlayer;
-import com.google.appinventor.components.runtime.errors.PermissionException;
 
 import java.io.IOException;
 

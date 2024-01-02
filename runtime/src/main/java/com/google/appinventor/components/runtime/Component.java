@@ -6,10 +6,13 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentConstants;
+
 /**
  * Interface for Simple components.
  */
-public interface Component {
+/* @SimpleObject
+ */public interface Component {
     /*
      * Components asset directory.
      */
@@ -78,10 +81,10 @@ public interface Component {
     /*
      * Typeface constants.
      */
-    static final int TYPEFACE_DEFAULT = 0;
-    static final int TYPEFACE_SANSSERIF = 1;
-    static final int TYPEFACE_SERIF = 2;
-    static final int TYPEFACE_MONOSPACE = 3;
+    static final String TYPEFACE_DEFAULT = "0";
+    static final String TYPEFACE_SANSSERIF = "1";
+    static final String TYPEFACE_SERIF = "2";
+    static final String TYPEFACE_MONOSPACE = "3";
     static final int LENGTH_PREFERRED = -1;
 
     /*

@@ -5,7 +5,6 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleFunction;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
 import com.google.appinventor.components.runtime.util.Ev3Constants;
@@ -19,7 +18,14 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3UI extends LegoMindstormsEv3Base {
+/* @DesignerComponent(version = YaVersion.EV3_UI_COMPONENT_VERSION,
+                   description = "A component that provides a high-level interface to a LEGO MINDSTORMS EV3 " +
+                                 "robot, with functions to draw graphs on EV3 screen.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3UI extends LegoMindstormsEv3Base {
 
     /**
      * Creates a new Ev3UI component.
@@ -31,7 +37,7 @@ public class Ev3UI extends LegoMindstormsEv3Base {
     /**
      * Draw a point on the screen.
      */
-    @SimpleFunction(description = "Draw a point on the screen.")
+    /* @SimpleFunction(description = "Draw a point on the screen.") */
     public void DrawPoint(int color, int x, int y) {
         String functionName = "DrawPoint";
 
@@ -63,7 +69,7 @@ public class Ev3UI extends LegoMindstormsEv3Base {
     /**
      * Draw a built-in icon on screen.
      */
-    @SimpleFunction(description = "Draw a built-in icon on screen.")
+    /* @SimpleFunction(description = "Draw a built-in icon on screen.") */
     public void DrawIcon(int color, int x, int y, int type, int no) {
         String functionName = "DrawIcon";
 
@@ -97,7 +103,7 @@ public class Ev3UI extends LegoMindstormsEv3Base {
     /**
      * Draw a line on the screen.
      */
-    @SimpleFunction(description = "Draw a line on the screen.")
+    /* @SimpleFunction(description = "Draw a line on the screen.") */
     public void DrawLine(int color, int x1, int y1, int x2, int y2) {
         String functionName = "DrawLine";
 
@@ -131,7 +137,7 @@ public class Ev3UI extends LegoMindstormsEv3Base {
     /**
      * Draw a rectangle on the screen.
      */
-    @SimpleFunction(description = "Draw a rectangle on the screen.")
+    /* @SimpleFunction(description = "Draw a rectangle on the screen.") */
     public void DrawRect(int color, int x, int y, int width, int height, boolean fill) {
         String functionName = "DrawRect";
 
@@ -165,7 +171,7 @@ public class Ev3UI extends LegoMindstormsEv3Base {
     /**
      * Draw a circle on the screen.
      */
-    @SimpleFunction(description = "Draw a circle on the screen.")
+    /* @SimpleFunction(description = "Draw a circle on the screen.") */
     public void DrawCircle(int color, int x, int y, int radius, boolean fill) {
         String functionName = "DrawCircle";
 
@@ -198,7 +204,7 @@ public class Ev3UI extends LegoMindstormsEv3Base {
     /**
      * Fill the screen with a color.
      */
-    @SimpleFunction(description = "Fill the screen with a color.")
+    /* @SimpleFunction(description = "Fill the screen with a color.") */
     public void FillScreen(int color) {
         String functionName = "FillScreen";
 

@@ -5,51 +5,70 @@
 
 package com.google.appinventor.components.runtime;
 
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
+import static android.Manifest.permission.INTERNET;
+
+import android.Manifest;
 import android.app.Activity;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
 import android.os.Handler;
+
 import android.util.Base64;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
+
+import com.google.appinventor.components.runtime.util.BulkPermissionRequest;
 import com.google.appinventor.components.runtime.util.CloudDBJedisListener;
 import com.google.appinventor.components.runtime.util.FileUtil;
 import com.google.appinventor.components.runtime.util.JsonUtil;
 import com.google.appinventor.components.runtime.util.YailList;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.exceptions.JedisNoScriptException;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The `CloudDB` component is a Non-visible component that allows you to store data on a Internet
@@ -67,6 +86,20 @@ import java.util.concurrent.atomic.AtomicReference;
  * to sync with data collected offline.
  */
 
+/* @DesignerComponent(version = YaVersion.CLOUDDB_COMPONENT_VERSION,
+    description = "Non-visible component allowing you to store data on a Internet " +
+        "connected database server (using Redis software). This allows the users of " +
+        "your App to share data with each other. " +
+        "By default data will be stored in a server maintained by MIT, however you " +
+        "can setup and run your own server. Set the \"RedisServer\" property and " +
+        "\"RedisPort\" Property to access your own server.",
+    designerHelpDescription = "Non-visible component that communicates with CloudDB " +
+        "server to store and retrieve information.",
+    category = ComponentCategory.STORAGE,
+    nonVisible = true,
+    iconName = "images//cloudDB.png") */
+/* @UsesPermissions({INTERNET, ACCESS_NETWORK_STATE}) */
+/* @UsesLibraries(libraries = "jedis.jar") */
 public class CloudDB extends AndroidNonvisibleComponent implements Component,
         OnClearListener, OnDestroyListener, ObservableDataSource<String, Future<YailList>> {
     private static final boolean DEBUG = false;
@@ -396,8 +429,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         t.start();
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "DEFAULT")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "DEFAULT") */
     public void RedisServer(String servername) {
         if (servername.equals("DEFAULT")) {
             if (!useDefault) {
@@ -420,9 +453,9 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         }
     }
 
-    @SimpleProperty(
-            description = "The Redis Server to use to store data. A setting of \"DEFAULT\" " +
-                    "means that the MIT server will be used.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "The Redis Server to use to store data. A setting of \"DEFAULT\" " +
+            "means that the MIT server will be used.") */
     public String RedisServer() {
         if (redisServer.equals(defaultRedisServer)) {
             return "DEFAULT";
@@ -431,10 +464,10 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         }
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING)
-    @SimpleProperty(
-            description = "The Default Redis Server to use.",
-            userVisible = false)
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING) */
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description = "The Default Redis Server to use.",
+    userVisible = false) */
     public void DefaultRedisServer(String server) {
         defaultRedisServer = server;
         if (useDefault) {
@@ -442,8 +475,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         }
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER,
-            defaultValue = "6381")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER,
+      defaultValue = "6381") */
     public void RedisPort(int port) {
         if (port != redisPort) {
             redisPort = port;
@@ -451,8 +484,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         }
     }
 
-    @SimpleProperty(
-            description = "The Redis Server port to use. Defaults to 6381")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "The Redis Server port to use. Defaults to 6381") */
     public int RedisPort() {
         return redisPort;
     }
@@ -462,8 +495,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @return the ProjectID for this CloudDB project
      */
-    @SimpleProperty(
-            description = "Gets the ProjectID for this CloudDB project.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Gets the ProjectID for this CloudDB project.") */
     public String ProjectID() {
         checkProjectIDNotBlank();
         return projectID;
@@ -474,8 +507,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param id the project ID
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
     public void ProjectID(String id) {
         if (!projectID.equals(id)) {
             projectID = id;
@@ -490,8 +523,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param authToken for CloudDB server
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+          defaultValue = "") */
     public void Token(String authToken) {
         if (!token.equals(authToken)) {
             token = authToken;
@@ -511,13 +544,13 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @return the authTokenSignature for this CloudDB project
      * @internaldoc Getter for the authTokenSignature.
      */
-    @SimpleProperty(userVisible = false,
-            description = "This field contains the authentication token used to login to " +
-                    "the backed Redis server. For the \"DEFAULT\" server, do not edit this " +
-                    "value, the system will fill it in for you. A system administrator " +
-                    "may also provide a special value to you which can be used to share " +
-                    "data between multiple projects from multiple people. If using your own " +
-                    "Redis server, set a password in the server's config and enter it here.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, userVisible = false,
+          description = "This field contains the authentication token used to login to " +
+              "the backed Redis server. For the \"DEFAULT\" server, do not edit this " +
+              "value, the system will fill it in for you. A system administrator " +
+              "may also provide a special value to you which can be used to share " +
+              "data between multiple projects from multiple people. If using your own " +
+              "Redis server, set a password in the server's config and enter it here.") */
     public String Token() {
         checkProjectIDNotBlank();
         return token;
@@ -529,8 +562,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param useSSL true if a secure connection should be used for CloudDB
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+           defaultValue = "True") */
     public void UseSSL(boolean useSSL) {
         if (this.useSSL != useSSL) {
             this.useSSL = useSSL;
@@ -538,9 +571,9 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         }
     }
 
-    @SimpleProperty(userVisible = false,
-            description = "Set to true to use SSL to talk to CloudDB/Redis server. " +
-                    "This should be set to True for the \"DEFAULT\" server.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, userVisible = false,
+            description = "Set to true to use SSL to talk to CloudDB//Redis server. " +
+                "This should be set to True for the \"DEFAULT\" server.") */
     public boolean UseSSL() {
         return useSSL;
     }
@@ -553,7 +586,7 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @param valueToStore The value to store. Can be any type of value (e.g.
      *                     number, text, boolean or list).
      */
-    @SimpleFunction(description = "Store a value at a tag.")
+    /* @SimpleFunction(description = "Store a value at a tag.") */
     public void StoreValue(final String tag, final Object valueToStore) {
         checkProjectIDNotBlank();
         final String value;
@@ -709,9 +742,9 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @param valueIfTagNotThere The value to pass to the event if the tag does
      *                           not exist.
      */
-    @SimpleFunction(description = "Get the Value for a tag, doesn't return the " +
-            "value but will cause a GotValue event to fire when the " +
-            "value is looked up.")
+  /* @SimpleFunction(description = "Get the Value for a tag, doesn't return the " +
+    "value but will cause a GotValue event to fire when the " +
+    "value is looked up.") */
     public void GetValue(final String tag, final Object valueIfTagNotThere) {
         if (DEBUG) {
             Log.d(LOG_TAG, "getting value ... for tag: " + tag);
@@ -812,8 +845,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @return true if the network is connected, otherwise false
      */
-    @SimpleFunction(description = "returns True if we are on the network and will likely " +
-            "be able to connect to the CloudDB server.")
+  /* @SimpleFunction(description = "returns True if we are on the network and will likely " +
+    "be able to connect to the CloudDB server.") */
     public boolean CloudConnected() {
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         boolean isConnected = networkInfo != null && networkInfo.isConnected();
@@ -827,9 +860,9 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param value the value removed from the beginning of the list
      */
-    @SimpleEvent(description = "Event triggered by the \"RemoveFirstFromList\" function. The " +
-            "argument \"value\" is the object that was the first in the list, and which is now " +
-            "removed.")
+  /* @SimpleEvent(description = "Event triggered by the \"RemoveFirstFromList\" function. The " +
+    "argument \"value\" is the object that was the first in the list, and which is now " +
+    "removed.") */
     public void FirstRemoved(Object value) {
         if (DEBUG) {
             Log.d(CloudDB.LOG_TAG, "FirstRemoved: Value = " + value);
@@ -860,10 +893,10 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param tag the tag to pop the first value from
      */
-    @SimpleFunction(description = "Return the first element of a list and atomically remove it. " +
-            "If two devices use this function simultaneously, one will get the first element and the " +
-            "the other will get the second element, or an error if there is no available element. " +
-            "When the element is available, the \"FirstRemoved\" event will be triggered.")
+  /* @SimpleFunction(description = "Return the first element of a list and atomically remove it. " +
+    "If two devices use this function simultaneously, one will get the first element and the " +
+    "the other will get the second element, or an error if there is no available element. " +
+    "When the element is available, the \"FirstRemoved\" event will be triggered.") */
     public void RemoveFirstFromList(final String tag) {
         checkProjectIDNotBlank();
 
@@ -882,9 +915,9 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
         });
     }
 
-    @SimpleFunction(description = "Append a value to the end of a list atomically. " +
-            "If two devices use this function simultaneously, both will be appended and no " +
-            "data lost.")
+    /* @SimpleFunction(description = "Append a value to the end of a list atomically. " +
+      "If two devices use this function simultaneously, both will be appended and no " +
+      "data lost.") */
     public void AppendValueToList(final String tag, final Object itemToAdd) {
         checkProjectIDNotBlank();
 
@@ -920,7 +953,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @param value the value that was returned. Can be any type of value
      *              (e.g. number, text, boolean or list).
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void GotValue(String tag, Object value) {
         if (DEBUG) {
             Log.d(CloudDB.LOG_TAG, "GotValue: tag = " + tag + " value = " + (String) value);
@@ -956,7 +990,7 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @param tag The tag to remove
      * @internaldoc Asks CloudDB to forget (delete or set to "null") a given tag.
      */
-    @SimpleFunction(description = "Remove the tag from CloudDB.")
+    /* @SimpleFunction(description = "Remove the tag from CloudDB.") */
     public void ClearTag(final String tag) {
         checkProjectIDNotBlank();
         background.submit(new Runnable() {
@@ -981,7 +1015,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @param tag       The tag that was altered
      * @param operation one of "ClearTag", "StoreValue" or "AppendValueToList"
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void UpdateDone(final String tag, final String operation) {
         if (DEBUG) {
             Log.d(CloudDB.LOG_TAG, "UpdateDone: tag = " + tag + " operations = " + operation);
@@ -998,9 +1033,9 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * Asks `CloudDB` to retrieve all the tags belonging to this project. The
      * resulting list is returned in the event {@link #TagList(List)}.
      */
-    @SimpleFunction(description = "Get the list of tags for this application. " +
-            "When complete a \"TagList\" event will be triggered with the list of " +
-            "known tags.")
+  /* @SimpleFunction(description = "Get the list of tags for this application. " +
+      "When complete a \"TagList\" event will be triggered with the list of " +
+      "known tags.") */
     public void GetTagList() {
         checkProjectIDNotBlank();
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
@@ -1043,8 +1078,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param value the list of tags that was returned.
      */
-    @SimpleEvent(description = "Event triggered when we have received the list of known tags. " +
-            "Used with the \"GetTagList\" Function.")
+  /* @SimpleEvent(description = "Event triggered when we have received the list of known tags. " +
+      "Used with the \"GetTagList\" Function.") */
     public void TagList(List<String> value) {
         checkProjectIDNotBlank();
         EventDispatcher.dispatchEvent(this, "TagList", value);
@@ -1057,7 +1092,7 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      * @param tag   the tag that has changed.
      * @param value the new value of the tag.
      */
-    @SimpleEvent(description = "Event indicating that CloudDB data has changed for the given tag and value.")
+    /* @SimpleEvent(description = "Event indicating that CloudDB data has changed for the given tag and value.") */
     public void DataChanged(final String tag, final Object value) {
         Object tagValue = "";
         try {
@@ -1085,8 +1120,8 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
      *
      * @param message the error message
      */
-    @SimpleEvent(description = "Indicates that an error occurred while communicating " +
-            "with the CloudDB Redis server.")
+  /* @SimpleEvent(description = "Indicates that an error occurred while communicating " +
+                   "with the CloudDB Redis server.") */
     public void CloudDBError(final String message) {
         // Log the error message for advanced developers
         Log.e(LOG_TAG, message);
@@ -1370,7 +1405,7 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
     public Future<YailList> getDataValue(final String key) {
         return background.submit(new Callable<YailList>() {
             @Override
-            public YailList call() throws JSONException {
+            public YailList call() {
                 // Get the value identified by the tag (key) or an empty
                 // YailList if not present
                 AtomicReference<Object> valueReference = getValueByTag(key, new YailList());
@@ -1379,12 +1414,12 @@ public class CloudDB extends AndroidNonvisibleComponent implements Component,
                 String valueString = (String) valueReference.get();
 
                 // Parse the value from JSON
-                Object value = JsonUtil.getObjectFromJson(valueString);
-
-                // Value is a List object; Convert and return it
-                if (value instanceof YailList) {
-                    return (YailList) value;
-                }
+//        Object value = JsonUtil.getObjectFromJson(valueString);
+//
+//        // Value is a List object; Convert and return it
+//        if (value instanceof YailList) {
+//          return (YailList)value;
+//        }
 
                 // Return empty list otherwise
                 return YailList.makeEmptyList();

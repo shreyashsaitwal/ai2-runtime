@@ -6,6 +6,8 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentConstants;
+
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
@@ -13,14 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
-import com.google.appinventor.components.common.ComponentConstants;
 
 /**
  * A layout component allowing subcomponents to be placed in tabular form.
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class TableLayout implements Layout {
+/* @SimpleObject
+ */public class TableLayout implements Layout {
 
     private final android.widget.TableLayout layoutManager;
     private final Handler handler;

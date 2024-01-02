@@ -6,12 +6,16 @@
 package com.google.appinventor.components.runtime.util;
 
 import android.app.Activity;
-import android.os.Handler;
+import android.content.Intent;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+
+import android.util.Log;
+
+import android.os.Handler;
 
 /**
  * Wrapper class for Android's {@link android.speech.tts.TextToSpeech} class, which doesn't exist on
@@ -74,10 +78,16 @@ public class InternalTextToSpeech implements ITextToSpeech {
         speak(message, loc, 0);
     }
 
+    @Override
+    public void stop() {
+        if (tts != null) {
+            tts.stop();
+        }
+    }
+
     public boolean isInitialized() {
         return isTtsInitialized;
     }
-
 
     private void speak(final String message, final Locale loc, final int retries) {
         Log.d(LOG_TAG, "InternalTTS speak called, message = " + message);

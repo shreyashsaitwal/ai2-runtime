@@ -7,10 +7,12 @@ package com.google.appinventor.components.runtime;
 
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
 import java.util.List;
@@ -31,7 +33,6 @@ public class BarChartView extends AxisChartView<
     // Local variables to keep track of the current Bar Space and Width.
     private float barSpace = 0f;
     private float barWidth = 0.3f;
-
 
     /**
      * Creates a new Bar Chart View with the specified Chart component

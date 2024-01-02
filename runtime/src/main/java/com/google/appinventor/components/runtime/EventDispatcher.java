@@ -49,16 +49,15 @@ public class EventDispatcher {
      * @param eventName        name of event
      */
     // Don't delete this method. It's called from runtime.scm.
-    public static void registerEventForDelegation(HandlesEventDispatching dispatchDelegate,
-                                                  String componentId, String eventName) {
+    public static synchronized void registerEventForDelegation(HandlesEventDispatching dispatchDelegate,
+                                                               String componentId, String eventName) {
         EventRegistry er = getEventRegistry(dispatchDelegate);
         Set<EventClosure> eventClosures = er.eventClosuresMap.get(eventName);
-        if (eventClosures == null) {
-            eventClosures = new HashSet<EventClosure>();
-            er.eventClosuresMap.put(eventName, eventClosures);
-        }
+        Set<EventClosure> newEventClosures = eventClosures == null
+                ? new HashSet<EventClosure>() : new HashSet<>(eventClosures);
+        newEventClosures.add(new EventClosure(componentId, eventName));
+        er.eventClosuresMap.put(eventName, newEventClosures);
 
-        eventClosures.add(new EventClosure(componentId, eventName));
         if (DEBUG) {
             Log.i("EventDispatcher", "Registered event closure for " +
                     componentId + "." + eventName);
@@ -74,26 +73,25 @@ public class EventDispatcher {
      * @param eventName        name of event
      */
     // Don't delete this method. It's called from runtime.scm.
-    public static void unregisterEventForDelegation(HandlesEventDispatching dispatchDelegate,
-                                                    String componentId, String eventName) {
+    public static synchronized void unregisterEventForDelegation(HandlesEventDispatching dispatchDelegate,
+                                                                 String componentId, String eventName) {
         EventRegistry er = getEventRegistry(dispatchDelegate);
         Set<EventClosure> eventClosures = er.eventClosuresMap.get(eventName);
         if (eventClosures == null || eventClosures.isEmpty()) {
             return;
         }
-        Set<EventClosure> toDelete = new HashSet<EventClosure>();
+        Set<EventClosure> updated = new HashSet<>();
         for (EventClosure eventClosure : eventClosures) {
             if (eventClosure.componentId.equals(componentId)) {
-                toDelete.add(eventClosure);
+                if (DEBUG) {
+                    Log.i("EventDispatcher", "Deleting event closure for " +
+                            eventClosure.componentId + "." + eventClosure.eventName);
+                }
+            } else {
+                updated.add(eventClosure);
             }
         }
-        for (EventClosure eventClosure : toDelete) {
-            if (DEBUG) {
-                Log.i("EventDispatcher", "Deleting event closure for " +
-                        eventClosure.componentId + "." + eventClosure.eventName);
-            }
-            eventClosures.remove(eventClosure);
-        }
+        er.eventClosuresMap.put(eventName, updated);
     }
 
     /**
@@ -101,7 +99,7 @@ public class EventDispatcher {
      * {@link EventDispatcher#registerEventForDelegation}.
      */
     // Don't delete this method. It's called from runtime.scm.
-    public static void unregisterAllEventsForDelegation() {
+    public static synchronized void unregisterAllEventsForDelegation() {
         for (EventRegistry er : mapDispatchDelegateToEventRegistry.values()) {
             er.eventClosuresMap.clear();
         }
@@ -114,7 +112,7 @@ public class EventDispatcher {
      * <p>
      * Called when a Form's onDestroy method is called.
      */
-    public static void removeDispatchDelegate(HandlesEventDispatching dispatchDelegate) {
+    public static synchronized void removeDispatchDelegate(HandlesEventDispatching dispatchDelegate) {
         EventRegistry er = removeEventRegistry(dispatchDelegate);
         if (er != null) {
             er.eventClosuresMap.clear();
@@ -128,7 +126,7 @@ public class EventDispatcher {
      * @param eventName name of event being raised
      * @param args      arguments to the event handler
      */
-    public static boolean dispatchEvent(Component component, String eventName, Object... args) {
+    public static synchronized boolean dispatchEvent(Component component, String eventName, Object... args) {
         if (DEBUG) {
             Log.i("EventDispatcher", "Trying to dispatch event " + eventName);
         }
@@ -153,9 +151,9 @@ public class EventDispatcher {
      * @param component     the component that generated the event
      * @param args          arguments to event handler
      */
-    private static boolean delegateDispatchEvent(HandlesEventDispatching dispatchDelegate,
-                                                 Set<EventClosure> eventClosures,
-                                                 Component component, Object... args) {
+    private static synchronized boolean delegateDispatchEvent(HandlesEventDispatching dispatchDelegate,
+                                                              Set<EventClosure> eventClosures,
+                                                              Component component, Object... args) {
         // The event closures set will contain all event closures matching the event name.
         // We depend on the delegate's dispatchEvent method to check the registered event closure and
         // only dispatch the event if the registered component matches the component that generated the

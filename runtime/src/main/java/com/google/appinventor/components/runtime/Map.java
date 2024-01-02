@@ -7,10 +7,8 @@ package com.google.appinventor.components.runtime;
 
 import android.util.Log;
 import android.view.View;
-import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.MapType;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.ScaleUnits;
 import com.google.appinventor.components.runtime.LocationSensor.LocationSensorListener;
 import com.google.appinventor.components.runtime.util.*;
@@ -38,6 +36,24 @@ import java.util.List;
  * @author ewpatton@mit.edu (Evan W. Patton)
  */
 @SuppressWarnings("WeakerAccess")
+/* @DesignerComponent(version = YaVersion.MAP_COMPONENT_VERSION,
+  category = ComponentCategory.MAPS,
+  androidMinSdk = 8,
+  description = "<p>A two-dimensional container that renders map tiles in the background and " +
+    "allows for multiple Marker elements to identify points on the map. Map tiles are supplied " +
+    "by OpenStreetMap contributors and the United States Geological Survey.<//p>" +
+    "<p>The Map component provides three utilities for manipulating its boundaries within App " +
+    "Inventor. First, a locking mechanism is provided to allow the map to be moved relative to " +
+    "other components on the Screen. Second, when unlocked, the user can pan the Map to any " +
+    "location. At this new location, the &quot;Set Initial Boundary&quot; button can be pressed " +
+    "to save the current Map coordinates to its properties. Lastly, if the Map is moved to a " +
+    "different location, for example to add Markers off-screen, then the &quot;Reset Map to " +
+    "Initial Bounds&quot; button can be used to re-center the Map at the starting location.<//p>",
+    iconName = "images//map.png") */
+/* @SimpleObject
+ *//* @UsesAssets(fileNames = "location.png, marker.svg") */
+/* @UsesPermissions({ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION}) */
+/* @UsesLibraries(libraries = "osmdroid.aar, osmdroid.jar, androidsvg.jar, jts.jar") */
 public class Map extends MapFeatureContainerBase implements MapEventListener {
     private static final String TAG = Map.class.getSimpleName();
 
@@ -97,14 +113,14 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @param center A comma-separated string containing the latitude and longitude of the map center.
      */
     @SuppressWarnings("squid:S00100")
-    @DesignerProperty(defaultValue = "42.359144, -71.093612",
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_GEOGRAPHIC_POINT)
-    @SimpleProperty(
-            description = "<p>Set the initial center coordinate of the map. The value is specified as " +
-                    "a comma-separated pair of decimal latitude and longitude coordinates, for example, " +
-                    "<code>42.359144, -71.093612</code>.</p><p>In blocks code, it is recommended for " +
-                    "performance reasons to use SetCenter with numerical latitude and longitude rather " +
-                    "than convert to the string representation for use with this property.</p>")
+  /* @DesignerProperty(defaultValue = "42.359144, -71.093612",
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_GEOGRAPHIC_POINT) */
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "<p>Set the initial center coordinate of the map. The value is specified as " +
+          "a comma-separated pair of decimal latitude and longitude coordinates, for example, " +
+          "<code>42.359144, -71.093612<//code>.<//p><p>In blocks code, it is recommended for " +
+          "performance reasons to use SetCenter with numerical latitude and longitude rather " +
+          "than convert to the string representation for use with this property.<//p>") */
     public void CenterFromString(String center) {
         String[] parts = center.split(",");
         if (parts.length != 2) {
@@ -145,8 +161,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @return Returns the latitude of the center of the map
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleProperty(
-            description = "The latitude of the center of the map.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The latitude of the center of the map.") */
     public double Latitude() {
         return mapController.getLatitude();
     }
@@ -158,8 +174,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @return Returns the longitude of the center of the map
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleProperty(
-            description = "The longitude of the center of the map.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The longitude of the center of the map.") */
     public double Longitude() {
         return mapController.getLongitude();
     }
@@ -174,9 +190,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param zoom New zoom level.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_MAP_ZOOM,
-            defaultValue = "13")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_MAP_ZOOM,
+      defaultValue = "13") */
+    /* @SimpleProperty
+     */
     public void ZoomLevel(int zoom) {
         mapController.setZoom(zoom);
     }
@@ -187,13 +204,13 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @return Returns the current zoom level of the map.
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "The zoom level of the map. Valid values of ZoomLevel are " +
-                    "dependent on the tile provider and the latitude and longitude of the map. For " +
-                    "example, zoom levels are more constrained over oceans than dense city centers to " +
-                    "conserve space for storing tiles, so valid values may be 1-7 over ocean and 1-18 " +
-                    "over cities. Tile providers may send warning or error tiles if the zoom level is too " +
-                    "great for the server to support.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The zoom level of the map. Valid values of ZoomLevel are " +
+          "dependent on the tile provider and the latitude and longitude of the map. For " +
+          "example, zoom levels are more constrained over oceans than dense city centers to " +
+          "conserve space for storing tiles, so valid values may be 1-7 over ocean and 1-18 " +
+          "over cities. Tile providers may send warning or error tiles if the zoom level is too " +
+          "great for the server to support.") */
     public int ZoomLevel() {
         return mapController.getZoom();
     }
@@ -206,9 +223,9 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @param zoom If true, then the user can use pinch/expand gestures to change the map zoom level.
      */
     @SuppressWarnings("WeakerAccess")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True")
-    @SimpleProperty
-    public void EnableZoom(boolean zoom) {
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True") */
+    /* @SimpleProperty
+     */ public void EnableZoom(boolean zoom) {
         mapController.setZoomEnabled(zoom);
     }
 
@@ -217,16 +234,17 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @return Returns whether multitouch zoom gestures are enabled for the map.
      */
-    @SimpleProperty(
-            description = "If this property is set to true, multitouch zoom gestures are allowed on " +
-                    "the map. Otherwise, the map zoom cannot be changed by the user except via the zoom " +
-                    "control buttons.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "If this property is set to true, multitouch zoom gestures are allowed on " +
+        "the map. Otherwise, the map zoom cannot be changed by the user except via the zoom " +
+        "control buttons.") */
     public boolean EnableZoom() {
         return mapController.isZoomEnabled();
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT, defaultValue = "0.0")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT, defaultValue = "0.0") */
+    /* @SimpleProperty
+     */
     public void Rotation(float rotation) {
         mapController.setRotation(rotation);
     }
@@ -234,7 +252,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
     /**
      * Specifies the rotation of the map in decimal degrees, if any.
      */
-    @SimpleProperty(description = "Sets or gets the rotation of the map in decimal degrees if any")
+    /* @SimpleProperty (category = PropertyCategory.APPEARANCE, description = "Sets or gets the rotation of the map in decimal degrees if any") */
     public float Rotation() {
         return mapController.getRotation();
     }
@@ -249,10 +267,11 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param type Integer identifying the tile set to use for the map's base layer.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_MAP_TYPE,
-            defaultValue = "1")
-    @SimpleProperty
-    public void MapType(@Options(MapType.class) int type) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_MAP_TYPE,
+      defaultValue = "1") */
+    /* @SimpleProperty
+     */
+    public void MapType(/* @Options(MapType.class) */ int type) {
         MapType mapType = MapType.fromUnderlyingValue(type);
         if (mapType != null) {
             MapTypeAbstract(mapType);
@@ -272,10 +291,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @return Returns an integer identifying the base tile layer in use by the map.
      */
-    @SimpleProperty(
-            description = "The type of tile layer to use as the base of the map. Valid values " +
-                    "are: 1 (Roads), 2 (Aerial), 3 (Terrain)")
-    public @Options(MapType.class) int MapType() {
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The type of tile layer to use as the base of the map. Valid values " +
+          "are: 1 (Roads), 2 (Aerial), 3 (Terrain)") */
+    public /* @Options(MapType.class) */ int MapType() {
         return MapTypeAbstract().toUnderlyingValue();
     }
 
@@ -301,9 +320,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param compass True if the compass should be enabled, otherwise false.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ShowCompass(boolean compass) {
         mapController.setCompassEnabled(compass);
     }
@@ -314,8 +334,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @return True if the compass is enabled, otherwise false.
      */
-    @SimpleProperty(
-            description = "Show a compass icon rotated based on user orientation.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Show a compass icon rotated based on user orientation.") */
     public boolean ShowCompass() {
         return mapController.isCompassEnabled();
     }
@@ -325,9 +345,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param zoom True if the controls should be shown, otherwise false.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ShowZoom(boolean zoom) {
         mapController.setZoomControlEnabled(zoom);
     }
@@ -338,8 +359,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @return True if the controls should be shown, otherwise false.
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "Show zoom buttons on the map.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Show zoom buttons on the map.") */
     public boolean ShowZoom() {
         return mapController.isZoomControlEnabled();
     }
@@ -351,9 +372,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param user True if the user's location should be shown, otherwise false.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ShowUser(boolean user) {
         mapController.setShowUserEnabled(user);
     }
@@ -364,8 +386,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @return True if the user's location is being shown on the map, otherwise false.
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "Show the user's location on the map.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Show the user's location on the map.") */
     public boolean ShowUser() {
         return mapController.isShowUserEnabled();
     }
@@ -375,9 +397,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param rotation True if the map should be rotated based on user orientation, otherwise false.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void EnableRotation(boolean rotation) {
         mapController.setRotationEnabled(rotation);
     }
@@ -387,15 +410,16 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @return True if the map is drawn based on orientation, otherwise false.
      */
-    @SimpleProperty(
-            description = "If set to true, the user can use multitouch gestures to rotate the map " +
-                    "around its current center.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "If set to true, the user can use multitouch gestures to rotate the map " +
+          "around its current center.") */
     public boolean EnableRotation() {
         return mapController.isRotationEnabled();
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void EnablePan(boolean pan) {
         mapController.setPanEnabled(pan);
     }
@@ -403,13 +427,14 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
     /**
      * Enables or disables the ability of the user to move the Map.
      */
-    @SimpleProperty(
-            description = "Enable two-finger panning of the Map")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Enable two-finger panning of the Map") */
     public boolean EnablePan() {
         return mapController.isPanEnabled();
     }
 
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void BoundingBox(YailList boundingbox) {
         double latNorth = GeometryUtil.coerceToDouble(((YailList) boundingbox.get(1)).get(1));
         double longWest = GeometryUtil.coerceToDouble(((YailList) boundingbox.get(1)).get(2));
@@ -423,8 +448,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * containing the northwest and southeast coordinates of the current view in the form
      * ``((North West) (South East))``.
      */
-    @SimpleProperty(
-            description = "Bounding box for the map stored as [[North, West], [South, East]].")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Bounding box for the map stored as [[North, West], [South, East]].") */
     public YailList BoundingBox() {
         BoundingBox bbox = mapController.getBoundingBox();
         YailList northwest = YailList.makeList(new Double[]{bbox.getLatNorth(), bbox.getLonWest()});
@@ -433,8 +458,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
     }
 
     @Override
-    @SimpleProperty
-    public YailList Features() {
+    /* @SimpleProperty
+     */ public YailList Features() {
         return super.Features();
     }
 
@@ -442,10 +467,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * Uses the provided [`LocationSensor`](sensors.html#LocationSensor) for user location data
      * rather than the built-in location provider.
      */
-    @SimpleProperty(
-            description = "Uses the provided LocationSensor for user location data rather than the " +
-                    "built-in location provider.")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COMPONENT + ":com.google.appinventor.components.runtime.LocationSensor")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Uses the provided LocationSensor for user location data rather than the " +
+          "built-in location provider.") */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COMPONENT + ":com.google.appinventor.components.runtime.LocationSensor") */
     public void LocationSensor(LocationSensor sensor) {
         LocationSensorListener listener = mapController.getLocationListener();
         if (this.sensor != null) {
@@ -465,14 +490,15 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * Shows or hides a scale overlay on the {@link Map}. The scale will change with the zoom level
      * and its units can be controlled by the {@link #ScaleUnits(int)} property.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ShowScale(boolean show) {
         mapController.setScaleVisible(show);
     }
 
-    @SimpleProperty(
-            description = "Shows a scale reference on the map.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "Shows a scale reference on the map.") */
     public boolean ShowScale() {
         return mapController.isScaleVisible();
     }
@@ -481,10 +507,10 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * Specifies the units used for the scale overlay. 1 (the default) will give metric units
      * (km, m) whereas 2 will give imperial units (mi, ft).
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_MAP_UNIT_SYSTEM,
-            defaultValue = "1")
-    @SimpleProperty
-    public void ScaleUnits(@Options(ScaleUnits.class) int units) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_MAP_UNIT_SYSTEM,
+      defaultValue = "1") */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
+    public void ScaleUnits(/* @Options(ScaleUnits.class) */ int units) {
         // Make sure units is a valid ScaleUnits.
         ScaleUnits scaleUnits = ScaleUnits.fromUnderlyingValue(units);
         if (scaleUnits == null) {
@@ -495,8 +521,9 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
         ScaleUnitsAbstract(scaleUnits);
     }
 
-    @SimpleProperty
-    public @Options(ScaleUnits.class) int ScaleUnits() {
+    /* @SimpleProperty
+     */
+    public /* @Options(ScaleUnits.class) */ int ScaleUnits() {
         return ScaleUnitsAbstract().toUnderlyingValue();
     }
 
@@ -516,20 +543,20 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
         mapController.setScaleUnitsAbstract(units);
     }
 
-    @SimpleProperty(
-            description = "Returns the user's latitude if ShowUser is enabled.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "Returns the user's latitude if ShowUser is enabled.") */
     public double UserLatitude() {
         return sensor == null ? -999 : sensor.Latitude();
     }
 
-    @SimpleProperty(
-            description = "Returns the user's longitude if ShowUser is enabled.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "Returns the user's longitude if ShowUser is enabled.") */
     public double UserLongitude() {
         return sensor == null ? -999 : sensor.Longitude();
     }
 
-    @SimpleFunction(description = "Pans the map center to the given latitude and longitude and " +
-            "adjust the zoom level to the specified zoom.")
+    /* @SimpleFunction(description = "Pans the map center to the given latitude and longitude and " +
+        "adjust the zoom level to the specified zoom.") */
     public void PanTo(double latitude, double longitude, int zoom) {
         mapController.panTo(latitude, longitude, zoom, 1);
     }
@@ -541,8 +568,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * @param longitude Longitude of the new Marker
      * @return a freshly created Marker instance
      */
-    @SimpleFunction(description = "Create a new marker with default properties at the specified " +
-            "latitude and longitude.")
+  /* @SimpleFunction(description = "Create a new marker with default properties at the specified " +
+      "latitude and longitude.") */
     public Marker CreateMarker(double latitude, double longitude) {
         Marker marker = new Marker(this);
         marker.SetLocation(latitude, longitude);
@@ -552,7 +579,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
     /**
      * Saves the features on the `Map` as a GeoJSON file at the specified path.
      */
-    @SimpleFunction(description = "Save the contents of the Map to the specified path.")
+    /* @SimpleFunction(description = "Save the contents of the Map to the specified path.") */
     public void Save(final String path) {
         final List<MapFeature> featuresToSave = new ArrayList<MapFeature>(features);
         // Needed for backward compatibility prior to nb188
@@ -595,7 +622,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * The `Ready` event runs once the `Map` has been initialized and is ready for user interaction.
      */
     @SuppressWarnings({"WeakerAccess", "squid:S00100"})
-    @SimpleEvent(description = "Map has been initialized and is ready for user interaction.")
+    /* @SimpleEvent(description = "Map has been initialized and is ready for user interaction.") */
     public void Ready() {
         EventDispatcher.dispatchEvent(this, "Ready");
     }
@@ -604,7 +631,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * The `BoundsChange` event runs when the user changes the map bounds, either by zooming, panning,
      * or rotating the view.
      */
-    @SimpleEvent(description = "User has changed the map bounds by panning or zooming the map.")
+    /* @SimpleEvent(description = "User has changed the map bounds by panning or zooming the map.") */
     public void BoundsChange() {
         EventDispatcher.dispatchEvent(this, "BoundsChange");
     }
@@ -613,7 +640,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * The `ZoomChange` event runs when the user has changed the zoom level of the map, such as by
      * pinching or double-tapping to zoom.
      */
-    @SimpleEvent(description = "User has changed the zoom level of the map.")
+    /* @SimpleEvent(description = "User has changed the zoom level of the map.") */
     public void ZoomChange() {
         EventDispatcher.dispatchEvent(this, "ZoomChange");
     }
@@ -626,8 +653,8 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      *
      * @param message
      */
-    @SimpleEvent(description = "An invalid coordinate was supplied during a maps operation. The " +
-            "message parameter will have more details about the issue.")
+  /* @SimpleEvent(description = "An invalid coordinate was supplied during a maps operation. The " +
+      "message parameter will have more details about the issue.") */
     public void InvalidPoint(String message) {
         EventDispatcher.dispatchEvent(this, "InvalidPoint", message);
     }
@@ -637,7 +664,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * reported in map coordinates via the `latitude`{:.variable.block} and
      * `longitude`{:.variable.block} parameters.
      */
-    @SimpleEvent(description = "The user tapped at a point on the map.")
+    /* @SimpleEvent(description = "The user tapped at a point on the map.") */
     public void TapAtPoint(double latitude, double longitude) {
         EventDispatcher.dispatchEvent(this, "TapAtPoint", latitude, longitude);
     }
@@ -647,9 +674,9 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * location will be reported in map coordinates via the `latitude`{:.variable.block} and
      * `longitude`{:.variable.block} parameters.
      */
-    @SimpleEvent(description = "The user double-tapped at a point on the map. This event will be " +
-            "followed by a ZoomChanged event if zooming gestures are enabled and the map is not at " +
-            "the highest possible zoom level.")
+  /* @SimpleEvent(description = "The user double-tapped at a point on the map. This event will be " +
+      "followed by a ZoomChanged event if zooming gestures are enabled and the map is not at " +
+      "the highest possible zoom level.") */
     public void DoubleTapAtPoint(double latitude, double longitude) {
         EventDispatcher.dispatchEvent(this, "DoubleTapAtPoint", latitude, longitude);
     }
@@ -660,7 +687,7 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
      * map coordinates via the `latitude`{:.variable.block} and `longitude`{:.variable.block}
      * parameters.
      */
-    @SimpleEvent(description = "The user long-pressed at a point on the map.")
+    /* @SimpleEvent(description = "The user long-pressed at a point on the map.") */
     public void LongPressAtPoint(double latitude, double longitude) {
         EventDispatcher.dispatchEvent(this, "LongPressAtPoint", latitude, longitude);
     }
@@ -784,7 +811,6 @@ public class Map extends MapFeatureContainerBase implements MapEventListener {
     public Map getMap() {
         return this;
     }
-
 
     // MapFeatureContainerBase optimizations
     @Override

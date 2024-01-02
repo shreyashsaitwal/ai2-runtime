@@ -6,17 +6,17 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.app.TimePickerDialog;
-import android.os.Handler;
-import android.text.format.DateFormat;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.Dates;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 
-import java.util.Calendar;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
+import android.text.format.DateFormat;
+import android.os.Handler;
 
+import java.util.Calendar;
 
 /**
  * A button that, when clicked on, opens a dialog to allow the user to select a time.
@@ -29,7 +29,13 @@ import java.util.Calendar;
  * unlike the other pickers, the TimePicker does not need to launch a new
  * activity and get a result. The TimePicker is launched as a dialog.
  */
-public class TimePicker extends ButtonBase {
+/* @DesignerComponent(version = YaVersion.TIMEPICKER_COMPONENT_VERSION,
+    category = ComponentCategory.USERINTERFACE,
+    description = "<p>A button that, when clicked on, launches  a popup" +
+    " dialog to allow the user to select a time.<//p>",
+    iconName = "images//timePicker.png") */
+/* @SimpleObject
+ */public class TimePicker extends ButtonBase {
 
     private int hour = 0;
     private int minute = 0;
@@ -59,7 +65,6 @@ public class TimePicker extends ButtonBase {
                 }
             };
 
-
     /**
      * Create a new TimePicker component.
      *
@@ -85,10 +90,11 @@ public class TimePicker extends ButtonBase {
      *
      * @return hour in 24-hour format
      */
-    @SimpleProperty(
-            description = "The hour of the last time set using the time picker." +
-                    " The hour is in a 24 hour format. If the last time set was 11:53 pm" +
-                    ", this property will return 23.")
+  /* @SimpleProperty(
+      description = "The hour of the last time set using the time picker." +
+      " The hour is in a 24 hour format. If the last time set was 11:53 pm" +
+      ", this property will return 23.",
+      category = PropertyCategory.APPEARANCE) */
     public int Hour() {
         return hour;
     }
@@ -99,8 +105,9 @@ public class TimePicker extends ButtonBase {
      *
      * @return hour in 24-hour format
      */
-    @SimpleProperty(
-            description = "The minute of the last time set using the time picker")
+  /* @SimpleProperty(
+      description = "The minute of the last time set using the time picker",
+      category = PropertyCategory.APPEARANCE) */
     public int Minute() {
         return minute;
     }
@@ -110,8 +117,9 @@ public class TimePicker extends ButtonBase {
      *
      * @return instant of the date
      */
-    @SimpleProperty(
-            description = "The instant of the last time set using the time picker")
+  /* @SimpleProperty(
+    description = "The instant of the last time set using the time picker",
+    category = PropertyCategory.APPEARANCE) */
     public Calendar Instant() {
         return instant;
     }
@@ -123,7 +131,7 @@ public class TimePicker extends ButtonBase {
      * @param hour
      * @param minute
      */
-    @SimpleFunction(description = "Set the time to be shown in the Time Picker popup. Current time is shown by default.")
+    /* @SimpleFunction(description="Set the time to be shown in the Time Picker popup. Current time is shown by default.") */
     public void SetTimeToDisplay(int hour, int minute) {
         if ((hour < 0) || (hour > 23)) {
             form.dispatchErrorOccurredEvent(this, "SetTimeToDisplay", ErrorMessages.ERROR_ILLEGAL_HOUR);
@@ -143,8 +151,8 @@ public class TimePicker extends ButtonBase {
      *
      * @param instant
      */
-    @SimpleFunction(description = "Set the time from the instant to be shown in the Time Picker dialog. " +
-            "Current time is shown by default.")
+  /* @SimpleFunction(description="Set the time from the instant to be shown in the Time Picker dialog. " +
+    "Current time is shown by default.") */
     public void SetTimeToDisplayFromInstant(Calendar instant) {
         int hour = Dates.Hour(instant);
         int minute = Dates.Minute(instant);
@@ -156,7 +164,7 @@ public class TimePicker extends ButtonBase {
     /**
      * Launches the `TimePicker` dialog.
      */
-    @SimpleFunction(description = "Launches the TimePicker dialog.")
+    /* @SimpleFunction(description="Launches the TimePicker dialog.") */
     public void LaunchPicker() {
         click();
     }
@@ -178,7 +186,7 @@ public class TimePicker extends ButtonBase {
     /**
      * This event is run when a user has set the time in the popup dialog.
      */
-    @SimpleEvent(description = "This event is run when a user has set the time in the popup dialog.")
+    /* @SimpleEvent(description="This event is run when a user has set the time in the popup dialog.") */
     public void AfterTimeSet() {
         EventDispatcher.dispatchEvent(this, "AfterTimeSet");
     }

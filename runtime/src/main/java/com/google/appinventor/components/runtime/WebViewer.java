@@ -11,14 +11,22 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.*;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.util.*;
+import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
+import com.google.appinventor.components.runtime.util.EclairUtil;
+import com.google.appinventor.components.runtime.util.FroyoUtil;
+import com.google.appinventor.components.runtime.util.FroyoWebViewClient;
+import com.google.appinventor.components.runtime.util.HoneycombWebViewClient;
+import com.google.appinventor.components.runtime.util.MediaUtil;
+import com.google.appinventor.components.runtime.util.SdkLevel;
 
 /**
  * Component for viewing Web pages.
@@ -71,8 +79,33 @@ import com.google.appinventor.components.runtime.util.*;
  * the place of the browser.
  */
 
+/* @DesignerComponent(version = YaVersion.WEBVIEWER_COMPONENT_VERSION,
+    category = ComponentCategory.USERINTERFACE,
+    description = "Component for viewing Web pages.  The Home URL can be " +
+        "specified in the Designer or in the Blocks Editor.  The view can be set " +
+        "to follow links when they are tapped, and users can fill in Web forms. " +
+        "Warning: This is not a full browser.  For example, pressing the phone's " +
+        "hardware Back key will exit the app, rather than move back in the " +
+        "browser history." +
+        "<p //>You can use the WebViewer.WebViewString property to communicate " +
+        "between your app and Javascript code running in the Webviewer page. " +
+        "In the app, you get and set WebViewString.  " +
+        "In the WebViewer, you include Javascript that references the window.AppInventor " +
+        "object, using the methoods <//em getWebViewString()<//em> and <em>setWebViewString(text)<//em>.  " +
+        "<p //>For example, if the WebViewer opens to a page that contains the Javascript command " +
+        "<br //> <em>document.write(\"The answer is\" + window.AppInventor.getWebViewString());<//em> " +
+        "<br //>and if you set WebView.WebVewString to \"hello\", then the web page will show " +
+        "<//br ><em>The answer is hello<//em>.  " +
+        "<br //>And if the Web page contains Javascript that executes the command " +
+        "<br //><em>window.AppInventor.setWebViewString(\"hello from Javascript\")<//em>, " +
+        "<br //>then the value of the WebViewString property will be " +
+        "<br //><em>hello from Javascript<//em>. ",
+    iconName = "images//webviewer.png") */
+
 // TODO(halabelson): Integrate control of the Back key, when we provide it
 
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
 public final class WebViewer extends AndroidViewComponent {
 
     private final WebView webview;
@@ -146,8 +179,9 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @return string
      */
-    @SimpleProperty(description = "Gets the WebView's String, which is viewable through " +
-            "Javascript in the WebView as the window.AppInventor object")
+  /* @SimpleProperty(description = "Gets the WebView's String, which is viewable through " +
+      "Javascript in the WebView as the window.AppInventor object",
+      category = PropertyCategory.BEHAVIOR) */
     public String WebViewString() {
         return wvInterface.getWebViewString();
     }
@@ -157,7 +191,7 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @suppressdoc
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void WebViewString(String newString) {
         wvInterface.setWebViewStringFromBlocks(newString);
     }
@@ -173,7 +207,7 @@ public final class WebViewer extends AndroidViewComponent {
      * @param width in pixels
      */
     @Override
-    @SimpleProperty()
+    /* @SimpleProperty() */
     public void Width(int width) {
         if (width == LENGTH_PREFERRED) {
             width = LENGTH_FILL_PARENT;
@@ -190,7 +224,7 @@ public final class WebViewer extends AndroidViewComponent {
      * @param height in pixels
      */
     @Override
-    @SimpleProperty()
+    /* @SimpleProperty() */
     public void Height(int height) {
         if (height == LENGTH_PREFERRED) {
             height = LENGTH_FILL_PARENT;
@@ -203,9 +237,10 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @return URL of the page the WebVewier should load
      */
-    @SimpleProperty(
-            description = "URL of the page the WebViewer should initially open to.  " +
-                    "Setting this will load the page.")
+  /* @SimpleProperty(
+      description = "URL of the page the WebViewer should initially open to.  " +
+          "Setting this will load the page.",
+      category = PropertyCategory.BEHAVIOR) */
     public String HomeUrl() {
         return homeUrl;
     }
@@ -216,9 +251,9 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @param url URL of the page the WebVewier should load
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty()
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty() */
     public void HomeUrl(String url) {
         homeUrl = url;
         // clear the history, since changing Home is a kind of reset
@@ -232,9 +267,10 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @return URL of the page being viewed
      */
-    @SimpleProperty(
-            description = "URL of the page currently viewed.   This could be different from the " +
-                    "Home URL if new pages were visited by following links.")
+  /* @SimpleProperty(
+      description = "URL of the page currently viewed.   This could be different from the " +
+          "Home URL if new pages were visited by following links.",
+      category = PropertyCategory.BEHAVIOR) */
     public String CurrentUrl() {
         return (webview.getUrl() == null) ? "" : webview.getUrl();
     }
@@ -244,8 +280,9 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @return title of the page being viewed
      */
-    @SimpleProperty(
-            description = "Title of the page currently viewed")
+  /* @SimpleProperty(
+      description = "Title of the page currently viewed",
+      category = PropertyCategory.BEHAVIOR) */
     public String CurrentPageTitle() {
         return (webview.getTitle() == null) ? "" : webview.getTitle();
     }
@@ -255,9 +292,10 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @return true or false
      */
-    @SimpleProperty(
-            description = "Determines whether to follow links when they are tapped in the WebViewer.  " +
-                    "If you follow links, you can use GoBack and GoForward to navigate the browser history. ")
+  /* @SimpleProperty(
+      description = "Determines whether to follow links when they are tapped in the WebViewer.  " +
+          "If you follow links, you can use GoBack and GoForward to navigate the browser history. ",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean FollowLinks() {
         return followLinks;
     }
@@ -268,9 +306,9 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @param follow
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty()
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty() */
     public void FollowLinks(boolean follow) {
         followLinks = follow;
         resetWebViewClient();
@@ -282,9 +320,10 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @return true or false
      */
-    @SimpleProperty(
-            description = "Determine whether or not to ignore SSL errors. Set to true to ignore " +
-                    "errors. Use this to accept self signed certificates from websites.")
+  /* @SimpleProperty(
+      description = "Determine whether or not to ignore SSL errors. Set to true to ignore " +
+          "errors. Use this to accept self signed certificates from websites.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean IgnoreSslErrors() {
         return ignoreSslErrors;
     }
@@ -295,9 +334,9 @@ public final class WebViewer extends AndroidViewComponent {
      * @param ignoreSslErrors set to true to ignore SSL errors
      * @suppressdoc
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty()
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty() */
     public void IgnoreSslErrors(boolean ignoreSslErrors) {
         this.ignoreSslErrors = ignoreSslErrors;
         resetWebViewClient();
@@ -307,9 +346,9 @@ public final class WebViewer extends AndroidViewComponent {
      * Loads the  page from the home URL.  This happens automatically when
      * home URL is changed.
      */
-    @SimpleFunction(
-            description = "Loads the home URL page.  This happens automatically when " +
-                    "the home URL is changed.")
+  /* @SimpleFunction(
+      description = "Loads the home URL page.  This happens automatically when " +
+          "the home URL is changed.") */
     public void GoHome() {
         loadUrl("GoHome", homeUrl);
     }
@@ -317,9 +356,9 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * Go back to the previous page in the history list. Does nothing if there is no previous page.
      */
-    @SimpleFunction(
-            description = "Go back to the previous page in the history list.  " +
-                    "Does nothing if there is no previous page.")
+  /* @SimpleFunction(
+      description = "Go back to the previous page in the history list.  " +
+          "Does nothing if there is no previous page.") */
     public void GoBack() {
         if (webview.canGoBack()) {
             webview.goBack();
@@ -329,9 +368,9 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * Go forward to the next page in the history list. Does nothing if there is no next page.
      */
-    @SimpleFunction(
-            description = "Go forward to the next page in the history list.   " +
-                    "Does nothing if there is no next page.")
+  /* @SimpleFunction(
+      description = "Go forward to the next page in the history list.   " +
+          "Does nothing if there is no next page.") */
     public void GoForward() {
         if (webview.canGoForward()) {
             webview.goForward();
@@ -341,8 +380,8 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * @return true if the WebViewer can go forward in the history list
      */
-    @SimpleFunction(
-            description = "Returns true if the WebViewer can go forward in the history list.")
+  /* @SimpleFunction(
+      description = "Returns true if the WebViewer can go forward in the history list.") */
     public boolean CanGoForward() {
         return webview.canGoForward();
     }
@@ -350,8 +389,8 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * @return true if the WebViewer can go back in the history list
      */
-    @SimpleFunction(
-            description = "Returns true if the WebViewer can go back in the history list.")
+  /* @SimpleFunction(
+      description = "Returns true if the WebViewer can go back in the history list.") */
     public boolean CanGoBack() {
         return webview.canGoBack();
     }
@@ -359,8 +398,8 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * Load the page at the given URL.
      */
-    @SimpleFunction(
-            description = "Load the page at the given URL.")
+  /* @SimpleFunction(
+      description = "Load the page at the given URL.") */
     public void GoToUrl(String url) {
         loadUrl("GoToUrl", url);
     }
@@ -368,8 +407,8 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * Stop loading a page.
      */
-    @SimpleFunction(
-            description = "Stop loading a page.")
+  /* @SimpleFunction(
+      description = "Stop loading a page.") */
     public void StopLoading() {
         webview.stopLoading();
     }
@@ -377,8 +416,8 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * Reload the current page.
      */
-    @SimpleFunction(
-            description = "Reload the current page.")
+  /* @SimpleFunction(
+      description = "Reload the current page.") */
     public void Reload() {
         webview.reload();
     }
@@ -389,11 +428,12 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @param uses -- Whether or not the API is available
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(userVisible = false,
-            description = "Whether or not to give the application permission to use the Javascript geolocation API. " +
-                    "This property is available only in the designer.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(userVisible = false,
+      description = "Whether or not to give the application permission to use the Javascript geolocation API. " +
+          "This property is available only in the designer.",
+      category = PropertyCategory.BEHAVIOR) */
     public void UsesLocation(boolean uses) {
         // We don't actually do anything here (the work is in the MockWebViewer)
     }
@@ -405,8 +445,8 @@ public final class WebViewer extends AndroidViewComponent {
      * @return true if prompting is  required.  False assumes permission is granted.
      */
 
-    @SimpleProperty(description = "If True, then prompt the user of the WebView to give permission to access the geolocation API. " +
-            "If False, then assume permission is granted.")
+  /* @SimpleProperty(description = "If True, then prompt the user of the WebView to give permission to access the geolocation API. " +
+      "If False, then assume permission is granted.") */
     public boolean PromptforPermission() {
         return prompt;
     }
@@ -420,9 +460,9 @@ public final class WebViewer extends AndroidViewComponent {
      * @param prompt set to true to require prompting. False assumes permission is granted.
      */
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty(userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty(userVisible = true, category = PropertyCategory.BEHAVIOR) */
     public void PromptforPermission(boolean prompt) {
         this.prompt = prompt;
     }
@@ -436,7 +476,7 @@ public final class WebViewer extends AndroidViewComponent {
      * As the permissions interface is not available on phones older then
      * Eclair, this function is a no-op on older phones.
      */
-    @SimpleFunction(description = "Clear stored location permissions.")
+    /* @SimpleFunction(description = "Clear stored location permissions.") */
     public void ClearLocations() {
         if (SdkLevel.getLevel() >= SdkLevel.LEVEL_ECLAIR)
             EclairUtil.clearWebViewGeoLoc();
@@ -459,7 +499,7 @@ public final class WebViewer extends AndroidViewComponent {
      * when using the `WebViewer` to poll a page that may not be sending
      * appropriate cache control headers.
      */
-    @SimpleFunction(description = "Clear WebView caches.")
+    /* @SimpleFunction(description = "Clear WebView caches.") */
     public void ClearCaches() {
         webview.clearCache(true);
     }
@@ -468,7 +508,7 @@ public final class WebViewer extends AndroidViewComponent {
      * Clear the webview's cookies. This is useful if you want to
      * sign the user out of a website that uses them to store logins.
      */
-    @SimpleFunction(description = "Clear WebView cookies.")
+    /* @SimpleFunction(description = "Clear WebView cookies.") */
     public void ClearCookies() {
         CookieManager cookieManager = CookieManager.getInstance();
         if (SdkLevel.getLevel() >= SdkLevel.LEVEL_LOLLIPOP) {
@@ -481,7 +521,7 @@ public final class WebViewer extends AndroidViewComponent {
     /**
      * Run JavaScript in the current page.
      */
-    @SimpleFunction(description = "Run JavaScript in the current page.")
+    /* @SimpleFunction(description = "Run JavaScript in the current page.") */
     public void RunJavaScript(String js) {
         // evaluateJavascript() was added in API 19
         // and is therefore not used here for compatibility purposes.
@@ -494,22 +534,22 @@ public final class WebViewer extends AndroidViewComponent {
      *
      * @param value
      */
-    @SimpleEvent(description = "When the JavaScript calls AppInventor.setWebViewString this event is run.")
+    /* @SimpleEvent(description = "When the JavaScript calls AppInventor.setWebViewString this event is run.") */
     public void WebViewStringChange(String value) {
         EventDispatcher.dispatchEvent(this, "WebViewStringChange", value);
     }
 
-    @SimpleEvent(description = "When a page is about to load this event is run.")
+    /* @SimpleEvent(description = "When a page is about to load this event is run.") */
     public void BeforePageLoad(String url) {
         EventDispatcher.dispatchEvent(this, "BeforePageLoad", url);
     }
 
-    @SimpleEvent(description = "When a page is finished loading this event is run.")
+    /* @SimpleEvent(description = "When a page is finished loading this event is run.") */
     public void PageLoaded(String url) {
         EventDispatcher.dispatchEvent(this, "PageLoaded", url);
     }
 
-    @SimpleEvent(description = "When an error occurs this event is run.")
+    /* @SimpleEvent(description = "When an error occurs this event is run.") */
     public void ErrorOccurred(int errorCode, String description, String failingUrl) {
         EventDispatcher.dispatchEvent(this, "ErrorOccurred", errorCode, description, failingUrl);
     }

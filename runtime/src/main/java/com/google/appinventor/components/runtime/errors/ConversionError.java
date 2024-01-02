@@ -12,5 +12,6 @@ package com.google.appinventor.components.runtime.errors;
  * also converting from a base type to a derived type where there is no
  * relationship.
  */
-public class ConversionError extends RuntimeError {
+/* @SimpleObject
+ */public class ConversionError extends RuntimeError {
 }

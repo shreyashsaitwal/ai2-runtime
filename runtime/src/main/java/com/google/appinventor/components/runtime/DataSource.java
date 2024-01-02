@@ -13,7 +13,8 @@ package com.google.appinventor.components.runtime;
  * @param <K> key (data identifier)
  * @param <V> value (returned data type)
  */
-public interface DataSource<K, V> {
+/* @SimpleObject
+ */public interface DataSource<K, V> {
     /**
      * Gets the specified data value.
      *

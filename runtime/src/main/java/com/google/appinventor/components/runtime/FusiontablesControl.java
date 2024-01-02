@@ -5,22 +5,31 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 package com.google.appinventor.components.runtime;
 
+import com.google.api.client.extensions.android2.AndroidHttp;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.services.fusiontables.Fusiontables;
+import com.google.api.services.fusiontables.Fusiontables.Query.Sql;
+
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.ClientLoginHelper;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.IClientLoginHelper;
+import com.google.appinventor.components.runtime.util.MediaUtil;
+import com.google.appinventor.components.runtime.util.OAuth2Helper;
+import com.google.appinventor.components.runtime.util.SdkLevel;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
-import com.google.api.client.extensions.android2.AndroidHttp;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.util.*;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -34,8 +43,13 @@ import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -60,6 +74,67 @@ import java.util.Collections;
  * Permission takes the form of an access token (called authToken), which must be
  * transmitted to the Fusiontables service as part of all Http requests.
  */
+/* @DesignerComponent(version = YaVersion.FUSIONTABLESCONTROL_COMPONENT_VERSION,
+    description = "<p>A non-visible component that communicates with Google Fusion Tables. " +
+    "Fusion Tables let you store, share, query and visualize data tables; " +
+    "this component lets you query, create, and modify these tables.<//p> "  +
+    "<p><font color=red><b>NOTE:<//b>&nbsp;Google shutdown the Fusion Tables service on December 3, 2019. This " +
+    "component no longer functions.<//font><//p> " +
+    "<p>This component uses the " +
+    "<a href=\"https:////developers.google.com//fusiontables//docs//v2//getting_started\" target=\"_blank\">Fusion Tables API V2.0<//a>. " +
+    "<p>Applications using Fusion Tables must authentication to Google's servers. There " +
+    "are two ways this can be done. The first way uses an API Key which you the developer " +
+    "obtain (see below). With this approach end-users must also login to access a Fusion Table. " +
+    "The second approach is to use a Service Account. With this approach you create credentials " +
+    "and a special \"Service Account Email Address\" which you obtain from the " +
+    "<a href=\"https:////code.google.com//apis//console//\" target=\"_blank\">Google APIs Console<//a>. " +
+    "You then tell the Fusion Table Control the name of the Service Account Email address and upload " +
+    "the secret key as an asset to your application and set the KeyFile property to point at this " +
+    "file. Finally you check the \"UseServiceAuthentication\" checkbox in the designer. " +
+    "When using a Service Account, end-users do not need to login to use Fusion Tables, " +
+    "your service account authenticates all access.<//p> " +
+    "<p>To get an API key, follow these instructions.<//p> " +
+    "<ol>" +
+    "<li>Go to your <a href=\"https:////code.google.com//apis//console//\" target=\"_blank\">Google APIs Console<//a> and login if necessary.<//li>" +
+    "<li>Select the <i>Services<//i> item from the menu on the left.<//li>"   +
+    "<li>Choose the <i>Fusiontables<//i> service from the list provided and turn it on.<//li>" +
+    "<li>Go back to the main menu and select the <i>API Access<//i> item. <//li>" +
+    "<//ol>" +
+    "<p>Your API Key will be near the bottom of that pane in the section called \"Simple API Access\"." +
+    "You will have to provide that key as the value for the <i>ApiKey<//i> property in your Fusiontables app.<//p>" +
+    "<p>Once you have an API key, set the value of the <i>Query<//i> property to a valid Fusiontables SQL query " +
+    "and call <i>SendQuery<//i> to execute the query.  App Inventor will send the query to the Fusion Tables " +
+    "server and the <i>GotResult<//i> block will fire when a result is returned from the server." +
+    "Query results will be returned in CSV format, and " +
+    "can be converted to list format using the \"list from csv table\" or " +
+    "\"list from csv row\" blocks.<//p>" +
+    "<p>Note that you do not need to worry about UTF-encoding the query. " +
+    "But you do need to make sure the query follows the syntax described in " +
+    "<a href=\"https:////developers.google.com//fusiontables//docs//v2//getting_started\" target=\"_blank\">the reference manual<//a>, " +
+    "which means that things like capitalization for names of columns matters, and " +
+    "that single quotes must be used around column names if there are spaces in them.<//p>",
+    category = ComponentCategory.INTERNAL,
+    nonVisible = true,
+    iconName = "images//fusiontables.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames =
+    "android.permission.INTERNET," +
+    "android.permission.ACCOUNT_MANAGER," +
+    "android.permission.MANAGE_ACCOUNTS," +
+    "android.permission.GET_ACCOUNTS," +
+    "android.permission.USE_CREDENTIALS," +
+    "android.permission.WRITE_EXTERNAL_STORAGE," +
+    "android.permission.READ_EXTERNAL_STORAGE") */
+/* @UsesLibraries(libraries =
+    "fusiontables.jar," +
+    "google-api-client.jar," +
+    "google-api-client-android2-beta.jar," +
+    "google-http-client.jar," +
+    "google-http-client-android2-beta.jar," +
+    "google-http-client-android3-beta.jar," +
+    "google-oauth-client.jar," +
+    "guava.jar," +
+    "gson-2.1.jar") */
 
 public class FusiontablesControl extends AndroidNonvisibleComponent implements Component {
     public static final String FUSIONTABLES_POST = "https://www.googleapis.com/fusiontables/v2/tables";
@@ -93,7 +168,6 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
     /**
      * Error message returned from API query
      */
-
 
     // standard error message to return
     // private String standardErrorMessage = Ode.MESSAGES.FusionTablesStandardErrorMessage();
@@ -162,18 +236,18 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
      */
     public static String httpResponseToString(com.google.api.client.http.HttpResponse response) {
         String resultStr = "";
-//        if (response != null) {
-//            if (response.getStatusCode() != 200) {
-//                resultStr = response.getStatusCode() + " " + response.getStatusMessage();
-//            } else {
-//                try {
-//                    resultStr = parseResponse(response.getContent());
-//                } catch (IOException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//            }
+        if (response != null) {
+//      if (response.getStatusCode() != 200) {
+//        resultStr = response.getStatusCode() + " " + response.getStatusMessage();
+//      } else {
+//        try {
+//          resultStr = parseResponse(response.getContent());
+//        } catch (IOException e) {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
 //        }
+//      }
+        }
         return resultStr;
     }
 
@@ -246,13 +320,15 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
      * Property to determine whether to use service authentication or user authentication. When this is
      * checked, service authentication is used.
      **/
-    @SimpleProperty(description = "Indicates whether a service account should be used for authentication")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Indicates whether a service account should be used for authentication") */
     public boolean UseServiceAuthentication() {
         return isServiceAuth;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void UseServiceAuthentication(boolean bool) {
         this.isServiceAuth = bool;
     }
@@ -260,14 +336,16 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
     /**
      * Property for the service account email to use when using service authentication.
      **/
-    @SimpleProperty(description = "The Service Account Email Address when service account authentication " +
-            "is in use.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "The Service Account Email Address when service account authentication " +
+      "is in use.") */
     public String ServiceAccountEmail() {
         return serviceAccountEmail;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ServiceAccountEmail(String email) {
         this.serviceAccountEmail = email;
     }
@@ -275,9 +353,10 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
     /**
      * Setter for the app developer's API key.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
@@ -287,35 +366,39 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
      *
      * @return apiKey the apiKey
      */
-    @SimpleProperty(
-            description = "Your Google API Key. For help, click on the question" +
-                    "mark (?) next to the FusiontablesControl component in the Palette. ")
+  /* @SimpleProperty(
+      description = "Your Google API Key. For help, click on the question" +
+      "mark (?) next to the FusiontablesControl component in the Palette. ",
+      category = PropertyCategory.BEHAVIOR) */
     public String ApiKey() {
         return apiKey;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = DEFAULT_QUERY)
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+        defaultValue = DEFAULT_QUERY) */
+    /* @SimpleProperty
+     */
     public void Query(String query) {
         this.query = query;
     }
 
-    @SimpleProperty(
-            description = "The query to send to the Fusion Tables API. " +
-                    "<p>For legal query formats and examples, see the " +
-                    "<a href=\"https://developers.google.com/fusiontables/docs/v2/getting_started\" target=\"_blank\">Fusion Tables API v2.0 reference manual</a>.</p> " +
-                    "<p>Note that you do not need to worry about UTF-encoding the query. " +
-                    "But you do need to make sure it follows the syntax described in the reference manual, " +
-                    "which means that things like capitalization for names of columns matters, " +
-                    "and that single quotes need to be used around column names if there are spaces in them.</p> ")
+    /* @SimpleProperty(
+        description = "The query to send to the Fusion Tables API. " +
+        "<p>For legal query formats and examples, see the " +
+        "<a href=\"https:////developers.google.com//fusiontables//docs//v2//getting_started\" target=\"_blank\">Fusion Tables API v2.0 reference manual<//a>.<//p> " +
+        "<p>Note that you do not need to worry about UTF-encoding the query. " +
+        "But you do need to make sure it follows the syntax described in the reference manual, " +
+        "which means that things like capitalization for names of columns matters, " +
+        "and that single quotes need to be used around column names if there are spaces in them.<//p> ",
+        category = PropertyCategory.BEHAVIOR) */
     public String Query() {
         return query;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
-            defaultValue = "")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+        defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void KeyFile(String path) {
         // If it's the same as on the prior call and the prior load was successful,
         // do nothing.
@@ -331,10 +414,10 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
         keyPath = (path == null) ? "" : path;
     }
 
-    @SimpleProperty(
-
-            description = "Specifies the path of the private key file.  " +
-                    "This key file is used to get access to the FusionTables API.")
+    /* @SimpleProperty(
+        category = PropertyCategory.BEHAVIOR,
+        description = "Specifies the path of the private key file.  " +
+        "This key file is used to get access to the FusionTables API.") */
     public String KeyFile() {
         return keyPath;
     }
@@ -343,7 +426,7 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
      * Calls QueryProcessor to execute the API request asynchronously, if
      * the user has already authenticated with the Fusiontables service.
      */
-    @SimpleFunction(description = "Send the query to the Fusiontables server.")
+    /* @SimpleFunction(description = "Send the query to the Fusiontables server.") */
     public void SendQuery() {
         new QueryProcessorV2(activity).execute(query);
     }
@@ -351,8 +434,8 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
     //Deprecated  -- Won't work after 12/2012
     @Deprecated // [lyn, 2015/12/30] In AI2, now use explicit @Deprecated annotation rather than
     // userVisible = false to deprecate an event, method, or property.
-    @SimpleFunction(
-            description = "DEPRECATED. This block is deprecated as of the end of 2012.  Use SendQuery.")
+  /* @SimpleFunction(
+      description = "DEPRECATED. This block is deprecated as of the end of 2012.  Use SendQuery.") */
     public void DoQuery() {
         if (requestHelper != null) {
             new QueryProcessor().execute(query);
@@ -362,11 +445,11 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
         }
     }
 
-    @SimpleEvent(
-            description = "Indicates that the Fusion Tables query has finished processing, " +
-                    "with a result.  The result of the query will generally be returned in CSV format, and " +
-                    "can be converted to list format using the \"list from csv table\" or " +
-                    "\"list from csv row\" blocks.")
+    /* @SimpleEvent(
+        description = "Indicates that the Fusion Tables query has finished processing, " +
+          "with a result.  The result of the query will generally be returned in CSV format, and " +
+          "can be converted to list format using the \"list from csv table\" or " +
+        "\"list from csv row\" blocks.") */
     public void GotResult(String result) {
         // Invoke the application's "GotValue" event handler
         EventDispatcher.dispatchEvent(this, "GotResult", result);
@@ -374,34 +457,34 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
 
     // TODO(sharon): figure out why this isn't working
     // TODO(ralph): Looks like it's working for OAuth 2, Let's user switch accounts
-    @SimpleFunction(
-            description = "Forget end-users login credentials. Has no effect on service authentication")
+  /* @SimpleFunction(
+      description = "Forget end-users login credentials. Has no effect on service authentication") */
     public void ForgetLogin() {
         OAuth2Helper.resetAccountCredential(activity);
     }
 
-    @SimpleFunction(
-            description = "Inserts a row into the specified fusion table. The tableId field is the id of the" +
-                    "fusion table. The columns is a comma-separated list of the columns to insert values into. The" +
-                    " values field specifies what values to insert into each column.")
+    /* @SimpleFunction(
+      description="Inserts a row into the specified fusion table. The tableId field is the id of the" +
+        "fusion table. The columns is a comma-separated list of the columns to insert values into. The" +
+        " values field specifies what values to insert into each column.") */
     public void InsertRow(String tableId, String columns, String values) {
         query = "INSERT INTO " + tableId + " (" + columns + ")" + " VALUES " + "(" + values + ")";
         new QueryProcessorV2(activity).execute(query);
     }
 
-    @SimpleFunction(
-            description = "Gets all the rows from a specified fusion table. The tableId field is the id of the" +
-                    "required fusion table. The columns field is a comma-separeted list of the columns to retrieve.")
+    /* @SimpleFunction(
+      description="Gets all the rows from a specified fusion table. The tableId field is the id of the" +
+        "required fusion table. The columns field is a comma-separeted list of the columns to retrieve.") */
     public void GetRows(String tableId, String columns) {
         query = "SELECT " + columns + " FROM " + tableId;
         new QueryProcessorV2(activity).execute(query);
     }
 
-    @SimpleFunction(
-            description = "Gets all the rows from a fusion table that meet certain conditions. The tableId field is" +
-                    "the id of the required fusion table. The columns field is a comma-separeted list of the columns to" +
-                    "retrieve. The conditions field specifies what rows to retrieve from the table, for example the rows in which" +
-                    "a particular column value is not null.")
+    /* @SimpleFunction(
+      description="Gets all the rows from a fusion table that meet certain conditions. The tableId field is" +
+      "the id of the required fusion table. The columns field is a comma-separeted list of the columns to" +
+      "retrieve. The conditions field specifies what rows to retrieve from the table, for example the rows in which" +
+      "a particular column value is not null.") */
     public void GetRowsWithConditions(String tableId, String columns, String conditions) {
         query = "SELECT " + columns + " FROM " + tableId + " WHERE " + conditions;
         new QueryProcessorV2(activity).execute(query);
@@ -410,9 +493,10 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
     /**
      * Setter for the loading dialog's message.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "Please wait loading...")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "Please wait loading...") */
+    /* @SimpleProperty
+     */
     public void LoadingDialogMessage(String loadingDialogMessage) {
         this.loadingDialogMessage = loadingDialogMessage;
     }
@@ -422,9 +506,9 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
      *
      * @return loadingDialogMessage
      */
-    @SimpleProperty(
-            description = "Set the loading message for the dialog."
-    )
+  /* @SimpleProperty(
+      description = "Set the loading message for the dialog.",
+      category = PropertyCategory.BEHAVIOR) */
     public String LoadingDialogMessage() {
         return loadingDialogMessage;
     }
@@ -432,9 +516,10 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
     /**
      * Setter for the loading dialog's visibility.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void ShowLoadingDialog(boolean showLoadingDialog) {
         this.showLoadingDialog = showLoadingDialog;
     }
@@ -444,8 +529,9 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
      *
      * @return True if the loading dialog should be shown, otherwise False.
      */
-    @SimpleProperty(
-            description = "Whether or not to show the loading dialog")
+  /* @SimpleProperty(
+      description = "Whether or not to show the loading dialog",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean ShowLoadingDialog() {
         return showLoadingDialog;
     }
@@ -809,7 +895,6 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
             return queryResultStr;
         }  //end of ServiceAuthRequest
 
-
         String parseJsonResponseException(String exceptionMessage) {
             Log.i(STAG, "parseJsonResponseException: " + exceptionMessage);
             // This procedure is here as a stub in case we want to someday make the
@@ -817,7 +902,6 @@ public class FusiontablesControl extends AndroidNonvisibleComponent implements C
             // now, we just return the raw message.
             return exceptionMessage;
         }
-
 
         /**
          * Fires the AppInventor GotResult() method

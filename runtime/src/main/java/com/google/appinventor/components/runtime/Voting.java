@@ -6,18 +6,18 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.app.Activity;
-import android.os.Handler;
-import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.collect.Lists;
 import com.google.appinventor.components.runtime.util.AsyncCallbackPair;
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.WebServiceUtil;
+
+import android.app.Activity;
+import android.os.Handler;
+import android.util.Log;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -60,6 +60,16 @@ import java.util.List;
  *
  * @author halabelson@google.com (Hal Abelson)
  */
+
+/* @DesignerComponent(version = YaVersion.VOTING_COMPONENT_VERSION,
+    designerHelpDescription = "<p>The Voting component enables users to vote " +
+    "on a question by communicating with a Web service to retrieve a ballot " +
+    "and later sending back users' votes.<//p>",
+    category = ComponentCategory.INTERNAL, //// moved to Internal until fully tested
+    nonVisible = true,
+    iconName = "images//voting.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
 
 public class Voting extends AndroidNonvisibleComponent implements Component {
     private static final String LOG_TAG = "Voting";
@@ -111,8 +121,9 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * The URL of the Voting Service
      */
-    @SimpleProperty(
-            description = "The URL of the Voting service")
+  /* @SimpleProperty(
+      description = "The URL of the Voting service",
+      category = PropertyCategory.BEHAVIOR) */
     public String ServiceURL() {
         return serviceURL;
     }
@@ -122,9 +133,10 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
      *
      * @param serviceURL the URL (includes initial http:, but no trailing slash)
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "http://androvote.appspot.com")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "http:////androvote.appspot.com") */
+    /* @SimpleProperty
+     */
     public void ServiceURL(String serviceURL) {
         this.serviceURL = serviceURL;
     }
@@ -132,8 +144,9 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * The question to be voted on.
      */
-    @SimpleProperty(
-            description = "The question to be voted on.")
+  /* @SimpleProperty(
+      description = "The question to be voted on.",
+      category = PropertyCategory.BEHAVIOR) */
     public String BallotQuestion() {
         return ballotQuestion;
     }
@@ -141,12 +154,12 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * The list of choices to vote.
      */
-    @SimpleProperty(
-            description = "The list of ballot options.")
+  /* @SimpleProperty(
+      description = "The list of ballot options.",
+      category = PropertyCategory.BEHAVIOR) */
     public List<String> BallotOptions() {
         return ballotOptions;
     }
-
 
     // This should not be settable by the user
     // @SimpleProperty
@@ -157,10 +170,11 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * An Id that is sent to the Web server along with the vote.
      */
-    @SimpleProperty(
-            description = "A text identifying the voter that is sent to the Voting " +
+  /* @SimpleProperty(
+      description = "A text identifying the voter that is sent to the Voting " +
                     "server along with the vote.  This must be set before " +
-                    "<code>SendBallot</code> is called.")
+                    "<code>SendBallot<//code> is called.",
+      category = PropertyCategory.BEHAVIOR) */
     public String UserId() {
         return userId;
     }
@@ -170,7 +184,8 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
      *
      * @param userId the string to use as the Id
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void UserId(String userId) {
         this.userId = userId;
     }
@@ -178,10 +193,11 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * The choice to select when sending the vote.
      */
-    @SimpleProperty(
-            description = "The ballot choice to send to the server, which must be " +
-                    "set before <code>SendBallot</code> is called.  " +
-                    "This must be one of <code>BallotOptions</code>.")
+  /* @SimpleProperty(
+      description = "The ballot choice to send to the server, which must be " +
+                    "set before <code>SendBallot<//code> is called.  " +
+                    "This must be one of <code>BallotOptions<//code>.",
+      category = PropertyCategory.BEHAVIOR) */
     public String UserChoice() {
         return userChoice;
     }
@@ -191,7 +207,8 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
      *
      * @param userChoice the choice to select.  Must be one of the BallotOptions
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void UserChoice(String userChoice) {
         this.userChoice = userChoice;
     }
@@ -200,9 +217,10 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
      * Returns the registered email address, as a string, for this
      * device's user.
      */
-    @SimpleProperty(
-            description = "The email address associated with this device. This property has been " +
-                    "deprecated and always returns the empty text value.")
+  /* @SimpleProperty(
+      description = "The email address associated with this device. This property has been " +
+      "deprecated and always returns the empty text value.",
+      category = PropertyCategory.BEHAVIOR) */
     public String UserEmailAddress() {
         // The UserEmailAddress has not been supported since before the Gingerbread release, so we
         // suspect that nobody is relying on it, and are therefore deprecating it. If it happens that
@@ -227,13 +245,13 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * Send a request ballot command to the Voting server.
      */
-    @SimpleFunction(
-            description =
-                    "Send a request for a ballot to the Web service specified " +
-                            "by the property <code>ServiceURL</code>.  When the " +
-                            "completes, one of the following events will be raised: " +
-                            "<code>GotBallot</code>, <code>NoOpenPoll</code>, or " +
-                            "<code>WebServiceError</code>.")
+  /* @SimpleFunction(
+      description =
+      "Send a request for a ballot to the Web service specified " +
+      "by the property <code>ServiceURL<//code>.  When the " +
+      "completes, one of the following events will be raised: " +
+      "<code>GotBallot<//code>, <code>NoOpenPoll<//code>, or " +
+      "<code>WebServiceError<//code>.") */
     public void RequestBallot() {
         final Runnable call = new Runnable() {
             public void run() {
@@ -326,16 +344,15 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
         return a;
     }
 
-
     /**
      * Event indicating that a ballot was received from the Web service.
      */
-    @SimpleEvent(
-            description =
-                    "Event indicating that a ballot was retrieved from the Web " +
-                            "service and that the properties <code>BallotQuestion</code> and " +
-                            "<code>BallotOptions</code> have been set.  This is always preceded " +
-                            "by a call to the method <code>RequestBallot</code>.")
+  /* @SimpleEvent(
+      description =
+      "Event indicating that a ballot was retrieved from the Web " +
+      "service and that the properties <code>BallotQuestion<//code> and " +
+      "<code>BallotOptions<//code> have been set.  This is always preceded " +
+      "by a call to the method <code>RequestBallot<//code>.") */
     public void GotBallot() {
         EventDispatcher.dispatchEvent(this, "GotBallot");
     }
@@ -343,7 +360,8 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * Event indicating that the service has no open poll.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void NoOpenPoll() {
         EventDispatcher.dispatchEvent(this, "NoOpenPoll");
     }
@@ -352,11 +370,11 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
      * Send a ballot to the Web Voting server.  The userId and the choice are
      * specified by the UserId and UserChoice properties.
      */
-    @SimpleFunction(
-            description =
-                    "Send a completed ballot to the Web service.  This should " +
-                            "not be called until the properties <code>UserId</code> " +
-                            "and <code>UserChoice</code> have been set by the application.")
+  /* @SimpleFunction(
+      description =
+      "Send a completed ballot to the Web service.  This should " +
+      "not be called until the properties <code>UserId<//code> " +
+      "and <code>UserChoice<//code> have been set by the application.") */
     public void SendBallot() {
         final Runnable call = new Runnable() {
             public void run() {
@@ -402,7 +420,8 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
     /**
      * Event confirming that the Voting service received the ballot.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void GotBallotConfirmation() {
         EventDispatcher.dispatchEvent(this, "GotBallotConfirmation");
     }
@@ -415,7 +434,8 @@ public class Voting extends AndroidNonvisibleComponent implements Component {
      *
      * @param message the error message
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void WebServiceError(String message) {
         // Invoke the application's "WebServiceError" event handler
         EventDispatcher.dispatchEvent(this, "WebServiceError", message);

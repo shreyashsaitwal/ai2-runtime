@@ -4,7 +4,6 @@
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
-
 package com.google.appinventor.components.runtime;
 
 import android.content.Context;
@@ -19,16 +18,19 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.Sensitivity;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Non-visible component that can detect shaking and measure acceleration approximately in three
@@ -60,7 +62,28 @@ import java.util.*;
  * close to zero. Acceleration values are given in SI units (m/s^2)."
  */
 // TODO(user): ideas - event for knocking
-public class AccelerometerSensor extends AndroidNonvisibleComponent
+/* @DesignerComponent(version = YaVersion.ACCELEROMETERSENSOR_COMPONENT_VERSION,
+    description = "Non-visible component that can detect shaking and " +
+    "measure acceleration approximately in three dimensions using SI units " +
+    "(m//s<sup>2<//sup>).  The components are: <ul>\n" +
+    "<li> <strong>xAccel<//strong>: 0 when the phone is at rest on a flat " +
+    "     surface, positive when the phone is tilted to the right (i.e., " +
+    "     its left side is raised), and negative when the phone is tilted " +
+    "     to the left (i.e., its right size is raised).<//li>\n " +
+    "<li> <strong>yAccel<//strong>: 0 when the phone is at rest on a flat " +
+    "     surface, positive when its bottom is raised, and negative when " +
+    "     its top is raised. <//li>\n " +
+    "<li> <strong>zAccel<//strong>: Equal to -9.8 (earth's gravity in meters per " +
+    "     second per second when the device is at rest parallel to the ground " +
+    "     with the display facing up, " +
+    "     0 when perpendicular to the ground, and +9.8 when facing down.  " +
+    "     The value can also be affected by accelerating it with or against " +
+    "     gravity. <//li><//ul>",
+    category = ComponentCategory.SENSORS,
+    nonVisible = true,
+    iconName = "images//accelerometersensor.png") */
+/* @SimpleObject
+ */public class AccelerometerSensor extends AndroidNonvisibleComponent
         implements OnPauseListener, OnResumeListener, SensorComponent, SensorEventListener, Deleteable,
         RealTimeDataSource<String, Float> {
 
@@ -123,7 +146,6 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
         SensitivityAbstract(Sensitivity.Moderate);
     }
 
-
     /**
      * Returns the minimum interval required between calls to Shaking(),
      * in milliseconds.
@@ -132,9 +154,9 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      *
      * @return minimum interval in ms
      */
-    @SimpleProperty(
-
-            description = "The minimum interval, in milliseconds, between phone shakes")
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR,
+      description = "The minimum interval, in milliseconds, between phone shakes") */
     public int MinimumInterval() {
         return minimumInterval;
     }
@@ -147,9 +169,10 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      *
      * @param interval minimum interval in ms
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "400") //Default value derived by trial of 12 people on 3 different devices
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "400") */ //Default value derived by trial of 12 people on 3 different devices
+    /* @SimpleProperty
+     */
     public void MinimumInterval(int interval) {
         minimumInterval = interval;
     }
@@ -162,12 +185,12 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      * {@link Component#ACCELEROMETER_SENSITIVITY_MODERATE} or
      * {@link Component#ACCELEROMETER_SENSITIVITY_STRONG}
      */
-    @SimpleProperty(
-
-            description = "A number that encodes how sensitive the accelerometer is. " +
-                    "The choices are: 1 = weak, 2 = moderate, " +
-                    " 3 = strong.")
-    public @Options(Sensitivity.class) int Sensitivity() {
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      description = "A number that encodes how sensitive the accelerometer is. " +
+              "The choices are: 1 = weak, 2 = moderate, " +
+              " 3 = strong.") */
+    public /* @Options(Sensitivity.class) */ int Sensitivity() {
         return sensitivity.toUnderlyingValue();
     }
 
@@ -195,10 +218,11 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      *                    {@link Component#ACCELEROMETER_SENSITIVITY_MODERATE} or
      *                    {@link Component#ACCELEROMETER_SENSITIVITY_STRONG}
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ACCELEROMETER_SENSITIVITY,
-            defaultValue = Component.ACCELEROMETER_SENSITIVITY_MODERATE + "")
-    @SimpleProperty
-    public void Sensitivity(@Options(Sensitivity.class) int sensitivity) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ACCELEROMETER_SENSITIVITY,
+      defaultValue = Component.ACCELEROMETER_SENSITIVITY_MODERATE + "") */
+    /* @SimpleProperty
+     */
+    public void Sensitivity(/* @Options(Sensitivity.class) */ int sensitivity) {
         // Make sure sensitivity is a valid Sensitivity.
         Sensitivity level = Sensitivity.fromUnderlyingValue(sensitivity);
         if (level == null) {
@@ -212,7 +236,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
     /**
      * Indicates the acceleration changed in the X, Y, and/or Z dimensions.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void AccelerationChanged(float xAccel, float yAccel, float zAccel) {
         this.xAccel = xAccel;
         this.yAccel = yAccel;
@@ -267,7 +292,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
     /**
      * Indicates the device started being shaken or continues to be shaken.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void Shaking() {
         EventDispatcher.dispatchEvent(this, "Shaking");
     }
@@ -278,8 +304,9 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that an accelerometer sensor is available,
      * {@code false} that it isn't
      */
-    @SimpleProperty(
-            description = "Returns whether the accelerometer is available on the device.")
+  /* @SimpleProperty(
+      description = "Returns whether the accelerometer is available on the device.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Available() {
         List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         return (sensors.size() > 0);
@@ -292,8 +319,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that the sensor generates events,
      * {@code false} that it doesn't
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Enabled() {
         return enabled;
     }
@@ -329,9 +356,10 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      * @param enabled {@code true} enables sensor event generation,
      *                {@code false} disables it
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void Enabled(boolean enabled) {
         if (this.enabled == enabled) {
             return;
@@ -350,8 +378,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      *
      * @return X acceleration
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public float XAccel() {
         return xAccel;
     }
@@ -362,8 +390,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      *
      * @return Y acceleration
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public float YAccel() {
         return yAccel;
     }
@@ -374,8 +402,8 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
      *
      * @return Z acceleration
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public float ZAccel() {
         return zAccel;
     }
@@ -415,22 +443,23 @@ public class AccelerometerSensor extends AndroidNonvisibleComponent
         }
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(userVisible = false,
-            description = "Prior to the release that added this property the AccelerometerSensor " +
-                    "component passed through sensor values directly as received from the " +
-                    "Android system. However these values do not compensate for tablets " +
-                    "that default to Landscape mode, requiring the MIT App Inventor " +
-                    "programmer to compensate. However compensating would result in " +
-                    "incorrect results in Portrait mode devices such as phones. " +
-                    "We now detect Landscape mode tablets and perform the compensation. " +
-                    "However if your project is already compensating for the change, you " +
-                    "will now get incorrect results. Although our preferred solution is for " +
-                    "you to update your project, you can also just set this property to “true” " +
-                    "and our compensation code will be deactivated. Note: We recommend that " +
-                    "you update your project as we may remove this property in a future " +
-                    "release.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(userVisible = false,
+    description="Prior to the release that added this property the AccelerometerSensor " +
+    "component passed through sensor values directly as received from the " +
+    "Android system. However these values do not compensate for tablets " +
+    "that default to Landscape mode, requiring the MIT App Inventor " +
+    "programmer to compensate. However compensating would result in " +
+    "incorrect results in Portrait mode devices such as phones. " +
+    "We now detect Landscape mode tablets and perform the compensation. " +
+    "However if your project is already compensating for the change, you " +
+    "will now get incorrect results. Although our preferred solution is for " +
+    "you to update your project, you can also just set this property to “true” " +
+    "and our compensation code will be deactivated. Note: We recommend that " +
+    "you update your project as we may remove this property in a future " +
+    "release.",
+    category = PropertyCategory.BEHAVIOR) */
     public void LegacyMode(boolean legacyMode) {
         this.legacyMode = legacyMode;
     }

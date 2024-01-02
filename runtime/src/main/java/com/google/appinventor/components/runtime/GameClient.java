@@ -6,17 +6,23 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.collect.Lists;
+import com.google.appinventor.components.runtime.errors.YailRuntimeError;
+import com.google.appinventor.components.runtime.util.AsyncCallbackPair;
+import com.google.appinventor.components.runtime.util.AsynchUtil;
+import com.google.appinventor.components.runtime.util.GameInstance;
+import com.google.appinventor.components.runtime.util.JsonUtil;
+import com.google.appinventor.components.runtime.util.PlayerListDelta;
+import com.google.appinventor.components.runtime.util.WebServiceUtil;
+import com.google.appinventor.components.runtime.util.YailList;
+
 import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.collect.Lists;
-import com.google.appinventor.components.runtime.errors.YailRuntimeError;
-import com.google.appinventor.components.runtime.util.*;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -59,6 +65,15 @@ import java.util.List;
  * or instance id. In this case, the response is completely ignored
  * and neither of these events will trigger.
  */
+/* @DesignerComponent(version = YaVersion.GAMECLIENT_COMPONENT_VERSION,
+    description = "Provides a way for applications to communicate with online game servers",
+    category = ComponentCategory.INTERNAL, //// moved to internal until fully tested
+    nonVisible = true,
+    iconName = "images//gameClient.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(
+    permissionNames = "android.permission.INTERNET, " +
+                "com.google.android.googleapps.permission.GOOGLE_AUTH") */
 public class GameClient extends AndroidNonvisibleComponent
         implements Component, OnResumeListener, OnStopListener {
 
@@ -153,7 +168,6 @@ public class GameClient extends AndroidNonvisibleComponent
     */
     }
 
-
     //----------------------------------------------------------------
     // Properties
 
@@ -161,9 +175,10 @@ public class GameClient extends AndroidNonvisibleComponent
      * Returns a string indicating the game name for this application.
      * The same game ID can have one or more game instances.
      */
-    @SimpleProperty(
-            description = "The game name for this application. " +
-                    "The same game ID can have one or more game instances.")
+  /* @SimpleProperty(
+      description = "The game name for this application. " +
+      "The same game ID can have one or more game instances.",
+      category = PropertyCategory.BEHAVIOR) */
     public String GameId() {
         return gameId;
     }
@@ -175,9 +190,9 @@ public class GameClient extends AndroidNonvisibleComponent
      */
     // Only exposed in the designer to enforce that each GameClient
     // instance should be made for a single GameId.
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
     public void GameId(String id) {
         this.gameId = id;
     }
@@ -186,9 +201,10 @@ public class GameClient extends AndroidNonvisibleComponent
      * Returns the game instance id.  Taken together, the game ID and
      * the instance ID uniquely identify the game.
      */
-    @SimpleProperty(
-            description = "The game instance id.  Taken together," +
-                    "the game ID and the instance ID uniquely identify the game.")
+  /* @SimpleProperty(
+      description = "The game instance id.  Taken together," +
+      "the game ID and the instance ID uniquely identify the game.",
+      category = PropertyCategory.BEHAVIOR) */
     public String InstanceId() {
         return instance.getInstanceId();
     }
@@ -198,10 +214,11 @@ public class GameClient extends AndroidNonvisibleComponent
      * invited but has not yet joined.  To ensure current values are
      * returned, first invoke {@link #GetInstanceLists}.
      */
-    @SimpleProperty(
-            description = "The set of game instances to which this player has been " +
+  /* @SimpleProperty(
+      description = "The set of game instances to which this player has been " +
                     "invited but has not yet joined.  To ensure current values are " +
-                    "returned, first invoke GetInstanceLists.")
+                    "returned, first invoke GetInstanceLists.",
+      category = PropertyCategory.BEHAVIOR) */
     public List<String> InvitedInstances() {
         return invitedInstances;
     }
@@ -211,10 +228,11 @@ public class GameClient extends AndroidNonvisibleComponent
      * participating.  To ensure current values are returned, first
      * invoke {@link #GetInstanceLists}.
      */
-    @SimpleProperty(
-            description = "The set of game instances in which this player is " +
-                    "participating.  To ensure current values are returned, first " +
-                    "invoke GetInstanceLists.")
+  /* @SimpleProperty(
+      description = "The set of game instances in which this player is " +
+      "participating.  To ensure current values are returned, first " +
+      "invoke GetInstanceLists.",
+      category = PropertyCategory.BEHAVIOR) */
     public List<String> JoinedInstances() {
         return joinedInstances;
     }
@@ -227,13 +245,14 @@ public class GameClient extends AndroidNonvisibleComponent
      * value is updated each time a successful communication is made
      * with the server.
      */
-    @SimpleProperty(
-            description = "The game's leader. At any time, each game instance has " +
-                    "only one leader, but the leader may change with time.  " +
-                    "Initially, the leader is the game instance creator. Application " +
-                    "writers determine special properties of the leader. The leader " +
-                    "value is updated each time a successful communication is made " +
-                    "with the server.")
+  /* @SimpleProperty(
+      description = "The game's leader. At any time, each game instance has " +
+      "only one leader, but the leader may change with time.  " +
+      "Initially, the leader is the game instance creator. Application " +
+      "writers determine special properties of the leader. The leader " +
+      "value is updated each time a successful communication is made " +
+      "with the server.",
+      category = PropertyCategory.BEHAVIOR) */
     public String Leader() {
         return instance.getLeader();
     }
@@ -244,11 +263,12 @@ public class GameClient extends AndroidNonvisibleComponent
      * list of players is updated each time a successful communication
      * is made with the game server.
      */
-    @SimpleProperty(
-            description = "The current set of players for this game instance. Each " +
-                    "player is designated by an email address, which is a string. The " +
-                    "list of players is updated each time a successful communication " +
-                    "is made with the game server.")
+  /* @SimpleProperty(
+      description = "The current set of players for this game instance. Each " +
+      "player is designated by an email address, which is a string. The " +
+      "list of players is updated each time a successful communication " +
+      "is made with the game server.",
+      category = PropertyCategory.BEHAVIOR) */
     public List<String> Players() {
         return instance.getPlayers();
     }
@@ -258,10 +278,11 @@ public class GameClient extends AndroidNonvisibleComponent
      * To ensure current values are returned, first
      * invoke {@link #GetInstanceLists}.
      */
-    @SimpleProperty(
-            description = "The set of game instances that have been marked public. " +
-                    "To ensure current values are returned, first " +
-                    "invoke {@link #GetInstanceLists}. ")
+  /* @SimpleProperty(
+      description = "The set of game instances that have been marked public. " +
+      "To ensure current values are returned, first " +
+      "invoke {@link #GetInstanceLists}. ",
+      category = PropertyCategory.BEHAVIOR) */
     public List<String> PublicInstances() {
         return publicInstances;
     }
@@ -269,8 +290,9 @@ public class GameClient extends AndroidNonvisibleComponent
     /**
      * The URL of the game server.
      */
-    @SimpleProperty(
-            description = "The URL of the game server.")
+  /* @SimpleProperty(
+      description = "The URL of the game server.",
+      category = PropertyCategory.BEHAVIOR) */
     public String ServiceUrl() {
         return serviceUrl;
     }
@@ -280,10 +302,10 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param url The URL (include initial http://).
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "http://appinvgameserver.appspot.com")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "http:////appinvgameserver.appspot.com") */
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.BEHAVIOR) */
     public void ServiceURL(String url) {
         if (url.endsWith("/")) {
             this.serviceUrl = url.substring(0, url.length() - 1);
@@ -296,13 +318,13 @@ public class GameClient extends AndroidNonvisibleComponent
      * Returns the registered email address that is being used as the
      * player id for this game client.
      */
-    @SimpleProperty(
-            description = "The email address that is being used as the " +
+  /* @SimpleProperty(
+      description = "The email address that is being used as the " +
                     "player id for this game client.   At present, users " +
                     "must set this manually in oder to join a game.  But " +
                     "this property will change in the future so that is set " +
-                    "automatically, and users will not be able to change it.")
-
+      "automatically, and users will not be able to change it.",
+      category = PropertyCategory.BEHAVIOR) */
     public String UserEmailAddress() {
         if (userEmailAddress.equals("")) {
             Info("User email address is empty.");
@@ -320,7 +342,8 @@ public class GameClient extends AndroidNonvisibleComponent
      * @param emailAddress The email address to set the current player
      *                     id to.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void UserEmailAddress(String emailAddress) {
         userEmailAddress = emailAddress;
         UserEmailAddressSet(emailAddress);
@@ -337,7 +360,7 @@ public class GameClient extends AndroidNonvisibleComponent
      * @param functionName The name of the App Inventor function that
      *                     finished.
      */
-    @SimpleEvent(description = "Indicates that a function call completed.")
+    /* @SimpleEvent(description = "Indicates that a function call completed.") */
     public void FunctionCompleted(final String functionName) {
         androidUIHandler.post(new Runnable() {
             public void run() {
@@ -366,8 +389,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *                 nested to arbitrary depth that includes string, boolean and
      *                 number values.
      */
-    @SimpleEvent(description = "Indicates that a new message has " +
-            "been received.")
+  /* @SimpleEvent(description = "Indicates that a new message has " +
+                "been received.") */
     public void GotMessage(final String type, final String sender, final List<Object> contents) {
         Log.d(LOG_TAG, "Got message of type " + type);
         androidUIHandler.post(new Runnable() {
@@ -383,9 +406,9 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param instanceId The id of the instance the player is now in.
      */
-    @SimpleEvent(description = "Indicates that the InstanceId " +
-            "property has changed as a result of calling " +
-            "MakeNewInstance or SetInstance.")
+  /* @SimpleEvent(description = "Indicates that the InstanceId " +
+                "property has changed as a result of calling " +
+                "MakeNewInstance or SetInstance.") */
     public void InstanceIdChanged(final String instanceId) {
         Log.d(LOG_TAG, "Instance id changed to " + instanceId);
         androidUIHandler.post(new Runnable() {
@@ -401,9 +424,9 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param instanceId The id of the new game instance.
      */
-    @SimpleEvent(
-            description = "Indicates that a user has been invited to " +
-                    "this game instance.")
+  /* @SimpleEvent(
+      description = "Indicates that a user has been invited to " +
+                "this game instance.") */
     public void Invited(final String instanceId) {
         Log.d(LOG_TAG, "Player invited to " + instanceId);
         androidUIHandler.post(new Runnable() {
@@ -423,8 +446,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param playerId The email address of the new leader.
      */
-    @SimpleEvent(description = "Indicates that this game has a new " +
-            "leader as specified through SetLeader")
+  /* @SimpleEvent(description = "Indicates that this game has a new " +
+                "leader as specified through SetLeader") */
     public void NewLeader(final String playerId) {
         androidUIHandler.post(new Runnable() {
             public void run() {
@@ -442,8 +465,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param instanceId The id of the newly created game instance.
      */
-    @SimpleEvent(description = "Indicates that a new instance was " +
-            "successfully created after calling MakeNewInstance.")
+  /* @SimpleEvent(description = "Indicates that a new instance was " +
+                "successfully created after calling MakeNewInstance.") */
     public void NewInstanceMade(final String instanceId) {
         androidUIHandler.post(new Runnable() {
             public void run() {
@@ -458,8 +481,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param playerId The email address of the new player.
      */
-    @SimpleEvent(description = "Indicates that a new player has " +
-            "joined this game instance.")
+  /* @SimpleEvent(description = "Indicates that a new player has " +
+                "joined this game instance.") */
     public void PlayerJoined(final String playerId) {
         androidUIHandler.post(new Runnable() {
             public void run() {
@@ -476,8 +499,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param playerId The email address of the player that left.
      */
-    @SimpleEvent(description = "Indicates that a player has left " +
-            "this game instance.")
+  /* @SimpleEvent(description = "Indicates that a player has left " +
+                "this game instance.") */
     public void PlayerLeft(final String playerId) {
         androidUIHandler.post(new Runnable() {
             public void run() {
@@ -494,8 +517,8 @@ public class GameClient extends AndroidNonvisibleComponent
      * @param command   The command requested.
      * @param arguments The arguments sent to the command.
      */
-    @SimpleEvent(
-            description = "Indicates that a server command failed.")
+  /* @SimpleEvent(
+      description = "Indicates that a server command failed.") */
     public void ServerCommandFailure(final String command, final YailList arguments) {
         androidUIHandler.post(new Runnable() {
             public void run() {
@@ -514,8 +537,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *                 nested to arbitrary depth that includes string, boolean and
      *                 number values.
      */
-    @SimpleEvent(description = "Indicates that a server command " +
-            "returned successfully.")
+  /* @SimpleEvent(description = "Indicates that a server command " +
+                "returned successfully.") */
     public void ServerCommandSuccess(final String command, final List<Object> response) {
         Log.d(LOG_TAG, command + " server command returned.");
         androidUIHandler.post(new Runnable() {
@@ -537,8 +560,8 @@ public class GameClient extends AndroidNonvisibleComponent
      * the user email address in its constructor and trigger this event
      * when it finishes.
      */
-    @SimpleEvent(description = "Indicates that the user email " +
-            "address has been set.")
+  /* @SimpleEvent(description = "Indicates that the user email " +
+                "address has been set.") */
     public void UserEmailAddressSet(final String emailAddress) {
         Log.d(LOG_TAG, "Email address set.");
         androidUIHandler.post(new Runnable() {
@@ -557,8 +580,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param message the message.
      */
-    @SimpleEvent(description = "Indicates that something has " +
-            "occurred which the player should know about.")
+  /* @SimpleEvent(description = "Indicates that something has " +
+                "occurred which the player should know about.") */
     public void Info(final String message) {
         Log.d(LOG_TAG, "Info: " + message);
         androidUIHandler.post(new Runnable() {
@@ -577,8 +600,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *                     error.
      * @param message      the error message
      */
-    @SimpleEvent(description = "Indicates that an error occurred " +
-            "while communicating with the web server.")
+  /* @SimpleEvent(description = "Indicates that an error occurred " +
+                "while communicating with the web server.") */
     public void WebServiceError(final String functionName, final String message) {
         Log.e(LOG_TAG, "WebServiceError: " + message);
         androidUIHandler.post(new Runnable() {
@@ -597,9 +620,9 @@ public class GameClient extends AndroidNonvisibleComponent
      * If the player has been invited to new instances an Invited
      * event will be raised for each new instance.
      */
-    @SimpleFunction(description = "Updates the InstancesJoined and " +
-            "InstancesInvited lists. This procedure can be called " +
-            "before setting the InstanceId.")
+  /* @SimpleFunction(description = "Updates the InstancesJoined and " +
+                "InstancesInvited lists. This procedure can be called " +
+                "before setting the InstanceId.") */
     public void GetInstanceLists() {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -686,8 +709,8 @@ public class GameClient extends AndroidNonvisibleComponent
      * @param count The maximum number of messages to retrieve. This
      *              should be an integer from 1 to 1000.
      */
-    @SimpleFunction(
-            description = "Retrieves messages of the specified type.")
+  /* @SimpleFunction(
+      description = "Retrieves messages of the specified type.") */
     public void GetMessages(final String type, final int count) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -758,8 +781,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *                    following formats:<br>"Name O. Person
      *                    &ltname.o.person@gmail.com&gt"<br>"name.o.person@gmail.com".
      */
-    @SimpleFunction(
-            description = "Invites a player to this game instance.")
+  /* @SimpleFunction(
+      description = "Invites a player to this game instance.") */
     public void Invite(final String playerEmail) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -819,7 +842,7 @@ public class GameClient extends AndroidNonvisibleComponent
      * Note that while this call does clear the leader and player
      * lists, no NewLeader or PlayerLeft events are raised.
      */
-    @SimpleFunction(description = "Leaves the current instance.")
+    /* @SimpleFunction(description = "Leaves the current instance.") */
     public void LeaveInstance() {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -870,8 +893,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *                   instance should be publicly viewable and able to be joined by
      *                   anyone.
      */
-    @SimpleFunction(description = "Asks the server to create a new " +
-            "instance of this game.")
+  /* @SimpleFunction(description = "Asks the server to create a new " +
+                "instance of this game.") */
     public void MakeNewInstance(final String instanceId, final boolean makePublic) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -920,9 +943,9 @@ public class GameClient extends AndroidNonvisibleComponent
      * @param contents   the contents of the message. This can be any
      *                   AppInventor data value.
      */
-    @SimpleFunction(description = "Sends a keyed message to all " +
-            "recipients in the recipients list. The message will " +
-            "consist of the contents list.")
+  /* @SimpleFunction(description = "Sends a keyed message to all " +
+                "recipients in the recipients list. The message will " +
+                "consist of the contents list.") */
     public void SendMessage(final String type, final YailList recipients, final YailList contents) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -973,8 +996,8 @@ public class GameClient extends AndroidNonvisibleComponent
      * @param arguments The arguments to pass to the server to specify
      *                  how to execute the command.
      */
-    @SimpleFunction(description = "Sends the specified command to " +
-            "the game server.")
+  /* @SimpleFunction(description = "Sends the specified command to " +
+                "the game server.") */
     public void ServerCommand(final String command, final YailList arguments) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -1019,8 +1042,8 @@ public class GameClient extends AndroidNonvisibleComponent
      *
      * @param instanceId the name of the game instance to join.
      */
-    @SimpleFunction(description = "Sets InstanceId and joins the " +
-            "specified instance.")
+  /* @SimpleFunction(description = "Sets InstanceId and joins the " +
+                "specified instance.") */
     public void SetInstance(final String instanceId) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -1072,9 +1095,9 @@ public class GameClient extends AndroidNonvisibleComponent
      *                    <br>"Name O. Person &ltname.o.person@gmail.com&gt"
      *                    <br>"name.o.person@gmail.com".
      */
-    @SimpleFunction(description = "Tells the server to set the " +
-            "leader to playerId. Only the current leader may " +
-            "successfully set a new leader.")
+  /* @SimpleFunction(description = "Tells the server to set the " +
+                "leader to playerId. Only the current leader may " +
+                "successfully set a new leader.") */
     public void SetLeader(final String playerEmail) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {

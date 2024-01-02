@@ -5,11 +5,12 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.*;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.UltrasonicSensorUnit;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+import android.os.Handler;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
@@ -20,7 +21,14 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Deleteable {
+/* @DesignerComponent(version = YaVersion.EV3_ULTRASONICSENSOR_COMPONENT_VERSION,
+                   description = "A component that provides a high-level interface to an ultrasonic sensor on a " +
+                                 "LEGO MINDSTORMS EV3 robot.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Deleteable {
     private static final int SENSOR_TYPE = 30;
 
     private static final int DEFAULT_BOTTOM_OF_RANGE = 30;
@@ -84,8 +92,8 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
         UnitAbstract(UltrasonicSensorUnit.Centimeters);
     }
 
-    @SimpleFunction(description = "Returns the current distance in centimeters as a value between " +
-            "0 and 254, or -1 if the distance can not be read.")
+    /* @SimpleFunction(description = "Returns the current distance in centimeters as a value between " +
+                                  "0 and 254, or -1 if the distance can not be read.") */
     public double GetDistance() {
         String functionName = "GetDistance";
         return getDistance(functionName);
@@ -101,8 +109,9 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Returns the bottom of the range used for the BelowRange, WithinRange,
      * and AboveRange events.
      */
-    @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange, " +
-            "and AboveRange events.")
+  /* @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange, " +
+                                "and AboveRange events.",
+                  category = PropertyCategory.BEHAVIOR) */
     public int BottomOfRange() {
         return bottomOfRange;
     }
@@ -111,9 +120,10 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Specifies the bottom of the range used for the BelowRange, WithinRange,
      * and AboveRange events.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+                    defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE) */
+    /* @SimpleProperty
+     */
     public void BottomOfRange(int bottomOfRange) {
         this.bottomOfRange = bottomOfRange;
     }
@@ -122,8 +132,9 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Returns the top of the range used for the BelowRange, WithinRange, and
      * AboveRange events.
      */
-    @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and " +
-            "AboveRange events.")
+  /* @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and " +
+                                "AboveRange events.",
+                  category = PropertyCategory.BEHAVIOR) */
     public int TopOfRange() {
         return topOfRange;
     }
@@ -132,9 +143,10 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Specifies the top of the range used for the BelowRange, WithinRange, and
      * AboveRange events.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "" + DEFAULT_TOP_OF_RANGE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+                    defaultValue = "" + DEFAULT_TOP_OF_RANGE) */
+    /* @SimpleProperty
+     */
     public void TopOfRange(int topOfRange) {
         this.topOfRange = topOfRange;
     }
@@ -143,8 +155,9 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Returns whether the BelowRange event should fire when the distance
      * goes below the BottomOfRange.
      */
-    @SimpleProperty(description = "Whether the BelowRange event should fire when the distance " +
-            "goes below the BottomOfRange.")
+  /* @SimpleProperty(description = "Whether the BelowRange event should fire when the distance " +
+                                "goes below the BottomOfRange.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean BelowRangeEventEnabled() {
         return belowRangeEventEnabled;
     }
@@ -153,9 +166,10 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Specifies whether the BelowRange event should fire when the distance
      * goes below the BottomOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void BelowRangeEventEnabled(boolean enabled) {
         belowRangeEventEnabled = enabled;
     }
@@ -163,7 +177,7 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
     /**
      * Called when the detected distance has gone below the range.
      */
-    @SimpleEvent(description = "Called when the detected distance has gone below the range.")
+    /* @SimpleEvent(description = "Called when the detected distance has gone below the range.") */
     public void BelowRange() {
         EventDispatcher.dispatchEvent(this, "BelowRange");
     }
@@ -172,8 +186,9 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Returns whether the WithinRange event should fire when the distance
      * goes between the BottomOfRange and the TopOfRange.
      */
-    @SimpleProperty(description = "Whether the WithinRange event should fire when the distance" +
-            " goes between the BottomOfRange and the TopOfRange.")
+  /* @SimpleProperty(description = "Whether the WithinRange event should fire when the distance" +
+                                " goes between the BottomOfRange and the TopOfRange.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean WithinRangeEventEnabled() {
         return withinRangeEventEnabled;
     }
@@ -182,9 +197,10 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Specifies whether the WithinRange event should fire when the distance
      * goes between the BottomOfRange and the TopOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void WithinRangeEventEnabled(boolean enabled) {
         withinRangeEventEnabled = enabled;
     }
@@ -192,7 +208,7 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
     /**
      * Called when the detected distance has gone within the range.
      */
-    @SimpleEvent(description = "Called when the detected distance has gone within the range.")
+    /* @SimpleEvent(description = "Called when the detected distance has gone within the range.") */
     public void WithinRange() {
         EventDispatcher.dispatchEvent(this, "WithinRange");
     }
@@ -201,8 +217,9 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Returns whether the AboveRange event should fire when the distance
      * goes above the TopOfRange.
      */
-    @SimpleProperty(description = "Whether the AboveRange event should fire when the distance " +
-            "goes above the TopOfRange.")
+  /* @SimpleProperty(description = "Whether the AboveRange event should fire when the distance " +
+                                "goes above the TopOfRange.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean AboveRangeEventEnabled() {
         return aboveRangeEventEnabled;
     }
@@ -211,9 +228,10 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
      * Specifies whether the AboveRange event should fire when the distance
      * goes above the TopOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void AboveRangeEventEnabled(boolean enabled) {
         aboveRangeEventEnabled = enabled;
     }
@@ -221,7 +239,7 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
     /**
      * Called when the detected distance has gone above the range.
      */
-    @SimpleEvent(description = "Called when the detected distance has gone above the range.")
+    /* @SimpleEvent(description = "Called when the detected distance has gone above the range.") */
     public void AboveRange() {
         EventDispatcher.dispatchEvent(this, "AboveRange");
     }
@@ -229,10 +247,11 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
     /**
      * Specifies the unit of distance.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_ULTRASONIC_SENSOR_MODE,
-            defaultValue = "cm")
-    @SimpleProperty
-    public void Unit(@Options(UltrasonicSensorUnit.class) String unitName) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_ULTRASONIC_SENSOR_MODE,
+      defaultValue = "cm") */
+    /* @SimpleProperty
+     */
+    public void Unit(/* @Options(UltrasonicSensorUnit.class) */ String unitName) {
         // Make sure unitName is a valid UltrasonicSensorUnit.
         UltrasonicSensorUnit unit = UltrasonicSensorUnit.fromUnderlyingValue(unitName);
         if (unit == null) {
@@ -262,15 +281,16 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
     /**
      * Returns the unit of distance.
      */
-    @SimpleProperty(description = "The distance unit, which can be either \"cm\" or \"inch\".")
-    public @Options(UltrasonicSensorUnit.class) String Unit() {
+  /* @SimpleProperty(description = "The distance unit, which can be either \"cm\" or \"inch\".",
+                  category = PropertyCategory.BEHAVIOR) */
+    public /* @Options(UltrasonicSensorUnit.class) */ String Unit() {
         return mode.toUnderlyingValue();
     }
 
     /**
      * Measure the distance in centimeters.
      */
-    @SimpleFunction(description = "Measure the distance in centimeters.")
+    /* @SimpleFunction(description = "Measure the distance in centimeters.") */
     @Deprecated
     public void SetCmUnit() {
         setMode(UltrasonicSensorUnit.Centimeters);
@@ -279,7 +299,7 @@ public class Ev3UltrasonicSensor extends LegoMindstormsEv3Sensor implements Dele
     /**
      * Measure the distance in inches.
      */
-    @SimpleFunction(description = "Measure the distance in inches.")
+    /* @SimpleFunction(description = "Measure the distance in inches.") */
     @Deprecated
     public void SetInchUnit() {
         setMode(UltrasonicSensorUnit.Inches);

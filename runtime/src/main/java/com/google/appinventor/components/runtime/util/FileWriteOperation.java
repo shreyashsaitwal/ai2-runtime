@@ -5,6 +5,7 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import android.net.Uri;
 import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.Form;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.net.URI;
 
 /**
@@ -83,6 +85,10 @@ public class FileWriteOperation extends FileStreamOperation<OutputStream> {
 
     @Override
     protected OutputStream openFile() throws IOException {
+        if (fileName.startsWith("content:")) {
+            return form.getContentResolver().openOutputStream(Uri.parse(fileName),
+                    this.accessMode == FileAccessMode.WRITE ? "wt" : "wa");
+        }
         String path = FileUtil.resolveFileName(form, fileName, scope);
         if (path.startsWith("file://")) {
             path = URI.create(path).getPath();

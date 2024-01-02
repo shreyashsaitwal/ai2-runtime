@@ -9,10 +9,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.GingerbreadUtil;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 
@@ -25,7 +25,20 @@ import com.google.appinventor.components.runtime.util.SdkLevel;
  * <p>
  * **Note:** This component will only work on Screen1 of any App Inventor app.
  */
+/* @DesignerComponent(version = YaVersion.NEARFIELD_COMPONENT_VERSION,
+    description = "<p>Non-visible component to provide NFC capabilities.  " +
+    "For now this component supports the reading and writing of text tags only " +
+    "(if supported by the device)<//p>" +
+    "<p>In order to read and write text tags, the component must have its " +
+    "<code>ReadMode<//code> property set to True or False respectively.<//p>" +
+    "<p><strong>Note:<//strong> This component will only work on Screen1 of" +
+    " any App Inventor app.<//p>",
+    category = ComponentCategory.SENSORS,
+    nonVisible = true,
+    iconName = "images//nearfield.png") */
 
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.NFC") */
 public class NearField extends AndroidNonvisibleComponent
         implements OnStopListener, OnResumeListener, OnPauseListener, OnNewIntentListener, Deleteable {
     private static final String TAG = "nearfield";
@@ -68,7 +81,8 @@ public class NearField extends AndroidNonvisibleComponent
      *
      * @internaldoc See Compiler.java.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void TagRead(String message) {
         Log.d(TAG, "Tag read: got message " + message);
         tagContent = message;
@@ -78,7 +92,8 @@ public class NearField extends AndroidNonvisibleComponent
     /**
      * Indicates that a tag has come into range of the NFC sensor and has been written.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void TagWritten() {
         Log.d(TAG, "Tag written: " + textToWrite);
         EventDispatcher.dispatchEvent(this, "TagWritten");
@@ -89,7 +104,7 @@ public class NearField extends AndroidNonvisibleComponent
     /**
      * Returns the content of the most recently received tag.
      */
-    @SimpleProperty()//what does this mean?
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) *///what does this mean?
     public String LastMessage() {
         Log.d(TAG, "String message method stared");
         return tagContent;
@@ -98,10 +113,10 @@ public class NearField extends AndroidNonvisibleComponent
     /**
      * Returns true if in read mode, false if in write mode.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
 
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean ReadMode() {
         Log.d(TAG, "boolean method stared");
         return readMode;
@@ -110,7 +125,7 @@ public class NearField extends AndroidNonvisibleComponent
     /**
      * Returns the content of the text that's going to be written to the tag.
      */
-    @SimpleProperty()//what does this mean?
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) *///what does this mean?
     public String TextToWrite() {
         Log.d(TAG, "String message method stared");
         return textToWrite;
@@ -120,7 +135,7 @@ public class NearField extends AndroidNonvisibleComponent
      * Returns the write type for the NFC component. For this version of the component, it is always
      * `1`.
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public int WriteType() {
         return writeType;
     }
@@ -129,8 +144,8 @@ public class NearField extends AndroidNonvisibleComponent
      * Specifies whether the NFC hardware should operate in read mode (`true`{:.logic.block}) or
      * write mode (`false`{:.logic.block}).
      */
-    @SimpleProperty(
-            description = "Specifies whether the NFC hardware should operate in read or write mode.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Specifies whether the NFC hardware should operate in read or write mode.") */
     public void ReadMode(boolean newMode) {
         Log.d(TAG, "Read mode set to" + newMode);
         readMode = newMode;
@@ -143,9 +158,9 @@ public class NearField extends AndroidNonvisibleComponent
      * Specifies the content that will be written to the tag when in write mode. This method has no
      * effect if {@link #ReadMode()} is `true`{:.logic.block}.
      */
-    @SimpleProperty(
-            description = "Specifies the content that will be written to the tag when in write mode. "
-                    + "This method has no effect if ReadMode is true.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Specifies the content that will be written to the tag when in write mode. "
+          + "This method has no effect if ReadMode is true.") */
     public void TextToWrite(String newText) {
         Log.d(TAG, "Text to write set to" + newText);
         textToWrite = newText;

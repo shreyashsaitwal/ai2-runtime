@@ -7,14 +7,15 @@
 package com.google.appinventor.components.runtime;
 
 import android.content.Context;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +32,19 @@ import java.util.Set;
  * - **Distance**: The distance from the object to the device
  */
 @SuppressWarnings("checkstyle:JavadocParagraph")
-public class ProximitySensor extends AndroidNonvisibleComponent
+/* @DesignerComponent(version = YaVersion.PROXIMITYSENSOR_COMPONENT_VERSION,
+    description = "<p>Non-visible component that can measures the proximity of an object in cm "
+        + "relative to the view screen of a device. This sensor is typically used to determine "
+        + "whether a handset is being held up to a persons ear; "
+        + "i.e. lets you determine how far away an object is from a device. "
+        + "Many devices return the absolute distance, in cm, but some return only near and far "
+        + "values. In this case, the sensor usually reports its maximum range value in the far "
+        + "state and a lesser value in the near state.<//p>",
+    category = ComponentCategory.SENSORS,
+    nonVisible = true,
+    iconName = "images//proximitysensor.png") */
+/* @SimpleObject
+ */ public class ProximitySensor extends AndroidNonvisibleComponent
         implements OnStopListener, OnResumeListener, SensorComponent, OnPauseListener,
         SensorEventListener, Deleteable, RealTimeDataSource<String, Float> {
 
@@ -70,8 +83,8 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      * {@code false} that it isn't
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "Reports whether or not the device has a proximity sensor.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Reports whether or not the device has a proximity sensor.") */
     public boolean Available() {
         List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_PROXIMITY);
         return (sensors.size() > 0);
@@ -104,7 +117,6 @@ public class ProximitySensor extends AndroidNonvisibleComponent
             stopListening();
         }
     }
-
 
     /**
      * Registers the sensor to start listening for proximity changes.
@@ -143,8 +155,8 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      *
      * @return Sensor's maximum range.
      */
-    @SimpleProperty(
-            description = "Reports the Maximum Range of the device's ProximitySensor")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Reports the Maximum Range of the device's ProximitySensor") */
     public float MaximumRange() {
         return proximitySensor.getMaximumRange();
     }
@@ -156,7 +168,7 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that the sensor generates events,
      * {@code false} that it doesn't
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean Enabled() {
         return enabled;
     }
@@ -169,8 +181,8 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      *                {@code false} disables it
      * @suppressdoc
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True")
-    @SimpleProperty(description = "If enabled, then device will listen for changes in proximity.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True") */
+    /* @SimpleProperty(description = "If enabled, then device will listen for changes in proximity.") */
     public void Enabled(boolean enabled) {
         if (this.enabled == enabled) {
             return;
@@ -189,7 +201,7 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean KeepRunningWhenOnPause() {
         return keepRunningWhenOnPause;
     }
@@ -200,10 +212,10 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      * @param enabled true if the sensor should continue running when the app is in the background
      * @suppressdoc
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(description = "If set to true, it will keep sensing for proximity changes even "
-            + "when the app is not visible")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(description = "If set to true, it will keep sensing for proximity changes even "
+      + "when the app is not visible") */
     public void KeepRunningWhenOnPause(boolean enabled) {
 
         this.keepRunningWhenOnPause = enabled;
@@ -215,7 +227,7 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      * @param distance the distance, in centimeters, the object is from the phone
      * @suppressdoc
      */
-    @SimpleEvent(description = "Triggered when distance (in cm) of the object to the device changes.")
+    /* @SimpleEvent(description = "Triggered when distance (in cm) of the object to the device changes.") */
     public void ProximityChanged(float distance) {
         this.distance = distance;
 
@@ -232,8 +244,8 @@ public class ProximitySensor extends AndroidNonvisibleComponent
      *
      * @return distance
      */
-    @SimpleProperty(
-            description = "Returns the distance from the object to the device")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Returns the distance from the object to the device") */
     public float Distance() {
         return distance;
     }

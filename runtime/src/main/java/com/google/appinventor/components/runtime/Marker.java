@@ -8,12 +8,10 @@ package com.google.appinventor.components.runtime;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentConstants;
+import com.google.appinventor.components.common.HorizontalAlignment;
 import com.google.appinventor.components.common.MapFeature;
-import com.google.appinventor.components.common.*;
+import com.google.appinventor.components.common.VerticalAlignment;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.GeometryUtil;
 import com.google.appinventor.components.runtime.util.MapFactory;
@@ -29,6 +27,13 @@ import org.osmdroid.util.GeoPoint;
  * dynamically by calling the {@link Map#CreateMarker(double, double)} method and configured using
  * the ["Any Component"](../other/any-component-blocks.html) blocks.
  */
+/* @DesignerComponent(version = YaVersion.MARKER_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "<p>An icon positioned at a point to indicate information on a map. Markers "
+        + "can be used to provide an info window, custom fill and stroke colors, and custom "
+        + "images to convey information to the user.<//p>") */
+/* @SimpleObject
+ *//* @UsesLibraries(libraries = "osmdroid.aar, androidsvg.jar") */
 public class Marker extends MapFeatureBaseWithFill implements MapMarker {
     private static final String TAG = Marker.class.getSimpleName();
     private static final MapFeatureVisitor<Double> distanceComputation = new MapFeatureVisitor<Double>() {
@@ -168,9 +173,9 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @return the type of the feature
      */
     @Override
-    @SimpleProperty(description = "Returns the type of the feature. For Markers, "
-            + "this returns MapFeature.Marker (\"Marker\").")
-    public @Options(MapFeature.class) String Type() {
+  /* @SimpleProperty(description = "Returns the type of the feature. For Markers, "
+      + "this returns MapFeature.Marker (\"Marker\").") */
+    public /* @Options(MapFeature.class) */ String Type() {
         return TypeAbstract().toUnderlyingValue();
     }
 
@@ -192,9 +197,9 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      *
      * @param latitude the new latitude of the marker. Range: [-90, 90]
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
-            defaultValue = "0")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
+      defaultValue = "0") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void Latitude(double latitude) {
         Log.d(TAG, "Latitude");
         if (latitude < -90 || latitude > 90) {
@@ -210,7 +215,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
     /**
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public double Latitude() {
         return location.getLatitude();
     }
@@ -223,9 +229,9 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      *
      * @param longitude the new longitude of the marker. Range: [-180, 180]
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
-            defaultValue = "0")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
+      defaultValue = "0") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void Longitude(double longitude) {
         Log.d(TAG, "Longitude");
         if (longitude < -180 || longitude > 180) {
@@ -241,7 +247,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
     /**
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public double Longitude() {
         return location.getLongitude();
     }
@@ -252,9 +259,9 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      *
      * @param path a relative or absolute path, or a url, to an image asset to use for the marker.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET)
-    @SimpleProperty
-    public void ImageAsset(String path) {
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET) */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
+    public void ImageAsset(/* @Asset  */String path) {
         Log.d(TAG, "ImageAsset");
         this.imagePath = path;
         setNeedsUpdate();
@@ -264,8 +271,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * Specifies the image shown for the `Marker`. If set to the empty string "", then the default
      * marker icon will be used.
      */
-    @SimpleProperty(description = "The ImageAsset property is used to provide an alternative image "
-            + "for the Marker.")
+  /* @SimpleProperty(description = "The ImageAsset property is used to provide an alternative image "
+      + "for the Marker.") */
     public String ImageAsset() {
         return imagePath;
     }
@@ -274,17 +281,18 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @param argb the outline paint color
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void StrokeColor(int argb) {
         super.StrokeColor(argb);
         map.getController().updateFeatureStroke(this);
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_HORIZONTAL_ALIGNMENT,
-            defaultValue = "3")
-    @SimpleProperty
-    public void AnchorHorizontal(@Options(HorizontalAlignment.class) int horizontal) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_HORIZONTAL_ALIGNMENT,
+      defaultValue = "3") */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
+    public void AnchorHorizontal(/* @Options(HorizontalAlignment.class) */ int horizontal) {
         // Make sure the horizontal alignment is a valid HorizontalAlignment.
         HorizontalAlignment alignment = HorizontalAlignment.fromUnderlyingValue(horizontal);
         if (alignment == null) {
@@ -300,10 +308,10 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * are: `1` (Left), `2` (Right), or `3` (Center).
      */
     @Override
-    @SimpleProperty(description = "The horizontal alignment property controls where the Marker's "
-            + "anchor is located relative to its width. The choices are: 1 = left aligned,"
-            + " 3 = horizontally centered, 2 = right aligned.")
-    public @Options(HorizontalAlignment.class) int AnchorHorizontal() {
+  /* @SimpleProperty(description = "The horizontal alignment property controls where the Marker's "
+      + "anchor is located relative to its width. The choices are: 1 = left aligned,"
+      + " 3 = horizontally centered, 2 = right aligned.") */
+    public /* @Options(HorizontalAlignment.class) */ int AnchorHorizontal() {
         return AnchorHorizontalAbstract().toUnderlyingValue();
     }
 
@@ -331,10 +339,10 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VERTICAL_ALIGNMENT,
-            defaultValue = "3")
-    @SimpleProperty
-    public void AnchorVertical(@Options(VerticalAlignment.class) int vertical) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VERTICAL_ALIGNMENT,
+      defaultValue = "3") */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
+    public void AnchorVertical(/* @Options(VerticalAlignment.class) */ int vertical) {
         // Make sure the vertical alignment is a valid VerticalAlignment.
         VerticalAlignment alignment = VerticalAlignment.fromUnderlyingValue(vertical);
         if (alignment == null) {
@@ -349,10 +357,10 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * are: `1` (Top), `2` (Center), or `3` (Bottom).
      */
     @Override
-    @SimpleProperty(description = "The vertical alignment property controls where the Marker's "
-            + "anchor is located relative to its height. The choices are: 1 = aligned at the top, 2 = "
-            + "vertically centered, 3 = aligned at the bottom.")
-    public @Options(VerticalAlignment.class) int AnchorVertical() {
+  /* @SimpleProperty(description = "The vertical alignment property controls where the Marker's "
+      + "anchor is located relative to its height. The choices are: 1 = aligned at the top, 2 = "
+      + "vertically centered, 3 = aligned at the bottom.") */
+    public /* @Options(VerticalAlignment.class) */ int AnchorVertical() {
         return AnchorVerticalAbstract().toUnderlyingValue();
     }
 
@@ -380,13 +388,13 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
     }
 
     @Override
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public void ShowShadow(boolean show) {
         // This method has been deprecated.
     }
 
     @Override
-    @SimpleProperty(description = "Gets whether or not the shadow of the Marker is shown.")
+    /* @SimpleProperty(description = "Gets whether or not the shadow of the Marker is shown.") */
     public boolean ShowShadow() {
         return false;
     }
@@ -397,8 +405,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @param width the new width of the marker image
      */
     @Override
-    @SimpleProperty
-    public void Width(int width) {
+    /* @SimpleProperty
+     */ public void Width(int width) {
         this.width = width;
         setNeedsUpdate();
     }
@@ -407,8 +415,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * Specifies the horizontal width of the `%type%`, measured in pixels.
      */
     @Override
-    @SimpleProperty
-    public int Width() {
+    /* @SimpleProperty
+     */ public int Width() {
         if (this.width == LENGTH_FILL_PARENT) {
             return map.getView().getWidth();
         } else if (this.width < LENGTH_PERCENT_TAG) {
@@ -424,7 +432,7 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @param pCent the new width, in percent, of the marker image
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
     public void WidthPercent(int pCent) {
         this.width = LENGTH_PERCENT_TAG - pCent;
         setNeedsUpdate();
@@ -436,8 +444,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @param height the new height of the marker image
      */
     @Override
-    @SimpleProperty
-    public void Height(int height) {
+    /* @SimpleProperty
+     */ public void Height(int height) {
         this.height = height;
         setNeedsUpdate();
     }
@@ -446,8 +454,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * Specifies the `%type%`'s vertical height, measured in pixels.
      */
     @Override
-    @SimpleProperty
-    public int Height() {
+    /* @SimpleProperty
+     */ public int Height() {
         if (this.height == LENGTH_FILL_PARENT) {
             return map.getView().getHeight();
         } else if (this.height < LENGTH_PERCENT_TAG) {
@@ -464,7 +472,7 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @param pCent The new height, in percent, of the marker image.
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
     public void HeightPercent(int pCent) {
         this.height = LENGTH_PERCENT_TAG - pCent;
         setNeedsUpdate();
@@ -476,7 +484,7 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @param latitude  the new latitude of the marker
      * @param longitude the new longitude of the marker
      */
-    @SimpleFunction(description = "Set the location of the marker.")
+    /* @SimpleFunction(description = "Set the location of the marker.") */
     public void SetLocation(double latitude, double longitude) {
         Log.d(TAG, "SetLocation");
         location.setCoords(latitude, longitude);
@@ -507,8 +515,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @return
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleFunction(description = "Compute the distance, in meters, between a Marker and a "
-            + "latitude, longitude point.")
+  /* @SimpleFunction(description = "Compute the distance, in meters, between a Marker and a "
+      + "latitude, longitude point.") */
     public double DistanceToPoint(double latitude, double longitude) {
         return GeometryUtil.distanceBetween(this, new GeoPoint(latitude, longitude));
     }
@@ -522,8 +530,8 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @return
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleFunction(description = "Returns the bearing from the Marker to the given latitude and "
-            + "longitude, in degrees from due north.")
+  /* @SimpleFunction(description = "Returns the bearing from the Marker to the given latitude and "
+      + "longitude, in degrees from due north.") */
     public double BearingToPoint(double latitude, double longitude) {
         return location.bearingTo(new GeoPoint(latitude, longitude));
     }
@@ -540,10 +548,10 @@ public class Marker extends MapFeatureBaseWithFill implements MapMarker {
      * @return The bearing in degrees east of due north
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleFunction(description = "Returns the bearing from the Marker to the given map feature, "
-            + "in degrees from due north. If the centroids parameter is true, the bearing will be to the "
-            + "center of the map feature. Otherwise, the bearing will be computed to the point in the "
-            + "feature nearest the Marker.")
+  /* @SimpleFunction(description = "Returns the bearing from the Marker to the given map feature, "
+      + "in degrees from due north. If the centroids parameter is true, the bearing will be to the "
+      + "center of the map feature. Otherwise, the bearing will be computed to the point in the "
+      + "feature nearest the Marker.") */
     public double BearingToFeature(MapFactory.MapFeature mapFeature, final boolean centroids) {
         return mapFeature == null ? -1 : mapFeature.accept(bearingComputation, this, centroids);
     }

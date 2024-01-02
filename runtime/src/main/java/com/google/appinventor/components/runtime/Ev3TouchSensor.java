@@ -5,12 +5,10 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+import android.os.Handler;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
@@ -21,7 +19,14 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteable {
+/* @DesignerComponent(version = YaVersion.EV3_TOUCHSENSOR_COMPONENT_VERSION,
+                   description = "A component that provides a high-level interface to a touch sensor on a " +
+                                 "LEGO MINDSTORMS EV3 robot.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteable {
     private static final int SENSOR_VALUE_THRESHOLD = 50;
     private static final int SENSOR_TYPE = 16;
     private static final int SENSOR_MODE_TOUCH = 0;
@@ -78,7 +83,7 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Returns true if the touch sensor is pressed.
      */
-    @SimpleFunction(description = "Returns true if the touch sensor is pressed.")
+    /* @SimpleFunction(description = "Returns true if the touch sensor is pressed.") */
     public boolean IsPressed() {
         String functionName = "IsPressed";
         return getPressedValue(functionName) >= SENSOR_VALUE_THRESHOLD;
@@ -88,9 +93,10 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies whether the Pressed event should fire when the touch sensor is
      * pressed.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void PressedEventEnabled(boolean enabled) {
         pressedEventEnabled = enabled;
     }
@@ -99,8 +105,9 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns whether the Pressed event should fire when the touch sensor is
      * pressed.
      */
-    @SimpleProperty(description = "Whether the Released event should fire when the touch sensor is " +
-            "pressed.")
+  /* @SimpleProperty(description = "Whether the Released event should fire when the touch sensor is " +
+                                "pressed.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean PressedEventEnabled() {
         return pressedEventEnabled;
     }
@@ -108,7 +115,7 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Called when the touch sensor is pressed.
      */
-    @SimpleEvent(description = "Called when the touch sensor is pressed.")
+    /* @SimpleEvent(description = "Called when the touch sensor is pressed.") */
     public void Pressed() {
         EventDispatcher.dispatchEvent(this, "Pressed");
     }
@@ -117,8 +124,9 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns whether the Released event should fire when the touch sensor is
      * released.
      */
-    @SimpleProperty(description = "Whether the Released event should fire when the touch sensor is " +
-            "released.")
+  /* @SimpleProperty(description = "Whether the Released event should fire when the touch sensor is " +
+                                "released.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean ReleasedEventEnabled() {
         return releasedEventEnabled;
     }
@@ -127,9 +135,10 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies whether the Released event should fire when the touch sensor is
      * released.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ReleasedEventEnabled(boolean enabled) {
         releasedEventEnabled = enabled;
     }
@@ -137,7 +146,7 @@ public class Ev3TouchSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Called when the touch sensor is pressed.
      */
-    @SimpleEvent(description = "Called when the touch sensor is pressed.")
+    /* @SimpleEvent(description = "Called when the touch sensor is pressed.") */
     public void Released() {
         EventDispatcher.dispatchEvent(this, "Released");
     }

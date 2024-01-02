@@ -6,27 +6,33 @@
 
 package com.google.appinventor.components.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.io.File;
+
+import twitter4j.DirectMessage;
+import twitter4j.IDs;
+import twitter4j.Query;
+import twitter4j.Status;
+import twitter4j.StatusUpdate;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.User;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
-import twitter4j.*;
-import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * A non-visible component that enables communication with [Twitter](https://twitter.com). Once a
@@ -52,6 +58,43 @@ import java.util.List;
  * @author josmasflores@gmail.com (Jose Dominguez) - added the twitter4j 3.0.3 jars and fixed auth bug 2413
  * @author edwinhzhang@gmail.com (Edwin Zhang) - added twitter4j-media-support-3.03 jar, status + image upload
  */
+/* @DesignerComponent(version = YaVersion.TWITTER_COMPONENT_VERSION, description = "A non-visible component that enables communication "
+    + "with <a href=\"http:////www.twitter.com\" target=\"_blank\">Twitter<//a>. "
+    + "Once a user has logged into their Twitter account (and the authorization has been confirmed successful by the "
+    + "<code>IsAuthorized<//code> event), many more operations are available:<ul>"
+    + "<li> Searching Twitter for tweets or labels (<code>SearchTwitter<//code>)<//li>\n"
+    + "<li> Sending a Tweet (<code>Tweet<//code>)"
+    + "     <//li>\n"
+    + "<li> Sending a Tweet with an Image (<code>TweetWithImage<//code>)"
+    + "     <//li>\n"
+    + "<li> Directing a message to a specific user "
+    + "     (<code>DirectMessage<//code>)<//li>\n "
+    + "<li> Receiving the most recent messages directed to the logged-in user "
+    + "     (<code>RequestDirectMessages<//code>)<//li>\n "
+    + "<li> Following a specific user (<code>Follow<//code>)<//li>\n"
+    + "<li> Ceasing to follow a specific user (<code>StopFollowing<//code>)<//li>\n"
+    + "<li> Getting a list of users following the logged-in user "
+    + "     (<code>RequestFollowers<//code>)<//li>\n "
+    + "<li> Getting the most recent messages of users followed by the "
+    + "     logged-in user (<code>RequestFriendTimeline<//code>)<//li>\n "
+    + "<li> Getting the most recent mentions of the logged-in user "
+    + "     (<code>RequestMentions<//code>)<//li><//ul><//p>\n "
+    + "<p>You must obtain a Consumer Key and Consumer Secret for Twitter authorization "
+    + " specific to your app from http:////twitter.com//oauth_clients//new",
+    category = ComponentCategory.SOCIAL, nonVisible = true, iconName = "images//twitter.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
+/* @UsesLibraries(libraries = "twitter4j.jar," + "twitter4jmedia.jar") */
+/* @UsesActivities(activities = {
+    @ActivityElement(name = "com.google.appinventor.components.runtime.WebViewActivity",
+                     configChanges = "orientation|keyboardHidden",
+                     screenOrientation = "behind",
+                     intentFilters = {
+                         @IntentFilterElement(actionElements = {
+                             @ActionElement(name = "android.intent.action.MAIN")
+                         })
+    })
+}) */
 public final class Twitter extends AndroidNonvisibleComponent implements
         ActivityResultListener, Component {
     private static final String ACCESS_TOKEN_TAG = "TwitterOauthAccessToken";
@@ -137,15 +180,15 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     // in AI1 is that the names of such methods no longer exist in OdeMessages.java, but the
     // AI2 bad blocks mechanism (which uses the @Deprecated annotation) requires the method names
     // to exist and be translatable so that they can appear in a block marked bad.
-    @SimpleFunction(description = "Twitter's API no longer supports login via username and "
-            + "password. Use the Authorize call instead.")
+  /* @SimpleFunction(userVisible = false, description = "Twitter's API no longer supports login via username and "
+      + "password. Use the Authorize call instead.") */
     public void Login(String username, String password) {
         form.dispatchErrorOccurredEvent(this, "Login",
                 ErrorMessages.ERROR_TWITTER_UNSUPPORTED_LOGIN_FUNCTION);
     }
 
-    @SimpleProperty(description = "The user name of the authorized user. Empty if "
-            + "there is no authorized user.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "The user name of the authorized user. Empty if "
+        + "there is no authorized user.") */
     public String Username() {
         return userName;
     }
@@ -153,7 +196,7 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * ConsumerKey property getter method.
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public String ConsumerKey() {
         return consumerKey;
     }
@@ -163,8 +206,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      *
      * @param consumerKey the key for use in Twitter OAuth
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(description = "The the consumer key to be used when authorizing with Twitter via OAuth.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "The the consumer key to be used when authorizing with Twitter via OAuth.") */
     public void ConsumerKey(String consumerKey) {
         this.consumerKey = consumerKey;
     }
@@ -172,7 +215,7 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * ConsumerSecret property getter method.
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public String ConsumerSecret() {
         return consumerSecret;
     }
@@ -182,8 +225,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      *
      * @param consumerSecret the secret for use in Twitter OAuth
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(description = "The consumer secret to be used when authorizing with Twitter via OAuth")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+    /* @SimpleProperty(description="The consumer secret to be used when authorizing with Twitter via OAuth") */
     public void ConsumerSecret(String consumerSecret) {
         this.consumerSecret = consumerSecret;
     }
@@ -192,8 +235,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * TwitPicAPIkey property getter method.
      */
     @Deprecated
-    @SimpleProperty( // [lyn 2015/12/30] removed userVisible = false, which is superseded by @Deprecated
-    )
+  /* @SimpleProperty( //// [lyn 2015//12//30] removed userVisible = false, which is superseded by @Deprecated
+      category = PropertyCategory.BEHAVIOR) */
     public String TwitPic_API_Key() {
         return TwitPic_API_Key;
     }
@@ -207,8 +250,9 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     @Deprecated
     // Hide the deprecated property from the Designer
     //@DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(
-            description = "The API Key for image uploading, provided by TwitPic.")
+  /* @SimpleProperty( //// [lyn 2015//12//30] removed userVisible = false, which is superseded by @Deprecated
+      category = PropertyCategory.BEHAVIOR,
+      description="The API Key for image uploading, provided by TwitPic.") */
     public void TwitPic_API_Key(String TwitPic_API_Key) {
         this.TwitPic_API_Key = TwitPic_API_Key;
     }
@@ -219,12 +263,12 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * valid access token. After this event has been raised, any other method for this component can
      * be called.
      */
-    @SimpleEvent(description = "This event is raised after the program calls "
-            + "<code>Authorize</code> if the authorization was successful.  "
-            + "It is also called after a call to <code>CheckAuthorized</code> "
-            + "if we already have a valid access token. "
-            + "After this event has been raised, any other method for this "
-            + "component can be called.")
+  /* @SimpleEvent(description = "This event is raised after the program calls "
+      + "<code>Authorize<//code> if the authorization was successful.  "
+      + "It is also called after a call to <code>CheckAuthorized<//code> "
+      + "if we already have a valid access token. "
+      + "After this event has been raised, any other method for this "
+      + "component can be called.") */
     public void IsAuthorized() {
         EventDispatcher.dispatchEvent(this, "IsAuthorized");
     }
@@ -234,8 +278,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      *
      * @suppressdoc
      */
-    @SimpleFunction(description = "Redirects user to login to Twitter via the Web browser using "
-            + "the OAuth protocol if we don't already have authorization.")
+  /* @SimpleFunction(description = "Redirects user to login to Twitter via the Web browser using "
+      + "the OAuth protocol if we don't already have authorization.") */
     public void Authorize() {
         if (consumerKey.length() == 0 || consumerSecret.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "Authorize",
@@ -296,8 +340,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * Check whether we already have access, and if so, causes the {@link #IsAuthorized()} event
      * handler to be called.
      */
-    @SimpleFunction(description = "Checks whether we already have access, and if so, causes "
-            + "IsAuthorized event handler to be called.")
+  /* @SimpleFunction(description = "Checks whether we already have access, and if so, causes "
+      + "IsAuthorized event handler to be called.") */
     public void CheckAuthorized() {
         final String myConsumerKey = consumerKey;
         final String myConsumerSecret = consumerSecret;
@@ -400,7 +444,7 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * Removes Twitter authorization from this running app instance.
      */
-    @SimpleFunction(description = "Removes Twitter authorization from this running app instance")
+    /* @SimpleFunction(description = "Removes Twitter authorization from this running app instance") */
     public void DeAuthorize() {
         deAuthorize();
     }
@@ -429,13 +473,13 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
      * been raised, indicating that the user has successfully logged in to Twitter.
      */
-    @SimpleFunction(description = "This sends a tweet as the logged-in user with the "
-            + "specified Text, which will be trimmed if it exceeds "
-            + MAX_CHARACTERS
-            + " characters. "
-            + "<p><u>Requirements</u>: This should only be called after the "
-            + "<code>IsAuthorized</code> event has been raised, indicating that the "
-            + "user has successfully logged in to Twitter.</p>")
+  /* @SimpleFunction(description = "This sends a tweet as the logged-in user with the "
+      + "specified Text, which will be trimmed if it exceeds "
+      + MAX_CHARACTERS
+      + " characters. "
+      + "<p><u>Requirements<//u>: This should only be called after the "
+      + "<code>IsAuthorized<//code> event has been raised, indicating that the "
+      + "user has successfully logged in to Twitter.<//p>") */
     public void Tweet(final String status) {
 
         if (twitter == null || userName.length() == 0) {
@@ -469,13 +513,13 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
      * been raised, indicating that the user has successfully logged in to Twitter.
      */
-    @SimpleFunction(description = "This sends a tweet as the logged-in user with the "
-            + "specified Text and a path to the image to be uploaded, which will be trimmed if it "
-            + "exceeds " + MAX_CHARACTERS + " characters. "
-            + "If an image is not found or invalid, only the text will be tweeted."
-            + "<p><u>Requirements</u>: This should only be called after the "
-            + "<code>IsAuthorized</code> event has been raised, indicating that the "
-            + "user has successfully logged in to Twitter.</p>")
+  /* @SimpleFunction(description = "This sends a tweet as the logged-in user with the "
+      + "specified Text and a path to the image to be uploaded, which will be trimmed if it "
+      + "exceeds " + MAX_CHARACTERS + " characters. "
+      + "If an image is not found or invalid, only the text will be tweeted."
+      + "<p><u>Requirements<//u>: This should only be called after the "
+      + "<code>IsAuthorized<//code> event has been raised, indicating that the "
+      + "user has successfully logged in to Twitter.<//p>" ) */
     public void TweetWithImage(final String status, final String imagePath) {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "TweetWithImage",
@@ -517,15 +561,15 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
      * been raised, indicating that the user has successfully logged in to Twitter.
      */
-    @SimpleFunction(description = "Requests the " + MAX_MENTIONS_RETURNED
-            + " most "
-            + "recent mentions of the logged-in user.  When the mentions have been "
-            + "retrieved, the system will raise the <code>MentionsReceived</code> "
-            + "event and set the <code>Mentions</code> property to the list of "
-            + "mentions."
-            + "<p><u>Requirements</u>: This should only be called after the "
-            + "<code>IsAuthorized</code> event has been raised, indicating that the "
-            + "user has successfully logged in to Twitter.</p>")
+  /* @SimpleFunction(description = "Requests the " + MAX_MENTIONS_RETURNED
+      + " most "
+      + "recent mentions of the logged-in user.  When the mentions have been "
+      + "retrieved, the system will raise the <code>MentionsReceived<//code> "
+      + "event and set the <code>Mentions<//code> property to the list of "
+      + "mentions."
+      + "<p><u>Requirements<//u>: This should only be called after the "
+      + "<code>IsAuthorized<//code> event has been raised, indicating that the "
+      + "user has successfully logged in to Twitter.<//p>") */
     public void RequestMentions() {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "RequestMentions",
@@ -563,10 +607,10 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * {@link #RequestMentions()} have been retrieved. A list of the mentions can then be found in
      * the `mentions`{:.variable.block} parameter or the {@link #Mentions()} property.
      */
-    @SimpleEvent(description = "This event is raised when the mentions of the logged-in user "
-            + "requested through <code>RequestMentions</code> have been retrieved.  "
-            + "A list of the mentions can then be found in the <code>mentions</code> "
-            + "parameter or the <code>Mentions</code> property.")
+  /* @SimpleEvent(description = "This event is raised when the mentions of the logged-in user "
+      + "requested through <code>RequestMentions<//code> have been retrieved.  "
+      + "A list of the mentions can then be found in the <code>mentions<//code> "
+      + "parameter or the <code>Mentions<//code> property.") */
     public void MentionsReceived(final List<String> mentions) {
         EventDispatcher.dispatchEvent(this, "MentionsReceived", mentions);
     }
@@ -583,16 +627,16 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * The value of this property will then be set to the list of mentions (and will maintain its
      * value until any subsequent calls to {@link #RequestMentions()}).
      */
-    @SimpleProperty(description = "This property contains a list of mentions of the "
-            + "logged-in user.  Initially, the list is empty.  To set it, the "
-            + "program must: <ol> "
-            + "<li> Call the <code>Authorize</code> method.</li> "
-            + "<li> Wait for the <code>IsAuthorized</code> event.</li> "
-            + "<li> Call the <code>RequestMentions</code> method.</li> "
-            + "<li> Wait for the <code>MentionsReceived</code> event.</li></ol>\n"
-            + "The value of this property will then be set to the list of mentions "
-            + "(and will maintain its value until any subsequent calls to "
-            + "<code>RequestMentions</code>).")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains a list of mentions of the "
+      + "logged-in user.  Initially, the list is empty.  To set it, the "
+      + "program must: <ol> "
+      + "<li> Call the <code>Authorize<//code> method.<//li> "
+      + "<li> Wait for the <code>IsAuthorized<//code> event.<//li> "
+      + "<li> Call the <code>RequestMentions<//code> method.<//li> "
+      + "<li> Wait for the <code>MentionsReceived<//code> event.<//li><//ol>\n"
+      + "The value of this property will then be set to the list of mentions "
+      + "(and will maintain its value until any subsequent calls to "
+      + "<code>RequestMentions<//code>).") */
     public List<String> Mentions() {
         return mentions;
     }
@@ -600,7 +644,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * Gets who is following you.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void RequestFollowers() {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "RequestFollowers",
@@ -642,11 +687,11 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * {@link #RequestFollowers()} have been retrieved. A list of the followers can then be found in
      * the `followers`{:.variable.block} parameter or the {@link #Followers()} property.
      */
-    @SimpleEvent(description = "This event is raised when all of the followers of the "
-            + "logged-in user requested through <code>RequestFollowers</code> have "
-            + "been retrieved. A list of the followers can then be found in the "
-            + "<code>followers</code> parameter or the <code>Followers</code> "
-            + "property.")
+  /* @SimpleEvent(description = "This event is raised when all of the followers of the "
+      + "logged-in user requested through <code>RequestFollowers<//code> have "
+      + "been retrieved. A list of the followers can then be found in the "
+      + "<code>followers<//code> parameter or the <code>Followers<//code> "
+      + "property.") */
     public void FollowersReceived(final List<String> followers2) {
         EventDispatcher.dispatchEvent(this, "FollowersReceived", followers2);
     }
@@ -663,16 +708,16 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * The value of this property will then be set to the list of followers (and maintain its value
      * until any subsequent call to {@link #RequestFollowers()}).
      */
-    @SimpleProperty(description = "This property contains a list of the followers of the "
-            + "logged-in user.  Initially, the list is empty.  To set it, the "
-            + "program must: <ol> "
-            + "<li> Call the <code>Authorize</code> method.</li> "
-            + "<li> Wait for the <code>IsAuthorized</code> event.</li> "
-            + "<li> Call the <code>RequestFollowers</code> method.</li> "
-            + "<li> Wait for the <code>FollowersReceived</code> event.</li></ol>\n"
-            + "The value of this property will then be set to the list of "
-            + "followers (and maintain its value until any subsequent call to "
-            + "<code>RequestFollowers</code>).")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains a list of the followers of the "
+      + "logged-in user.  Initially, the list is empty.  To set it, the "
+      + "program must: <ol> "
+      + "<li> Call the <code>Authorize<//code> method.<//li> "
+      + "<li> Wait for the <code>IsAuthorized<//code> event.<//li> "
+      + "<li> Call the <code>RequestFollowers<//code> method.<//li> "
+      + "<li> Wait for the <code>FollowersReceived<//code> event.<//li><//ol>\n"
+      + "The value of this property will then be set to the list of "
+      + "followers (and maintain its value until any subsequent call to "
+      + "<code>RequestFollowers<//code>).") */
     public List<String> Followers() {
         return followers;
     }
@@ -685,15 +730,15 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
      * been raised, indicating that the user has successfully logged in to Twitter.
      */
-    @SimpleFunction(description = "Requests the " + MAX_MENTIONS_RETURNED
-            + " most "
-            + "recent direct messages sent to the logged-in user.  When the "
-            + "messages have been retrieved, the system will raise the "
-            + "<code>DirectMessagesReceived</code> event and set the "
-            + "<code>DirectMessages</code> property to the list of messages."
-            + "<p><u>Requirements</u>: This should only be called after the "
-            + "<code>IsAuthorized</code> event has been raised, indicating that the "
-            + "user has successfully logged in to Twitter.</p>")
+  /* @SimpleFunction(description = "Requests the " + MAX_MENTIONS_RETURNED
+      + " most "
+      + "recent direct messages sent to the logged-in user.  When the "
+      + "messages have been retrieved, the system will raise the "
+      + "<code>DirectMessagesReceived<//code> event and set the "
+      + "<code>DirectMessages<//code> property to the list of messages."
+      + "<p><u>Requirements<//u>: This should only be called after the "
+      + "<code>IsAuthorized<//code> event has been raised, indicating that the "
+      + "user has successfully logged in to Twitter.<//p>") */
     public void RequestDirectMessages() {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "RequestDirectMessages",
@@ -736,11 +781,11 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * {@link #RequestDirectMessages()} have been retrieved. A list of the messages can then be found
      * in the `messages`{:.variable.block} parameter or the {@link #DirectMessages()} property.
      */
-    @SimpleEvent(description = "This event is raised when the recent messages "
-            + "requested through <code>RequestDirectMessages</code> have "
-            + "been retrieved. A list of the messages can then be found in the "
-            + "<code>messages</code> parameter or the <code>Messages</code> "
-            + "property.")
+  /* @SimpleEvent(description = "This event is raised when the recent messages "
+      + "requested through <code>RequestDirectMessages<//code> have "
+      + "been retrieved. A list of the messages can then be found in the "
+      + "<code>messages<//code> parameter or the <code>Messages<//code> "
+      + "property.") */
     public void DirectMessagesReceived(final List<String> messages) {
         EventDispatcher.dispatchEvent(this, "DirectMessagesReceived", messages);
     }
@@ -757,17 +802,17 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * The value of this property will then be set to the list of direct messages retrieved (and
      * maintain that value until any subsequent call to {@link #RequestDirectMessages()}).
      */
-    @SimpleProperty(description = "This property contains a list of the most recent "
-            + "messages mentioning the logged-in user.  Initially, the list is "
-            + "empty.  To set it, the program must: <ol> "
-            + "<li> Call the <code>Authorize</code> method.</li> "
-            + "<li> Wait for the <code>Authorized</code> event.</li> "
-            + "<li> Call the <code>RequestDirectMessages</code> method.</li> "
-            + "<li> Wait for the <code>DirectMessagesReceived</code> event.</li>"
-            + "</ol>\n"
-            + "The value of this property will then be set to the list of direct "
-            + "messages retrieved (and maintain that value until any subsequent "
-            + "call to <code>RequestDirectMessages</code>).")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains a list of the most recent "
+      + "messages mentioning the logged-in user.  Initially, the list is "
+      + "empty.  To set it, the program must: <ol> "
+      + "<li> Call the <code>Authorize<//code> method.<//li> "
+      + "<li> Wait for the <code>Authorized<//code> event.<//li> "
+      + "<li> Call the <code>RequestDirectMessages<//code> method.<//li> "
+      + "<li> Wait for the <code>DirectMessagesReceived<//code> event.<//li>"
+      + "<//ol>\n"
+      + "The value of this property will then be set to the list of direct "
+      + "messages retrieved (and maintain that value until any subsequent "
+      + "call to <code>RequestDirectMessages<//code>).") */
     public List<String> DirectMessages() {
         return directMessages;
     }
@@ -779,13 +824,13 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
      * been raised, indicating that the user has successfully logged in to Twitter.
      */
-    @SimpleFunction(description = "This sends a direct (private) message to the specified "
-            + "user.  The message will be trimmed if it exceeds "
-            + MAX_CHARACTERS
-            + "characters. "
-            + "<p><u>Requirements</u>: This should only be called after the "
-            + "<code>IsAuthorized</code> event has been raised, indicating that the "
-            + "user has successfully logged in to Twitter.</p>")
+  /* @SimpleFunction(description = "This sends a direct (private) message to the specified "
+      + "user.  The message will be trimmed if it exceeds "
+      + MAX_CHARACTERS
+      + "characters. "
+      + "<p><u>Requirements<//u>: This should only be called after the "
+      + "<code>IsAuthorized<//code> event has been raised, indicating that the "
+      + "user has successfully logged in to Twitter.<//p>") */
     public void DirectMessage(final String user, final String message) {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "DirectMessage",
@@ -807,7 +852,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * Starts following a user.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Follow(final String user) {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "Follow",
@@ -829,7 +875,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * Stops following a user.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void StopFollowing(final String user) {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "StopFollowing",
@@ -851,7 +898,8 @@ public final class Twitter extends AndroidNonvisibleComponent implements
     /**
      * Gets the most recent 20 messages in the user's timeline.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void RequestFriendTimeline() {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "RequestFriendTimeline",
@@ -894,11 +942,11 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * property will contain a list of lists, where each sub-list contains a status update of the
      * form (username message).
      */
-    @SimpleEvent(description = "This event is raised when the messages "
-            + "requested through <code>RequestFriendTimeline</code> have "
-            + "been retrieved. The <code>timeline</code> parameter and the "
-            + "<code>Timeline</code> property will contain a list of lists, where "
-            + "each sub-list contains a status update of the form (username message)")
+  /* @SimpleEvent(description = "This event is raised when the messages "
+      + "requested through <code>RequestFriendTimeline<//code> have "
+      + "been retrieved. The <code>timeline<//code> parameter and the "
+      + "<code>Timeline<//code> property will contain a list of lists, where "
+      + "each sub-list contains a status update of the form (username message)") */
     public void FriendTimelineReceived(final List<List<String>> timeline) {
         EventDispatcher.dispatchEvent(this, "FriendTimelineReceived", timeline);
     }
@@ -916,19 +964,19 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * The value of this property will then be set to the list of messages (and maintain its value
      * until any subsequent call to {@link #RequestFriendTimeline()}.
      */
-    @SimpleProperty(description = "This property contains the 20 most recent messages of "
-            + "users being followed.  Initially, the list is empty.  To set it, "
-            + "the program must: <ol> "
-            + "<li> Call the <code>Authorize</code> method.</li> "
-            + "<li> Wait for the <code>IsAuthorized</code> event.</li> "
-            + "<li> Specify users to follow with one or more calls to the "
-            + "<code>Follow</code> method.</li> "
-            + "<li> Call the <code>RequestFriendTimeline</code> method.</li> "
-            + "<li> Wait for the <code>FriendTimelineReceived</code> event.</li> "
-            + "</ol>\n"
-            + "The value of this property will then be set to the list of messages "
-            + "(and maintain its value until any subsequent call to "
-            + "<code>RequestFriendTimeline</code>.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains the 20 most recent messages of "
+      + "users being followed.  Initially, the list is empty.  To set it, "
+      + "the program must: <ol> "
+      + "<li> Call the <code>Authorize<//code> method.<//li> "
+      + "<li> Wait for the <code>IsAuthorized<//code> event.<//li> "
+      + "<li> Specify users to follow with one or more calls to the "
+      + "<code>Follow<//code> method.<//li> "
+      + "<li> Call the <code>RequestFriendTimeline<//code> method.<//li> "
+      + "<li> Wait for the <code>FriendTimelineReceived<//code> event.<//li> "
+      + "<//ol>\n"
+      + "The value of this property will then be set to the list of messages "
+      + "(and maintain its value until any subsequent call to "
+      + "<code>RequestFriendTimeline<//code>.") */
     public List<List<String>> FriendTimeline() {
         return timeline;
     }
@@ -939,10 +987,10 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
      * been raised, indicating that the user has successfully logged in to Twitter.
      */
-    @SimpleFunction(description = "This searches Twitter for the given String query."
-            + "<p><u>Requirements</u>: This should only be called after the "
-            + "<code>IsAuthorized</code> event has been raised, indicating that the "
-            + "user has successfully logged in to Twitter.</p>")
+  /* @SimpleFunction(description = "This searches Twitter for the given String query."
+      + "<p><u>Requirements<//u>: This should only be called after the "
+      + "<code>IsAuthorized<//code> event has been raised, indicating that the "
+      + "user has successfully logged in to Twitter.<//p>") */
     public void SearchTwitter(final String query) {
         if (twitter == null || userName.length() == 0) {
             form.dispatchErrorOccurredEvent(this, "SearchTwitter",
@@ -978,11 +1026,11 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * {@link #SearchTwitter(String)} have been retrieved. A list of the results can then be found in
      * the `results`{:.variable.block} parameter or the {@link #SearchResults()} property.
      */
-    @SimpleEvent(description = "This event is raised when the results of the search "
-            + "requested through <code>SearchSuccessful</code> have "
-            + "been retrieved. A list of the results can then be found in the "
-            + "<code>results</code> parameter or the <code>Results</code> "
-            + "property.")
+  /* @SimpleEvent(description = "This event is raised when the results of the search "
+      + "requested through <code>SearchSuccessful<//code> have "
+      + "been retrieved. A list of the results can then be found in the "
+      + "<code>results<//code> parameter or the <code>Results<//code> "
+      + "property.") */
     public void SearchSuccessful(final List<String> searchResults) {
         EventDispatcher.dispatchEvent(this, "SearchSuccessful", searchResults);
     }
@@ -997,14 +1045,14 @@ public final class Twitter extends AndroidNonvisibleComponent implements
      * {@link #SearchSuccessful(List)}. Note that it is not necessary to call the {@link #Authorize()}
      * method before calling {@link #SearchTwitter(String)}.
      */
-    @SimpleProperty(description = "This property, which is initially empty, is set to a "
-            + "list of search results after the program: <ol>"
-            + "<li>Calls the <code>SearchTwitter</code> method.</li> "
-            + "<li>Waits for the <code>SearchSuccessful</code> event.</li></ol>\n"
-            + "The value of the property will then be the same as the parameter to "
-            + "<code>SearchSuccessful</code>.  Note that it is not necessary to "
-            + "call the <code>Authorize</code> method before calling "
-            + "<code>SearchTwitter</code>.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property, which is initially empty, is set to a "
+      + "list of search results after the program: <ol>"
+      + "<li>Calls the <code>SearchTwitter<//code> method.<//li> "
+      + "<li>Waits for the <code>SearchSuccessful<//code> event.<//li><//ol>\n"
+      + "The value of the property will then be the same as the parameter to "
+      + "<code>SearchSuccessful<//code>.  Note that it is not necessary to "
+      + "call the <code>Authorize<//code> method before calling "
+      + "<code>SearchTwitter<//code>.") */
     public List<String> SearchResults() {
         return searchResults;
     }

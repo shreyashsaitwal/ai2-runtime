@@ -6,6 +6,13 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.FroyoUtil;
+import com.google.appinventor.components.runtime.util.OrientationSensorUtil;
+import com.google.appinventor.components.runtime.util.SdkLevel;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,13 +22,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.util.FroyoUtil;
-import com.google.appinventor.components.runtime.util.OrientationSensorUtil;
-import com.google.appinventor.components.runtime.util.SdkLevel;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,8 +47,30 @@ import java.util.Set;
  * <p>
  * These measurements assume that the device itself is not moving.
  */
+/* @DesignerComponent(version = YaVersion.ORIENTATIONSENSOR_COMPONENT_VERSION,
+    description = "<p>Non-visible component providing information about the " +
+    "device's physical orientation in three dimensions: <ul> " +
+    "<li> <strong>Roll<//strong>: 0 degrees when the device is level, increases to " +
+    "     90 degrees as the device is tilted up on its left side, and " +
+    "     decreases to -90 degrees when the device is tilted up on its right side. " +
+    "     <//li> " +
+    "<li> <strong>Pitch<//strong>: 0 degrees when the device is level, up to " +
+    "     90 degrees as the device is tilted so its top is pointing down, " +
+    "     up to 180 degrees as it gets turned over.  Similarly, as the device " +
+    "     is tilted so its bottom points down, pitch decreases to -90 " +
+    "     degrees, then further decreases to -180 degrees as it gets turned all the way " +
+    "     over.<//li> " +
+    "<li> <strong>Azimuth<//strong>: 0 degrees when the top of the device is " +
+    "     pointing north, 90 degrees when it is pointing east, 180 degrees " +
+    "     when it is pointing south, 270 degrees when it is pointing west, " +
+    "     etc.<//li><//ul>" +
+    "     These measurements assume that the device itself is not moving.<//p>",
+    category = ComponentCategory.SENSORS,
+    nonVisible = true,
+    iconName = "images//orientationsensor.png") */
 
-public class OrientationSensor extends AndroidNonvisibleComponent
+/* @SimpleObject
+ */public class OrientationSensor extends AndroidNonvisibleComponent
         implements SensorEventListener, Deleteable, OnPauseListener, OnResumeListener,
         RealTimeDataSource<String, Float> {
     // Constants
@@ -120,7 +142,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      *              left side, -90 degrees if it is tilted entirely on its right
      *              side; the maximum absolute value of roll is 90 degrees, after
      *              which it decreases back toward 0 (flat face-up or face-down).
-     * @returns the corresonding angle in the range [-180, +180] degrees
+     * @returns the corresponding angle in the range [-180, +180] degrees
      */
     static float computeAngle(float pitch, float roll) {
         return (float) Math.toDegrees(Math.atan2(Math.toRadians(pitch),
@@ -165,7 +187,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      * is tilted from top to bottom, and roll indicates how much the device is tilted from
      * side to side.</p>
      */
-    @SimpleEvent(description = "Called when the orientation has changed.")
+    /* @SimpleEvent(description = "Called when the orientation has changed.") */
     public void OrientationChanged(float azimuth, float pitch, float roll) {
         // Notify the Data Source observers with the updated values
         notifyDataObservers("azimuth", azimuth);
@@ -181,7 +203,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that an orientation sensor is available,
      * {@code false} that it isn't
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean Available() {
         return sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).size() > 0
                 && sensorManager.getSensorList(Sensor.TYPE_MAGNETIC_FIELD).size() > 0;
@@ -193,7 +215,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that the sensor generates events,
      * {@code false} that it doesn't
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean Enabled() {
         return enabled;
     }
@@ -205,9 +227,10 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      *                {@code false} disables it
      * @suppressdoc
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void Enabled(boolean enabled) {
         if (this.enabled != enabled) {
             this.enabled = enabled;
@@ -225,7 +248,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      *
      * @return current pitch
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public float Pitch() {
         return pitch;
     }
@@ -236,7 +259,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      *
      * @return current roll
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public float Roll() {
         return roll;
     }
@@ -247,7 +270,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      *
      * @return current azimuth
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public float Azimuth() {
         return azimuth;
     }
@@ -264,7 +287,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      *
      * <p>To return meaningful values the sensor must be enabled.</p>
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public float Angle() {
         return OrientationSensor.computeAngle(pitch, roll);
     }
@@ -278,7 +301,7 @@ public class OrientationSensor extends AndroidNonvisibleComponent
      * @return the magnitude of the tilt, from 0 to 1
      * @internaldoc <p>To return meaningful values the sensor must be enabled.</p>
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public float Magnitude() {
         // Limit pitch and roll to 90; otherwise, the phone is upside down.
         // The official documentation falsely claims that the range of pitch and

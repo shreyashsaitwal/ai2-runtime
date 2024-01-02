@@ -6,7 +6,9 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.ComponentConstants;
+import com.google.appinventor.components.common.YaVersion;
 
 /**
  * ![HorizontalArrangement icon](images/horizontalarrangement.png)
@@ -41,7 +43,15 @@ import com.google.appinventor.components.common.ComponentConstants;
  *
  * @author sharon@google.com (Sharon Perl)
  */
-public class HorizontalArrangement extends HVArrangement {
+/* @DesignerComponent(version = YaVersion.HORIZONTALARRANGEMENT_COMPONENT_VERSION,
+    description = "<p>A formatting element in which to place components " +
+    "that should be displayed from left to right.  If you wish to have " +
+    "components displayed one over another, use " +
+    "<code>VerticalArrangement<//code> instead.<//p>",
+    category = ComponentCategory.LAYOUT,
+    iconName = "images//horizontal.png") */
+/* @SimpleObject
+ */public class HorizontalArrangement extends HVArrangement {
     public HorizontalArrangement(ComponentContainer container) {
         super(container, ComponentConstants.LAYOUT_ORIENTATION_HORIZONTAL,
                 ComponentConstants.NONSCROLLABLE_ARRANGEMENT);

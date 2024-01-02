@@ -5,15 +5,15 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.view.View;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.MapFactory;
 import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureCollection;
 import com.google.appinventor.components.runtime.util.YailList;
+
+import android.view.View;
 import org.json.JSONException;
 
 /**
@@ -22,7 +22,15 @@ import org.json.JSONException;
  * `FeatureCollection`s can be loaded from external resources to populate {@link Map}s with content.
  * GeoJSON is the only format supported at this time.
  */
-public class FeatureCollection extends MapFeatureContainerBase implements MapFeatureCollection {
+/* @DesignerComponent(version = YaVersion.FEATURE_COLLECTION_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "A FeatureCollection contains one or more map features as a group. Any events " +
+        "fired on a feature in the collection will also trigger the corresponding event on the " +
+        "collection object. FeatureCollections can be loaded from external resources as a means " +
+        "of populating a Map with content.",
+    iconName = "images//featurecollection.png") */
+/* @SimpleObject
+ */public class FeatureCollection extends MapFeatureContainerBase implements MapFeatureCollection {
     private String source = "";
     private Map map;
 
@@ -39,10 +47,11 @@ public class FeatureCollection extends MapFeatureContainerBase implements MapFea
      * @param geojson
      */
     @SuppressWarnings("squid:S00100")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA)
-    @SimpleProperty(description = "Loads a collection of features from the given string. If the " +
-            "string is not valid GeoJSON, the ErrorLoadingFeatureCollection error will be run with " +
-            "url = <string>.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA) */
+  /* @SimpleProperty(description = "Loads a collection of features from the given string. If the " +
+      "string is not valid GeoJSON, the ErrorLoadingFeatureCollection error will be run with " +
+      "url = <string>.",
+      category = PropertyCategory.APPEARANCE) */
     public void FeaturesFromGeoJSON(String geojson) {
         try {
             processGeoJSON("<string>", geojson);
@@ -62,24 +71,24 @@ public class FeatureCollection extends MapFeatureContainerBase implements MapFea
      * @param features the list of feature descriptions read from the resource at {@code url}
      */
     @Override
-    @SimpleEvent(description = "A GeoJSON document was successfully read from url. The features " +
-            "specified in the document are provided as a list in features.")
+  /* @SimpleEvent(description = "A GeoJSON document was successfully read from url. The features " +
+      "specified in the document are provided as a list in features.") */
     public void GotFeatures(String url, YailList features) {
         source = url;
         super.GotFeatures(url, features);
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_GEOJSON_TYPE)
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_GEOJSON_TYPE) */
     public void Source(String source) {
         // Only set from the designer. Blocks will call {@link #LoadFromURL} instead.
         this.source = source;
     }
 
     @Override
-    @SimpleProperty(
-            description = "Specifies the source URL used to populate the feature collection. If " +
-                    "the feature collection was not loaded from a URL, this will be the empty string.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Specifies the source URL used to populate the feature collection. If " +
+          "the feature collection was not loaded from a URL, this will be the empty string.") */
     public String Source() {
         return source;
     }
@@ -89,8 +98,8 @@ public class FeatureCollection extends MapFeatureContainerBase implements MapFea
      *
      * @return true iff the component is visible
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public boolean Visible() {
         return getMap().getController().isFeatureCollectionVisible(this);
     }
@@ -101,10 +110,10 @@ public class FeatureCollection extends MapFeatureContainerBase implements MapFea
      *
      * @param visibility desired state
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
-            defaultValue = "True")
-    @SimpleProperty(description = "Specifies whether the component should be visible on the screen. "
-            + "Value is true if the component is showing and false if hidden.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
+      defaultValue = "True") */
+  /* @SimpleProperty(description = "Specifies whether the component should be visible on the screen. "
+      + "Value is true if the component is showing and false if hidden.") */
     public void Visible(boolean visibility) {
         getMap().getController().setFeatureCollectionVisible(this, visibility);
     }

@@ -9,7 +9,8 @@ package com.google.appinventor.components.runtime.errors;
 /**
  * Superclass of all Simple runtime errors.
  */
-public abstract class RuntimeError extends RuntimeException {
+/* @SimpleObject
+ */public abstract class RuntimeError extends RuntimeException {
 
     /**
      * Creates a runtime error.

@@ -11,7 +11,8 @@ package com.google.appinventor.components.runtime;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public abstract class AndroidNonvisibleComponent implements Component {
+/* @SimpleObject
+ */public abstract class AndroidNonvisibleComponent implements Component {
 
     protected final Form form;
 

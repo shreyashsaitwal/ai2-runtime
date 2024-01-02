@@ -6,8 +6,11 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import android.accounts.*;
-import android.annotation.SuppressLint;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -62,7 +65,6 @@ public class AccountChooser {
      * Find the account to use for this service
      */
     public Account findAccount() {
-        @SuppressLint("MissingPermission")
         Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
 
         // only one matching account - use it, and remember it for the next time.

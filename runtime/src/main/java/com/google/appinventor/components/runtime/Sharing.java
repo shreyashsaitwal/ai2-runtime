@@ -7,9 +7,14 @@
 package com.google.appinventor.components.runtime;
 
 import android.content.Intent;
+
 import android.net.Uri;
+
 import android.webkit.MimeTypeMap;
-import com.google.appinventor.components.annotations.SimpleFunction;
+
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.NougatUtil;
 
@@ -33,6 +38,23 @@ import java.io.File;
  * @author victsou@gmail.com (Victor Silva) - Picked up on @cfromknecht's work
  * and fixed file support.
  */
+/* @DesignerComponent(version = YaVersion.SHARING_COMPONENT_VERSION,
+    description ="Sharing is a non-visible component that enables sharing files and//or " +
+        "messages between your app and other apps installed on a device. The component " +
+        "will display a list of the installed apps that can handle the information provided, " +
+        "and will allow the user to choose one to share the content with, for instance a " +
+        "mail app, a social network app, a texting app, and so on.<br>" +
+        "The file path can be taken directly from other components such as the Camera or the " +
+        "ImagePicker, but can also be specified directly to read from storage. Be aware that " +
+        "different devices treat storage differently, so a few things to try if, " +
+        "for instance, you have a file called arrow.gif in the folder " +
+        "<code>Appinventor//assets<//code>, would be: <ul>" +
+        "<li><code>\"file://////sdcard//Appinventor//assets//arrow.gif\"<//code><//li> or " +
+        "<li><code>\"//storage//Appinventor//assets//arrow.gif\"<//code><//li><//ul>",
+    category = ComponentCategory.SOCIAL,
+    nonVisible = true, iconName = "images//sharing.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.READ_EXTERNAL_STORAGE") */
 public class Sharing extends AndroidNonvisibleComponent {
 
     public Sharing(ComponentContainer container) {
@@ -44,10 +66,10 @@ public class Sharing extends AndroidNonvisibleComponent {
      *
      * @suppressdoc
      */
-    @SimpleFunction(description = "Shares a message through any capable " +
-            "application installed on the phone by displaying a list of the available apps and " +
-            "allowing the user to choose one from the list. The selected app will open with the " +
-            "message inserted on it.")
+  /* @SimpleFunction(description = "Shares a message through any capable " +
+      "application installed on the phone by displaying a list of the available apps and " +
+      "allowing the user to choose one from the list. The selected app will open with the " +
+      "message inserted on it.") */
     public void ShareMessage(String message) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, message);
@@ -63,9 +85,9 @@ public class Sharing extends AndroidNonvisibleComponent {
      *
      * @suppressdoc
      */
-    @SimpleFunction(description = "Shares a file through any capable application "
-            + "installed on the phone by displaying a list of the available apps and allowing the " +
-            "user to choose one from the list. The selected app will open with the file inserted on it.")
+  /* @SimpleFunction(description = "Shares a file through any capable application "
+      + "installed on the phone by displaying a list of the available apps and allowing the " +
+      "user to choose one from the list. The selected app will open with the file inserted on it.") */
     public void ShareFile(String file) {
         ShareFileWithMessage(file, "");
     }
@@ -75,9 +97,9 @@ public class Sharing extends AndroidNonvisibleComponent {
      *
      * @suppressdoc
      */
-    @SimpleFunction(description = "Shares both a file and a message through any capable application "
-            + "installed on the phone by displaying a list of available apps and allowing the user to " +
-            " choose one from the list. The selected app will open with the file and message inserted on it.")
+  /* @SimpleFunction(description = "Shares both a file and a message through any capable application "
+      + "installed on the phone by displaying a list of available apps and allowing the user to " +
+      " choose one from the list. The selected app will open with the file and message inserted on it.") */
     public void ShareFileWithMessage(String file, String message) {
         if (!file.startsWith("file://"))
             file = "file://" + file;

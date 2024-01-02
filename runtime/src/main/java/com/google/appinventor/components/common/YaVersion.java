@@ -11,15 +11,6 @@ package com.google.appinventor.components.common;
  * version numbers.
  */
 public class YaVersion {
-    public static final int YOUNG_ANDROID_VERSION = 219;
-
-    // ............................ Young Android System Version Number .............................
-
-    // YOUNG_ANDROID_VERSION must be incremented when either the blocks language or a component
-    // changes.
-    // TODO(lizlooney) - should this version number be generated so that it is automatically
-    // incremented when the blocks language or a component changes?
-
     // For YOUNG_ANDROID_VERSION 2:
     // - The Logger component was removed. The Notifier component should be used instead.
     // - TINYWEBDB_COMPONENT_VERSION was incremented to 2.
@@ -563,7 +554,37 @@ public class YaVersion {
     // - CHART_COMPONENT_VERSION was introduced
     // - CHART_DATA_2D_COMPONENT_VERSION was introduced
     // - DATA_FILE_COMPONENT_VERSION was introduced
-    // - BLUETOOTH_CLIENT_COMPONENT_VERSION was incremented to 7
+    // - BLUETOOTHCLIENT_COMPONENT_VERSION was incremented to 7
+    // For YOUNG_ANDROID_VERSION 220:
+    // - CHART_COMPONENT_VERSION was incremented to 2
+    // - SPREADSHEET_COMPONENT_VERSION was incremented to 2
+    // For YOUNG_ANDROID_VERSION 221:
+    // - BLUETOOTHCLIENT_COMPONENT_VERSION was incremented to 8
+    // For YOUNG_ANDROID_VERSION 222:
+    // - CHATBOT_COMPONENT_VERSION was introduced
+    // For YOUNG_ANDROID_VERSION 223:
+    // - IMAGEBOT_COMPONENT_VERSION was introduced
+    // For YOUNG_ANDROID_VERSION 224:
+    // - ANOMALY_COMPONENT_VERSION was introduced
+    // - CHATBOT_COMPONENT_VERSION was incremented to 2
+    // - FILEPICKER_COMPONENT_VERSION was introduced
+    // - IMAGEBOT_COMPONENT_VERSION was incremented to 2
+    // - REGRESSION_COMPONENT_VERSION was introduced
+    // - TEXTTOSPEEECH_COMPONENT_VERSION was incremented to 6
+    // - TINYDB_COMPONENT_VERSION was incremented to 3
+    // For YOUNG_ANDROID_VERSION 225:
+    // - LISTVIEW_COMPONENT_VERSION was incremented to 7
+    // - WEB_COMPONENT_VERSION was incremented to 9
+    // For YOUNG_ANDROID_VERSION 226:
+    // - FORM_COMPONENT_VERSION was incremented to 31
+    public static final int YOUNG_ANDROID_VERSION = 226;
+
+    // ............................ Young Android System Version Number .............................
+
+    // YOUNG_ANDROID_VERSION must be incremented when either the blocks language or a component
+    // changes.
+    // TODO(lizlooney) - should this version number be generated so that it is automatically
+    // incremented when the blocks language or a component changes?
     // For BLOCKS_LANGUAGE_VERSION 2:
     // - Allow arguments of different procedures and events to have the same names.
     // For BLOCKS_LANGUAGE_VERSION 3:
@@ -642,7 +663,13 @@ public class YaVersion {
     // For BLOCKS_LANGUAGE_VERSION 34
     // - The helpers_screen_names block was added.
     // - Add sanitizing concrete values to OptionLists.
-    public static final int BLOCKS_LANGUAGE_VERSION = 34;
+    // For BLOCKS_LANGUAGE_VERSION 35
+    // - Add PHOLO blocks
+    // For BLOCKS_LANGUAGE_VERSION 36
+    // - Add stats blocks
+    // - Rename lists_*_number to lists_*_value
+    // - Added "every component" block.
+    public static final int BLOCKS_LANGUAGE_VERSION = 36;
 
     // ............................... Blocks Language Version Number ...............................
 
@@ -650,10 +677,10 @@ public class YaVersion {
     // 1. Increment YOUNG_ANDROID_VERSION above.
     // 2. Increment BLOCKS_LANGUAGE_VERSION here
     // 3. Add code in YoungAndroidFormUpgrader to upgrade the source file
-    public static final int TARGET_SDK_VERSION = 31;
+    public static final int TARGET_SDK_VERSION = 33;
 
     // ................................. Target SDK Version Number ..................................
-    public static final String TARGET_ANDROID_VERSION = "Android 12.0";
+    public static final String TARGET_ANDROID_VERSION = "Android 13.0";
     //For ACCELEROMETERSENSOR_COMPONENT_VERSION 2:
     // - AccelerometerSensor.MinimumInterval property was added.
     // - AccelerometerSensor.AccelerationChanged method was modified to wait for
@@ -680,7 +707,6 @@ public class YaVersion {
     //    upgradeComponentProperties to upgrade the .scm file contents
     // 4. For AI2, update the table in blocklyeditor/src/versioning.js
     // 5. Update documentation in the appropriate html file in docs/reference/components.
-
 
     // Note added after internationalization (8/25/2014)
     // If you add any properties, events or methods to a component you *must*:
@@ -713,6 +739,7 @@ public class YaVersion {
     // For ACTIVITYSTARTER_COMPONENT_VERSION 6:
     // - Extras property was added to accept a list of key-value pairs to put to the intent
     public static final int ACTIVITYSTARTER_COMPONENT_VERSION = 6;
+    public static final int ANOMALY_COMPONENT_VERSION = 1;
     // For BALL_COMPONENT_VERSION 2:
     // - The PointTowards method was added (for all sprites)
     // - The heading property was changed from int to double (for all sprites)
@@ -742,9 +769,11 @@ public class YaVersion {
     // - The BluetoothClient.Secure property was added.
     // For BLUETOOTHCLIENT_COMPONENT_VERSION 6:
     // - The BluetoothClient.DisconnectOnError property was added.
-    // For BLUETOOTH_CLIENT_COMPONENT_VERSION 7:
-    // - The BluuetoothClient.PollingRate property was added.
-    public static final int BLUETOOTHCLIENT_COMPONENT_VERSION = 7;
+    // For BLUETOOTHCLIENT_COMPONENT_VERSION 7:
+    // - The BluetoothClient.PollingRate property was added.
+    // For BLUETOOTHCLIENT_COMPONENT_VERSION 8:
+    // - The BluetoothClient.NoLocationNeeded property was added.
+    public static final int BLUETOOTHCLIENT_COMPONENT_VERSION = 8;
     // For BLUETOOTHSERVER_COMPONENT_VERSION 2:
     // - The BluetoothServer.Enabled property was added.
     // For BLUETOOTHSERVER_COMPONENT_VERSION 3:
@@ -811,8 +840,15 @@ public class YaVersion {
     // For CANVAS_COMPONENT_VERSION 15
     // - Assets helper block was added.
     public static final int CANVAS_COMPONENT_VERSION = 15;
-    public static final int CHART_COMPONENT_VERSION = 1;
+    // For CHART_COMPONENT_VERSION 2:
+    // - The XFromZero and YFromZero properties were added
+    // - The SetDomain and SetRange methods were added
+    public static final int CHART_COMPONENT_VERSION = 2;
     public static final int CHART_DATA_2D_COMPONENT_VERSION = 1;
+    // For CHATBOT_COMPONENT_VERSION: Initial Version
+    // For CHATBOT_COMPONENT_VERSION 2:
+    // - The ApiKey property was made visible in the designer view
+    public static final int CHATBOT_COMPONENT_VERSION = 2;
     // For CHECKBOX_COMPONENT_VERSION 2:
     // - The Value property was renamed to Checked.
     public static final int CHECKBOX_COMPONENT_VERSION = 2;
@@ -876,6 +912,7 @@ public class YaVersion {
     // - The WritePermission property was added.
     // - The LegacyMode property was removed. Use DefaultScope instead.
     public static final int FILE_COMPONENT_VERSION = 4;
+    public static final int FILEPICKER_COMPONENT_VERSION = 1;
     // For FORM_COMPONENT_VERSION 2:
     // - The Screen.Scrollable property was added.
     // For FORM_COMPONENT_VERSION 3:
@@ -948,7 +985,9 @@ public class YaVersion {
     // - Adds Permission dropdown block.
     // For FORM_COMPONENT_VERSION 30:
     // - Add DefaultFileScope designer property.
-    public static final int FORM_COMPONENT_VERSION = 30;
+    // For FORM_COMPONENT_VERSION 31:
+    // - The default theme was changed to Device Default.
+    public static final int FORM_COMPONENT_VERSION = 31;
     // For FUSIONTABLESCONTROL_COMPONENT_VERSION 2:
     // - The Fusiontables API was migrated from SQL to V1
     // For FUSIONTABLESCONTROL_COMPONENT_VERSION 3:
@@ -960,7 +999,6 @@ public class YaVersion {
     // - The ShowLoadingDialog property was added
     public static final int FUSIONTABLESCONTROL_COMPONENT_VERSION = 4;
     public static final int GAMECLIENT_COMPONENT_VERSION = 1;
-    public static final int SPREADSHEET_COMPONENT_VERSION = 1;
     public static final int GYROSCOPESENSOR_COMPONENT_VERSION = 1;
     // For HORIZONTALARRANGEMENT_COMPONENT_VERSION 2:
     // - The AlignHorizontal property was added
@@ -987,6 +1025,9 @@ public class YaVersion {
     // For IMAGE_COMPONENT_VERSION 6:
     // - Assets helper block was added.
     public static final int IMAGE_COMPONENT_VERSION = 6;
+    // For IMAGEBOT_COMPONENT_VERSION 2:
+    // - The ApiKey property was made available in the designer
+    public static final int IMAGEBOT_COMPONENT_VERSION = 2;
     public static final int IMAGEPICKER_COMPONENT_VERSION = 5;
 
     // For IMAGEPICKER_COMPONENT_VERSION 2:
@@ -1061,7 +1102,9 @@ public class YaVersion {
     // - Added SelectionColor Property
     // For LISTVIEW_COMPONENT_VERSION 6:
     // - Added ...
-    public static final int LISTVIEW_COMPONENT_VERSION = 6;
+    // For LISTVIEW_COMPONENT_VERSION 7:
+    // - Added RemoveItemAtIndex method
+    public static final int LISTVIEW_COMPONENT_VERSION = 7;
     // For LOCATIONSENSOR_COMPONENT_VERSION 2:
     // - The TimeInterval and DistanceInterval properties were added.
     // For LOCATIONSENSOR_COMPONENT_VERSION 3:
@@ -1199,6 +1242,9 @@ public class YaVersion {
     // For RECTANGLE_COMPONENT_VERSION 2:
     // - Added fill and stroke opacity properties
     public static final int RECTANGLE_COMPONENT_VERSION = 2;
+    // For REGRESSION_COMPONENT_VERSION 2:
+    // - The CalculateLineOfBestFitValue second argument was changed from String to LOBFValues
+    public static final int REGRESSION_COMPONENT_VERSION = 2;
     public static final int SHARING_COMPONENT_VERSION = 1;
     // For SLIDER_COMPONENT_VERSION 1:
     // - Initial version.
@@ -1224,6 +1270,24 @@ public class YaVersion {
     // For SPEECHRECOGNIZER_COMPONENT_VERSION 3:
     // - The Language property was added.
     public static final int SPEECHRECOGNIZER_COMPONENT_VERSION = 3;
+    public static final int SPREADSHEET_COMPONENT_VERSION = 3;
+
+    // For SPREADSHEET_COMPONENT_VERSION 2:
+    // - Added the HasHeaders property
+    // - The ReadCol method was renamed to ReadColumn
+    // - The GotColData event was renamed to GotColumnData
+    // - The WriteCol method was renamed to WriteColumn
+    // - The FinishedWriteCol event was renamed to FinishedWriteColumn
+    // - The AddCol method was renamed to AddColumn
+    // - The FinishedAddCol event was renamed to FinishedAddColumn
+    // - The RemoveCol method was renamed to RemoveColumn
+    // - The FinishedRemoveCol event was renamed to FinishedRemoveColumn
+
+    // For SPREADSHEET_COMPONENT_VERSION 3:
+    // - Added the AddSheet block
+    // - Added the FinishedAddSheet event
+    // - Added the DeleteSheet block
+    // - Added the FinishedDeleteSheet event
     // For SWITCH_COMPONENT_VERSION 1
     //  - Initial Version
     public static final int SWITCH_COMPONENT_VERSION = 1;
@@ -1268,7 +1332,7 @@ public class YaVersion {
     // For TEXTTOSPEECH_COMPONENT_VERSION 5:
     // - default value was added to the Country designer property
     // - default value was added to the Language designer property
-    public static final int TEXTTOSPEECH_COMPONENT_VERSION = 5;
+    public static final int TEXTTOSPEECH_COMPONENT_VERSION = 6;
     // For TIMEPICKER_COMPONENT_VERSION 2:
     // After feedback from the forum, the timepicker dialog was updated
     // to show the current time instead of the last set time by default.
@@ -1282,7 +1346,9 @@ public class YaVersion {
     public static final int TIMEPICKER_COMPONENT_VERSION = 4;
     // For TINYDB_COMPONENT_VERSION 2:
     // - Added Property: Namespace
-    public static final int TINYDB_COMPONENT_VERSION = 2;
+    // For TINYDB_COMPONENT_VERSION 3:
+    // - Added GetEntries method
+    public static final int TINYDB_COMPONENT_VERSION = 3;
     // For TINYWEBDB_COMPONENT_VERSION 2:
     // - The TinyWebDB.ShowAlert method was removed. Notifier.ShowAlert should be used instead.
     public static final int TINYWEBDB_COMPONENT_VERSION = 2;
@@ -1374,7 +1440,9 @@ public class YaVersion {
     // - The XMLTextDecodeAsDictionary method was added.
     // For WEB_COMPONENT_VERSION 8:
     // - PATCH methods added (PatchText, PatchTextWithEncoding, and PatchFile).
-    public static final int WEB_COMPONENT_VERSION = 8;
+    // For WEB_COMPONENT_VERSION 9:
+    // - Added property ResponseTextEncoding
+    public static final int WEB_COMPONENT_VERSION = 9;
     // For WEBVIEWER_COMPONENT_VERSION 2:
     // - The CanGoForward and CanGoBack methods were added
     // For WEBVIEWER_COMPONENT_VERSION 3:
@@ -1455,12 +1523,12 @@ public class YaVersion {
     // of the Android Package for this version of App Inventor. The
     // default value here is for the MIT App Inventor service run
     // by MIT
-    public static final String PREFERRED_COMPANION = "2.65";
+    public static final String PREFERRED_COMPANION = "2.69";
     public static final String EMULATOR_UPDATE_URL = ""; // Should be an APK
     public static final String COMPANION_UPDATE_URL = "";
     public static final String COMPANION_UPDATE_URL1 = "";
     public static final String COMPANION_UPDATE_EMULATOR_URL = "";
-    public static final String[] ACCEPTABLE_COMPANIONS = {"2.65", "2.65u"};
+    public static final String[] ACCEPTABLE_COMPANIONS = {"2.69", "2.69u"};
     // Splash Screen Values
     public static final int SPLASH_SURVEY = 1;
 

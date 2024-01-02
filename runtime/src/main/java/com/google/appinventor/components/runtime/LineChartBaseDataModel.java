@@ -11,6 +11,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
+
+import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.LineType;
 import com.google.appinventor.components.runtime.util.YailList;
 
@@ -53,7 +55,6 @@ public abstract class LineChartBaseDataModel<V extends LineChartViewBase<V>>
       */
             // getDataset().addEntryOrdered(entry);
 
-
             // In Line Chart based data series, the data is already pre-sorted.
             // We can thus run binary search by comparing with the x value, and
             // using an x+1 value to find the insertion point
@@ -78,6 +79,10 @@ public abstract class LineChartBaseDataModel<V extends LineChartViewBase<V>>
             }
 
             entries.add(index, entry);
+
+            List<Integer> defaultColors = ((LineDataSet) dataset).getCircleColors();
+            defaultColors.add(index, dataset.getColor());
+            ((LineDataSet) dataset).setCircleColors(defaultColors);
         }
     }
 

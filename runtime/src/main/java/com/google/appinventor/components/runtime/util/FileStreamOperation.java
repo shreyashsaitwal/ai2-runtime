@@ -6,6 +6,7 @@
 package com.google.appinventor.components.runtime.util;
 
 import android.util.Log;
+
 import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.Form;

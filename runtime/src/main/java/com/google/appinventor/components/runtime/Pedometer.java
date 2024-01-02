@@ -6,6 +6,10 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -13,11 +17,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +24,16 @@ import java.util.Set;
 /**
  * This component keeps count of steps using the accelerometer.
  */
-public class Pedometer extends AndroidNonvisibleComponent
+/* @DesignerComponent(version = YaVersion.PEDOMETER_COMPONENT_VERSION,
+  description = "A Component that acts like a Pedometer. It senses motion via the " +
+  "Accelerometer and attempts to determine if a step has been " +
+  "taken. Using a configurable stride length, it can estimate the " +
+  "distance traveled as well. ",
+  category = ComponentCategory.SENSORS,
+  nonVisible = true,
+  iconName = "images//pedometer.png") */
+/* @SimpleObject
+ */public class Pedometer extends AndroidNonvisibleComponent
         implements Component, SensorEventListener, Deleteable,
         RealTimeDataSource<String, Float> {
     private static final String TAG = "Pedometer";
@@ -94,7 +102,7 @@ public class Pedometer extends AndroidNonvisibleComponent
     /**
      * Starts the pedometer.
      */
-    @SimpleFunction(description = "Start counting steps")
+    /* @SimpleFunction(description = "Start counting steps") */
     public void Start() {
         if (pedometerPaused) {
             pedometerPaused = false;
@@ -108,7 +116,7 @@ public class Pedometer extends AndroidNonvisibleComponent
     /**
      * Stops the pedometer.
      */
-    @SimpleFunction(description = "Stop counting steps")
+    /* @SimpleFunction(description = "Stop counting steps") */
     public void Stop() {
         if (!pedometerPaused) {
             pedometerPaused = true;
@@ -123,7 +131,7 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleFunction(description = "Resets the step counter, distance measure and time running.")
+    /* @SimpleFunction(description = "Resets the step counter, distance measure and time running.") */
     public void Reset() {
         numStepsWithFilter = 0;
         numStepsRaw = 0;
@@ -136,7 +144,7 @@ public class Pedometer extends AndroidNonvisibleComponent
      * This method has been deprecated. Use {@link #Start()} instead.
      */
     @Deprecated
-    @SimpleFunction(description = "Resumes counting, synonym of Start.")
+    /* @SimpleFunction(description = "Resumes counting, synonym of Start.") */
     public void Resume() {
         Start();
     }
@@ -145,7 +153,7 @@ public class Pedometer extends AndroidNonvisibleComponent
      * This method has been deprecated. Use {@link #Stop()} instead.
      */
     @Deprecated
-    @SimpleFunction(description = "Pause counting of steps and distance.")
+    /* @SimpleFunction(description = "Pause counting of steps and distance.") */
     public void Pause() {
         Stop();
     }
@@ -155,9 +163,9 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleFunction(description = "Saves the pedometer state to the phone. Permits " +
-            "permits accumulation of steps and distance between invocations of an App that uses " +
-            "the pedometer. Different Apps will have their own saved state.")
+  /* @SimpleFunction(description = "Saves the pedometer state to the phone. Permits " +
+    "permits accumulation of steps and distance between invocations of an App that uses " +
+    "the pedometer. Different Apps will have their own saved state.") */
     public void Save() {
         // Store preferences
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -185,7 +193,7 @@ public class Pedometer extends AndroidNonvisibleComponent
      * @param distance    approximate distance covered by number of simpleSteps in meters
      * @suppressdoc
      */
-    @SimpleEvent(description = "This event is run when a raw step is detected.")
+    /* @SimpleEvent(description = "This event is run when a raw step is detected.") */
     public void SimpleStep(int simpleSteps, float distance) {
         // Notify Data Observers with changed SimpleSteps and Distance values
         notifyDataObservers("SimpleSteps", simpleSteps);
@@ -202,8 +210,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      * @param distance  approximate distance covered by the number of walkSteps in meters
      * @suppressdoc
      */
-    @SimpleEvent(description = "This event is run when a walking step is detected. " +
-            "A walking step is a step that appears to be involved in forward motion.")
+  /* @SimpleEvent(description = "This event is run when a walking step is detected. " +
+    "A walking step is a step that appears to be involved in forward motion.") */
     public void WalkStep(int walkSteps, float distance) {
         // Notify Data Observers with changed WalkSteps and Distance values
         notifyDataObservers("WalkSteps", walkSteps);
@@ -221,10 +229,11 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @param length is the stride length in meters.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-            defaultValue = "0.73")
-    @SimpleProperty(
-            description = "Set the average stride length in meters.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = "0.73") */
+  /* @SimpleProperty(
+    description = "Set the average stride length in meters.",
+    category = PropertyCategory.BEHAVIOR) */
     public void StrideLength(float length) {
         strideLength = length;
     }
@@ -235,7 +244,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @return length of the stride in meters.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public float StrideLength() {
         return strideLength;
     }
@@ -245,11 +255,12 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @param timeout the timeout in milliseconds.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "2000")
-    @SimpleProperty(
-            description = "The duration in milliseconds of idleness (no steps detected) " +
-                    "after which to go into a \"stopped\" state")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "2000") */
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR,
+      description = "The duration in milliseconds of idleness (no steps detected) " +
+      "after which to go into a \"stopped\" state") */
     public void StopDetectionTimeout(int timeout) {
         stopDetectionTimeout = timeout;
     }
@@ -259,7 +270,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @return the timeout in milliseconds.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public int StopDetectionTimeout() {
         return stopDetectionTimeout;
     }
@@ -269,7 +281,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @return approximate distance traveled in meters.
      */
-    @SimpleProperty(description = "The approximate distance traveled in meters.")
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR, description = "The approximate distance traveled in meters.") */
     public float Distance() {
         return totalDistance;
     }
@@ -279,7 +292,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @return time elapsed in milliseconds since the pedometer was started.
      */
-    @SimpleProperty(description = "Time elapsed in milliseconds since the pedometer was started.")
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR, description = "Time elapsed in milliseconds since the pedometer was started.") */
     public long ElapsedTime() {
         if (pedometerPaused) {
             return prevStopClockTime;
@@ -293,8 +307,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @return the number of simple steps since the pedometer was started.
      */
-    @SimpleProperty(
-            description = "The number of simple steps taken since the pedometer has started.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description = "The number of simple steps taken since the pedometer has started.") */
     public int SimpleSteps() {
         return numStepsRaw;
     }
@@ -304,8 +318,8 @@ public class Pedometer extends AndroidNonvisibleComponent
      *
      * @return the number of walk steps since the pedometer was started.
      */
-    @SimpleProperty(
-            description = "the number of walk steps taken since the pedometer has started.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description = "the number of walk steps taken since the pedometer has started.") */
     public int WalkSteps() {
         return numStepsWithFilter;
     }
@@ -450,53 +464,53 @@ public class Pedometer extends AndroidNonvisibleComponent
     // that has them is loaded.
 
     @Deprecated
-    @SimpleEvent(description = "This event has been deprecated.")
+    /* @SimpleEvent(description = "This event has been deprecated.") */
     public void StartedMoving() {
     }
 
     @Deprecated
-    @SimpleEvent(description = "This event has been deprecated.")
+    /* @SimpleEvent(description = "This event has been deprecated.") */
     public void StoppedMoving() {
 
     }
 
     @Deprecated
-    @SimpleProperty(
-            description = "This property has been deprecated.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "This property has been deprecated.") */
     public void UseGPS(boolean gps) {
     }
 
     @Deprecated
-    @SimpleEvent(description = "This event has been deprecated.")
+    /* @SimpleEvent(description = "This event has been deprecated.") */
     public void CalibrationFailed() {
     }
 
     @Deprecated
-    @SimpleEvent(description = "This event has been deprecated.")
+    /* @SimpleEvent(description = "This event has been deprecated.") */
     public void GPSAvailable() {
     }
 
     @Deprecated
-    @SimpleEvent(description = "This event has been deprecated.")
+    /* @SimpleEvent(description = "This event has been deprecated.") */
     public void GPSLost() {
     }
 
     // Properties
 
     @Deprecated
-    @SimpleProperty(
-            description = "This property has been deprecated.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "This property has been deprecated.") */
     public void CalibrateStrideLength(boolean cal) {
     }
 
     @Deprecated
-    @SimpleProperty(description = "This property has been deprecated.")
+    /* @SimpleProperty(description = "This property has been deprecated.") */
     public boolean CalibrateStrideLength() {
         return false;
     }
 
     @Deprecated
-    @SimpleProperty(description = "This property has been deprecated.")
+    /* @SimpleProperty(description = "This property has been deprecated.") */
     public boolean Moving() {
         return false;
     }

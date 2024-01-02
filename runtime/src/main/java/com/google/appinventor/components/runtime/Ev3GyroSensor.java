@@ -5,11 +5,12 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.*;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.GyroSensorMode;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+import android.os.Handler;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
@@ -20,7 +21,14 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable {
+/* @DesignerComponent(version = YaVersion.EV3_GYROSENSOR_COMPONENT_VERSION,
+                   description = "A component that provides a high-level interface to a gyro sensor on a " +
+                                 "LEGO MINDSTORMS EV3 robot.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable {
     private static final int DELAY_MILLISECONDS = 50;
     private static final int SENSOR_TYPE = 32;
     private final Runnable sensorValueChecker;
@@ -71,8 +79,8 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
      * Returns the current angle or rotation speed based on current mode,
      * or -1 if the value cannot be read from sensor.
      */
-    @SimpleFunction(description = "Returns the current angle or rotation speed based on current mode, " +
-            "or -1 if the value cannot be read from sensor.")
+  /* @SimpleFunction(description = "Returns the current angle or rotation speed based on current mode, " +
+                                "or -1 if the value cannot be read from sensor.") */
     public double GetSensorValue() {
         String functionName = "";
         return getSensorValue(functionName);
@@ -81,10 +89,11 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
     /**
      * Specifies the mode of the sensor.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_GYRO_SENSOR_MODE,
-            defaultValue = "angle")
-    @SimpleProperty
-    public void Mode(@Options(GyroSensorMode.class) String modeName) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_GYRO_SENSOR_MODE,
+                    defaultValue = "angle") */
+    /* @SimpleProperty
+     */
+    public void Mode(/* @Options(GyroSensorMode.class) */ String modeName) {
         // Make sure modeName is a valid GyroSensorMode.
         GyroSensorMode gyroMode = GyroSensorMode.fromUnderlyingValue(modeName);
         if (gyroMode == null) {
@@ -114,16 +123,17 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
     /**
      * Returns the mode of the sensor.
      */
-    @SimpleProperty(description = "The sensor mode can be a text constant of either \"rate\" or \"angle\", " +
-            "which correspond to SetAngleMode or SetRateMode respectively.")
-    public @Options(GyroSensorMode.class) String Mode() {
+  /* @SimpleProperty(description = "The sensor mode can be a text constant of either \"rate\" or \"angle\", " +
+                                "which correspond to SetAngleMode or SetRateMode respectively.",
+                  category = PropertyCategory.BEHAVIOR) */
+    public /* @Options(GyroSensorMode.class) */ String Mode() {
         return mode.toUnderlyingValue();
     }
 
     /**
      * Make the sensor read the angle.
      */
-    @SimpleFunction(description = "Measures the orientation of the sensor.")
+    /* @SimpleFunction(description = "Measures the orientation of the sensor.") */
     @Deprecated
     public void SetAngleMode() {
         setMode(GyroSensorMode.Angle);
@@ -132,7 +142,7 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
     /**
      * Make the sensor read the rotation rate.
      */
-    @SimpleFunction(description = "Measures the angular velocity of the sensor.")
+    /* @SimpleFunction(description = "Measures the angular velocity of the sensor.") */
     @Deprecated
     public void SetRateMode() {
         setMode(GyroSensorMode.Rate);
@@ -141,7 +151,8 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
     /**
      * Returns whether the SensorValueChanged event should fire when the sensor value changed.
      */
-    @SimpleProperty(description = "Whether the SensorValueChanged event should fire when the sensor value changed.")
+  /* @SimpleProperty(description = "Whether the SensorValueChanged event should fire when the sensor value changed.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean SensorValueChangedEventEnabled() {
         return sensorValueChangedEventEnabled;
     }
@@ -149,9 +160,10 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
     /**
      * Returns whether the SensorValueChanged event should fire when the sensor value changed.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void SensorValueChangedEventEnabled(boolean enabled) {
         sensorValueChangedEventEnabled = enabled;
     }
@@ -159,7 +171,7 @@ public class Ev3GyroSensor extends LegoMindstormsEv3Sensor implements Deleteable
     /**
      * Called then the sensor value changed.
      */
-    @SimpleEvent(description = "Called then the sensor value changed.")
+    /* @SimpleEvent(description = "Called then the sensor value changed.") */
     public void SensorValueChanged(double sensorValue) {
         EventDispatcher.dispatchEvent(this, "SensorValueChanged", sensorValue);
     }

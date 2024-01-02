@@ -4,7 +4,11 @@ import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.runtime.Component;
 import com.google.appinventor.components.runtime.Form;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public abstract class CompositeFileOperation extends FileOperation
         implements Iterable<CompositeFileOperation.FileOperand> {

@@ -6,8 +6,6 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import com.google.appinventor.components.annotations.SimpleFunction;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +16,8 @@ import java.util.GregorianCalendar;
 /**
  * Implementation of various date and time related runtime functions.
  */
-public final class Dates {
+/* @SimpleObject
+ */public final class Dates {
 
     /**
      * Date/time interval kinds.
@@ -71,7 +70,8 @@ public final class Dates {
      * @param interval     units to add
      * @see DateAddInMillis()
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static void DateAdd(Calendar date, int intervalKind, int interval) {
         switch (intervalKind) {
             default:
@@ -97,7 +97,8 @@ public final class Dates {
      * @param millis an interval to add
      * @see Dates.DateAdd()
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static void DateAddInMillis(Calendar date, long millis) {
         long dateInMillis = date.getTimeInMillis();
         date.setTimeInMillis(dateInMillis + millis);
@@ -119,7 +120,8 @@ public final class Dates {
      * @param value string to convert
      * @return date
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static Calendar DateValue(String value) {
         Calendar date = new GregorianCalendar();
         date.setTime(tryParseDate(value));
@@ -153,7 +155,8 @@ public final class Dates {
      * @param date date to get day of
      * @return day (range 1 - 31)
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Day(Calendar date) {
         return date.get(Calendar.DAY_OF_MONTH);
     }
@@ -166,7 +169,8 @@ public final class Dates {
      * @param intervalkind time unit
      * @return duration converted into a different time unit
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static long ConvertDuration(long duration, int intervalKind) {
         switch (intervalKind) {
             default:
@@ -192,7 +196,8 @@ public final class Dates {
      * @return formatted date
      * @see SimpleDateFormat
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static String FormatDateTime(Calendar date, String pattern) {
         SimpleDateFormat formatdate = new SimpleDateFormat();
         if (pattern.length() == 0) {
@@ -211,7 +216,8 @@ public final class Dates {
      * @return formatted date
      * @see SimpleDateFormat
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static String FormatDate(Calendar date, String pattern) {
         SimpleDateFormat formatdate = new SimpleDateFormat();
         if (pattern.length() == 0) {
@@ -229,7 +235,8 @@ public final class Dates {
      * @return formatted date
      * @see SimpleDateFormat
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static String FormatTime(Calendar date) {
         return DateFormat.getTimeInstance(DateFormat.MEDIUM).format(date.getTime());
     }
@@ -242,7 +249,8 @@ public final class Dates {
      * @param day   day of the date
      * @return Calendar (instant in time)
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static Calendar DateInstant(int year, int month, int day) {
         String year_str = String.valueOf(year);
         String month_str = String.valueOf(month);
@@ -264,7 +272,8 @@ public final class Dates {
      * @param day   day of the date
      * @return Calendar (instant in time)
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static Calendar TimeInstant(int hour, int minute) {
         String hour_str = String.valueOf(hour);
         String minute_str = String.valueOf(minute);
@@ -283,7 +292,8 @@ public final class Dates {
      * @param date date to use hours of
      * @return hours (range 0 - 23)
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Hour(Calendar date) {
         return date.get(Calendar.HOUR_OF_DAY);
     }
@@ -294,7 +304,8 @@ public final class Dates {
      * @param date date to use minutes of
      * @return minutes (range 0 - 59)
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Minute(Calendar date) {
         return date.get(Calendar.MINUTE);
     }
@@ -310,7 +321,8 @@ public final class Dates {
      * {@link #DATE_SEPTEMBER}, {@link #DATE_OCTOBER},
      * {@link #DATE_NOVEMBER}, {@link #DATE_DECEMBER}
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Month(Calendar date) {
         return date.get(Calendar.MONTH);
     }
@@ -321,7 +333,8 @@ public final class Dates {
      * @param date date to use month of
      * @return name of month
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static String MonthName(Calendar date) {
         return String.format("%1$tB", date);
     }
@@ -331,7 +344,8 @@ public final class Dates {
      *
      * @return current date and time
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static Calendar Now() {
         return new GregorianCalendar();
     }
@@ -342,7 +356,8 @@ public final class Dates {
      * @param date date to use seconds of
      * @return seconds (range 0 - 59)
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Second(Calendar date) {
         return date.get(Calendar.SECOND);
     }
@@ -352,7 +367,8 @@ public final class Dates {
      *
      * @return current system time in milliseconds
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static long Timer() {
         return System.currentTimeMillis();
     }
@@ -366,7 +382,8 @@ public final class Dates {
      * {@link #DATE_THURSDAY}, {@link #DATE_FRIDAY},
      * {@link #DATE_SATURDAY}
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Weekday(Calendar date) {
         return date.get(Calendar.DAY_OF_WEEK);
     }
@@ -377,7 +394,8 @@ public final class Dates {
      * @param date date to use weekday of
      * @return name of weekday
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static String WeekdayName(Calendar date) {
         return String.format("%1$tA", date);
     }
@@ -388,7 +406,8 @@ public final class Dates {
      * @param date date to use year of
      * @return year
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public static int Year(Calendar date) {
         return date.get(Calendar.YEAR);
     }

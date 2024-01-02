@@ -7,11 +7,12 @@
 package com.google.appinventor.components.runtime;
 
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
 import com.google.appinventor.components.common.FileScope;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+
 import com.google.appinventor.components.runtime.errors.StopBlocksExecution;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.FileStreamReadOperation;
 import com.google.appinventor.components.runtime.util.IOUtils;
@@ -27,7 +28,8 @@ import java.io.IOException;
  * this functionality (DataFile is an example component that benefits
  * from this generalization)
  */
-public abstract class FileBase extends AndroidNonvisibleComponent implements Component {
+/* @SimpleObject
+ */public abstract class FileBase extends AndroidNonvisibleComponent implements Component {
     protected static final String LOG_TAG = "FileComponent";
 
     protected FileScope scope = FileScope.App;
@@ -49,14 +51,14 @@ public abstract class FileBase extends AndroidNonvisibleComponent implements Com
      *
      * @param scope the default file access scope
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FILESCOPE,
-            defaultValue = "App")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FILESCOPE,
+      defaultValue = "App") */
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.BEHAVIOR) */
     public void DefaultScope(FileScope scope) {
         this.scope = scope;
     }
 
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, userVisible = false) */
     @Deprecated
     public void LegacyMode(boolean legacy) {
         this.scope = legacy ? FileScope.Legacy : FileScope.App;
@@ -72,8 +74,8 @@ public abstract class FileBase extends AndroidNonvisibleComponent implements Com
      * <p><b>Note:</b> Apps that enable this property will likely stop working after upgrading to
      * Android 11, which strongly enforces that apps only write to app-private directories.
      */
-    @SimpleProperty(description = "Allows app to access files from the root of the external storage "
-            + "directory (legacy mode).")
+  /* @SimpleProperty(description = "Allows app to access files from the root of the external storage "
+      + "directory (legacy mode).") */
     @Deprecated
     public boolean LegacyMode() {
         return scope == FileScope.Legacy;

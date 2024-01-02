@@ -281,7 +281,6 @@ public final class MultiDex {
             try {
                 Field field = clazz.getDeclaredField(name);
 
-
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                 }
@@ -309,7 +308,6 @@ public final class MultiDex {
         for (Class<?> clazz = instance.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
             try {
                 Method method = clazz.getDeclaredMethod(name, parameterTypes);
-
 
                 if (!method.isAccessible()) {
                     method.setAccessible(true);

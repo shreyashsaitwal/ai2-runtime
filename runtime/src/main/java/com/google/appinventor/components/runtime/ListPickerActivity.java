@@ -6,23 +6,26 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.*;
+import android.widget.TextView;
 import com.google.appinventor.components.runtime.util.AnimationUtil;
-
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * ListPickerActivity class - Brings up a list of items specified in an intent
@@ -155,7 +158,6 @@ public class ListPickerActivity extends AppInventorCompatActivity implements Ada
         AnimationUtil.ApplyCloseScreenAnimation(this, closeAnim);
         super.onBackPressed();
     }
-
 
     private static class MyAdapter extends ArrayAdapter<String> {
 

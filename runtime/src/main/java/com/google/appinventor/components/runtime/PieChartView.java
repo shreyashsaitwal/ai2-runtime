@@ -7,13 +7,19 @@ package com.google.appinventor.components.runtime;
 
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.RelativeLayout;
+
 import com.github.mikephil.charting.charts.PieChart;
+
 import com.github.mikephil.charting.components.LegendEntry;
+
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
+
 import com.github.mikephil.charting.utils.Utils;
 
 import java.util.ArrayList;
@@ -285,7 +291,6 @@ public class PieChartView extends ChartView<
                 // difference between the new and old radius, the bigger
                 // the new radius)
                 float setRadius = pieHoleRadius * (1f + (delta) / 100f);
-
 
                 // Set the hole radius of the Pie chart to the calculated radius
                 pieChart.setTransparentCircleRadius(setRadius);

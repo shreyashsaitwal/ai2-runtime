@@ -6,8 +6,9 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import android.util.Log;
 import com.google.appinventor.components.runtime.collect.Maps;
+
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;

@@ -7,8 +7,8 @@
 package com.google.appinventor.components.runtime.util;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.Context;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -17,12 +17,14 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Parcelable;
 import android.util.Log;
+
 import com.google.appinventor.components.runtime.NearField;
 
-import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookieStore;
+
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Locale;
 

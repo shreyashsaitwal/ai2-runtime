@@ -5,11 +5,12 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
-import com.google.appinventor.components.runtime.util.ErrorMessages;
 
 import java.util.ArrayList;
 

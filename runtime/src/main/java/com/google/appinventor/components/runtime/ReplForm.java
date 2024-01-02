@@ -8,27 +8,48 @@ package com.google.appinventor.components.runtime;
 
 import android.content.Context;
 import android.content.Intent;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
+
 import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+
 import android.widget.Toast;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+//import com.google.appinventor.common.version.AppInventorFeatures;
+
 import com.google.appinventor.components.common.ComponentConstants;
-import com.google.appinventor.components.runtime.util.*;
+
+import com.google.appinventor.components.runtime.util.AppInvHTTPD;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.FileUtil;
+import com.google.appinventor.components.runtime.util.OnInitializeListener;
+import com.google.appinventor.components.runtime.util.QUtil;
+import com.google.appinventor.components.runtime.util.RetValManager;
+import com.google.appinventor.components.runtime.util.WebRTCNativeMgr;
+
 import dalvik.system.DexClassLoader;
+
 import gnu.expr.Language;
-import kawa.standard.Scheme;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import kawa.standard.Scheme;
 
 /**
  * Subclass of Form used by the 'stem cell apk', i.e. the Android app that allows communication
@@ -109,6 +130,16 @@ public class ReplForm extends Form {
                 }
             });
         }
+    }
+
+    @Override
+    protected void defaultPropertyValues() {
+        super.defaultPropertyValues();
+        // Previously this was set in the {@link Form#defaultPropertyValues()}. However, in compiled
+        // apps we do not want to reset the theme since it is provided in the AndroidManifest.xml.
+        // In the companion though we do want to reset the theme in case we are switching from a project
+        // with a different theme than the default one to one that uses the default.
+        Theme(ComponentConstants.DEFAULT_THEME);
     }
 
     @Override
@@ -193,15 +224,15 @@ public class ReplForm extends Form {
     }
 
     public void addLogcatButton(Menu menu) {
-//        if (!ReplApplication.isAcraActive()) { // If ACRA isn't active
-//            return;                              // we don't show the button
-//        }
+        if (!ReplApplication.isAcraActive()) { // If ACRA isn't active
+            return;                              // we don't show the button
+        }
         MenuItem showSettingsItem = menu.add(Menu.NONE, Menu.NONE, 4,
                 "Send Error Report").setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 String reportId = genReportId();
-//                ReplApplication.reportError(null, reportId);
+                ReplApplication.reportError(null, reportId);
                 Notifier.oneButtonAlert(activeForm, "Your Report Id is: " + reportId +
                         "<br />Use this ID when reporting this error.", "Error Report Id", "OK");
                 return true;
@@ -386,7 +417,7 @@ public class ReplForm extends Form {
     }
 
     @Override
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public void Theme(String theme) {
         currentTheme = theme;
         super.Theme(theme);

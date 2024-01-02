@@ -7,7 +7,7 @@
 package com.google.appinventor.components.runtime;
 
 import android.os.Handler;
-import com.google.appinventor.components.annotations.*;
+
 import com.google.appinventor.components.common.Direction;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.errors.IllegalArgumentError;
@@ -28,7 +28,8 @@ import java.util.Set;
  *
  * @author spertus.google.com (Ellen Spertus)
  */
-public abstract class Sprite extends VisibleComponent
+/* @SimpleObject
+ */public abstract class Sprite extends VisibleComponent
         implements AlarmHandler, OnDestroyListener, Deleteable {
     protected static final boolean DEFAULT_ORIGIN_AT_CENTER = false;
     private static final String LOG_TAG = "Sprite";
@@ -197,9 +198,9 @@ public abstract class Sprite extends VisibleComponent
      * @return {@code true} indicates a running timer, {@code false} a stopped
      * timer
      */
-    @SimpleProperty(
-            description = "Controls whether the %type% moves and can be interacted with " +
-                    "through collisions, dragging, touching, and flinging.")
+  /* @SimpleProperty(
+      description = "Controls whether the %type% moves and can be interacted with " +
+          "through collisions, dragging, touching, and flinging.") */
     public boolean Enabled() {
         return timerInternal.Enabled();
     }
@@ -210,10 +211,10 @@ public abstract class Sprite extends VisibleComponent
      * @param enabled {@code true} starts the timer, {@code false} stops it
      * @suppressdoc
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = DEFAULT_ENABLED ? "True" : "False")
-    @SimpleProperty
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = DEFAULT_ENABLED ? "True" : "False") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void Enabled(boolean enabled) {
         timerInternal.Enabled(enabled);
     }
@@ -224,10 +225,10 @@ public abstract class Sprite extends VisibleComponent
      *
      * @return degrees above the positive x-axis
      */
-    @SimpleProperty(
-            description = "Returns the %type%'s heading in degrees above the positive " +
-                    "x-axis.  Zero degrees is toward the right of the screen; 90 degrees is toward the " +
-                    "top of the screen.")
+  /* @SimpleProperty(
+      description = "Returns the %type%'s heading in degrees above the positive " +
+          "x-axis.  Zero degrees is toward the right of the screen; 90 degrees is toward the " +
+          "top of the screen.") */
     public double Heading() {
         return userHeading;
     }
@@ -240,10 +241,10 @@ public abstract class Sprite extends VisibleComponent
      * @param userHeading degrees above the positive x-axis
      * @suppressdoc
      */
-    @SimpleProperty
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = DEFAULT_HEADING + "")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = DEFAULT_HEADING + "") */
     public void Heading(double userHeading) {
         this.userHeading = userHeading;
         // Flip, because y increases in the downward direction on Android canvases
@@ -262,10 +263,10 @@ public abstract class Sprite extends VisibleComponent
      *
      * @return timer interval in ms
      */
-    @SimpleProperty(
-            description = "The interval in milliseconds at which the %type%'s " +
-                    "position is updated.  For example, if the interval is 50 and the speed is 10, " +
-                    "then every 50 milliseconds the sprite will move 10 pixels in the heading direction.")
+  /* @SimpleProperty(
+      description = "The interval in milliseconds at which the %type%'s " +
+          "position is updated.  For example, if the interval is 50 and the speed is 10, " +
+          "then every 50 milliseconds the sprite will move 10 pixels in the heading direction.") */
     public int Interval() {
         return timerInternal.Interval();
     }
@@ -276,10 +277,10 @@ public abstract class Sprite extends VisibleComponent
      * @param interval timer interval in ms
      * @suppressdoc
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = DEFAULT_INTERVAL + "")
-    @SimpleProperty
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = DEFAULT_INTERVAL + "") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void Interval(int interval) {
         timerInternal.Interval(interval);
     }
@@ -291,11 +292,12 @@ public abstract class Sprite extends VisibleComponent
      * @param speed the magnitude (in pixels) to move every {@link #interval}
      *              milliseconds
      */
-    @SimpleProperty(
-            description = "The number of pixels that the %type% should move every interval, if enabled.")
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = DEFAULT_SPEED + "")
+  /* @SimpleProperty(
+      description = "The number of pixels that the %type% should move every interval, if enabled.",
+      category = PropertyCategory.BEHAVIOR) */
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = DEFAULT_SPEED + "") */
     public void Speed(float speed) {
         this.speed = speed;
     }
@@ -307,9 +309,9 @@ public abstract class Sprite extends VisibleComponent
      * milliseconds.
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "The speed at which the %type% moves. The %type% moves " +
-                    "this many pixels every interval if enabled.")
+  /* @SimpleProperty(
+    description = "The speed at which the %type% moves. The %type% moves " +
+        "this many pixels every interval if enabled.") */
     public float Speed() {
         return speed;
     }
@@ -320,7 +322,7 @@ public abstract class Sprite extends VisibleComponent
      *
      * @return {@code true} if the sprite is visible, {@code false} otherwise
      */
-    @SimpleProperty(description = "Whether the %type% is visible.")
+    /* @SimpleProperty(description = "Whether the %type% is visible.") */
     public boolean Visible() {
         return visible;
     }
@@ -331,10 +333,10 @@ public abstract class Sprite extends VisibleComponent
      * @param visible {@code true} if the sprite should be visible; {@code false}
      *                otherwise.
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = DEFAULT_VISIBLE ? "True" : "False")
-    @SimpleProperty
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = DEFAULT_VISIBLE ? "True" : "False") */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
     public void Visible(boolean visible) {
         this.visible = visible;
         registerChange();
@@ -364,10 +366,10 @@ public abstract class Sprite extends VisibleComponent
         }
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0.0")
-    @SimpleProperty(
-    )
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+        defaultValue = "0.0") */
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public void X(double x) {
         updateX(x);
         registerChange();
@@ -393,9 +395,9 @@ public abstract class Sprite extends VisibleComponent
         }
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0.0")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+        defaultValue = "0.0") */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
     public void Y(double y) {
         updateY(y);
         registerChange();
@@ -413,9 +415,9 @@ public abstract class Sprite extends VisibleComponent
      *              in front of ones with lower numbers; if values are equal for
      *              sprites, either can go in front of the other
      */
-    @SimpleProperty
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = DEFAULT_Z + "")
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+                    defaultValue = DEFAULT_Z + "") */
     public void Z(double layer) {
         this.zLayer = layer;
         canvas.changeSpriteLayer(this);  // Tell canvas about change
@@ -425,9 +427,9 @@ public abstract class Sprite extends VisibleComponent
     // Simple events: CollidedWith, Dragged, EdgeReached, Touched, NoLongerCollidingWith,
     // Flung, TouchUp, and TouchDown.
 
-    @SimpleProperty(
-            description = "How the %type% should be layered relative to other Balls and ImageSprites, " +
-                    "with higher-numbered layers in front of lower-numbered layers.")
+    /* @SimpleProperty(
+        description = "How the %type% should be layered relative to other Balls and ImageSprites, " +
+            "with higher-numbered layers in front of lower-numbered layers.") */
     public double Z() {
         return zLayer;
     }
@@ -470,7 +472,8 @@ public abstract class Sprite extends VisibleComponent
      *
      * @param other the other sprite in the collision
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void CollidedWith(Sprite other) {
         if (!registeredCollisions.contains(other)) {
             registeredCollisions.add(other);
@@ -495,17 +498,17 @@ public abstract class Sprite extends VisibleComponent
      * @param currentX the current x-coordinate
      * @param currentY the current y-coordinate
      */
-    @SimpleEvent(
-            description = "Event handler called when a %type% is dragged. " +
-                    "On all calls, the starting coordinates " +
-                    "are where the screen was first touched, and the \"current\" coordinates " +
-                    "describe the endpoint of the current line segment. On the first call " +
-                    "within a given drag, the \"previous\" coordinates are the same as the " +
-                    "starting coordinates; subsequently, they are the \"current\" coordinates " +
-                    "from the prior call. Note that the %type% won't actually move " +
-                    "anywhere in response to the Dragged event unless MoveTo is explicitly called. " +
-                    "For smooth movement, each of its coordinates should be set to the sum of its " +
-                    "initial value and the difference between its current and previous values.")
+  /* @SimpleEvent(
+      description = "Event handler called when a %type% is dragged. " +
+          "On all calls, the starting coordinates " +
+          "are where the screen was first touched, and the \"current\" coordinates " +
+          "describe the endpoint of the current line segment. On the first call " +
+          "within a given drag, the \"previous\" coordinates are the same as the " +
+          "starting coordinates; subsequently, they are the \"current\" coordinates " +
+          "from the prior call. Note that the %type% won't actually move " +
+          "anywhere in response to the Dragged event unless MoveTo is explicitly called. " +
+          "For smooth movement, each of its coordinates should be set to the sum of its " +
+          "initial value and the difference between its current and previous values.") */
     public void Dragged(float startX, float startY,
                         float prevX, float prevY,
                         float currentX, float currentY) {
@@ -519,13 +522,13 @@ public abstract class Sprite extends VisibleComponent
      * directions north(1), northeast(2), east(3), southeast(4), south (-1), southwest(-2), west(-3),
      * and northwest(-4).
      */
-    @SimpleEvent(
-            description = "Event handler called when the %type% reaches an edge of the screen. " +
-                    "If Bounce is then called with that edge, the %type% will appear to " +
-                    "bounce off of the edge it reached. Edge here is represented as an integer that " +
-                    "indicates one of eight directions north (1), northeast (2), east (3), southeast (4), " +
-                    "south (-1), southwest (-2), west (-3), and northwest (-4).")
-    public void EdgeReached(@Options(Direction.class) int edge) {
+  /* @SimpleEvent(
+      description = "Event handler called when the %type% reaches an edge of the screen. " +
+          "If Bounce is then called with that edge, the %type% will appear to " +
+          "bounce off of the edge it reached. Edge here is represented as an integer that " +
+          "indicates one of eight directions north (1), northeast (2), east (3), southeast (4), " +
+          "south (-1), southwest (-2), west (-3), and northwest (-4).") */
+    public void EdgeReached(/* @Options(Direction.class) */ int edge) {
         // Make sure that "edge" is a valid Direction.
         Direction dir = Direction.fromUnderlyingValue(edge);
         if (dir == null) {
@@ -552,9 +555,9 @@ public abstract class Sprite extends VisibleComponent
      * {@link #CollidedWith(Sprite)} and this event are only raised once per
      * beginning and ending of a collision.
      */
-    @SimpleEvent(
-            description = "Event handler called when a pair of sprites (Balls and ImageSprites) are no " +
-                    "longer colliding.")
+  /* @SimpleEvent(
+      description = "Event handler called when a pair of sprites (Balls and ImageSprites) are no " +
+          "longer colliding.") */
     public void NoLongerCollidingWith(Sprite other) {
         registeredCollisions.remove(other);
         postEvent(this, "NoLongerCollidingWith", other);
@@ -567,10 +570,10 @@ public abstract class Sprite extends VisibleComponent
      * @param x x-coordinate of touched point
      * @param y y-coordinate of touched point
      */
-    @SimpleEvent(
-            description = "Event handler called when the user touches an enabled " +
-                    "%type% and then immediately lifts their finger. The provided x and y coordinates " +
-                    "are relative to the upper left of the canvas.")
+  /* @SimpleEvent(
+    description = "Event handler called when the user touches an enabled " +
+        "%type% and then immediately lifts their finger. The provided x and y coordinates " +
+        "are relative to the upper left of the canvas.") */
     public void Touched(float x, float y) {
         postEvent(this, "Touched", x, y);
     }
@@ -579,7 +582,7 @@ public abstract class Sprite extends VisibleComponent
      * When a fling gesture (quick swipe) is made on the sprite: provides
      * the (x,y) position of the start of the fling, relative to the upper
      * left of the canvas. Also provides the speed (pixels per millisecond) and heading
-     * (0-360 degrees) of the fling, as well as the x velocity and y velocity
+     * (-180 to 180 degrees) of the fling, as well as the x velocity and y velocity
      * components of the fling's vector.
      *
      * @param x       x-coordinate of touched point
@@ -589,12 +592,12 @@ public abstract class Sprite extends VisibleComponent
      * @param xvel    the speed in x-direction of the fling
      * @param yvel    the speed in y-direction of the fling
      */
-    @SimpleEvent(
-            description = "Event handler called when a fling gesture (quick swipe) is made on " +
-                    "an enabled %type%. This provides the x and y coordinates of the start of the " +
-                    "fling (relative to the upper left of the canvas), the speed (pixels per millisecond), " +
-                    "the heading (0-360 degrees), and the x and y velocity components of " +
-                    "the fling's vector.")
+  /* @SimpleEvent(
+      description = "Event handler called when a fling gesture (quick swipe) is made on " +
+          "an enabled %type%. This provides the x and y coordinates of the start of the " +
+          "fling (relative to the upper left of the canvas), the speed (pixels per millisecond), " +
+          "the heading (-180 to 180 degrees), and the x and y velocity components of " +
+          "the fling's vector.") */
     public void Flung(float x, float y, float speed, float heading, float xvel, float yvel) {
         postEvent(this, "Flung", x, y, speed, heading, xvel, yvel);
     }
@@ -610,10 +613,10 @@ public abstract class Sprite extends VisibleComponent
      * @param x x-coordinate of touched point
      * @param y y-coordinate of touched point
      */
-    @SimpleEvent(
-            description = "Event handler called when the user stops touching an enabled %type% " +
-                    "(lifting their finger after a TouchDown event). This provides the " +
-                    "x and y coordinates of the touch, relative to the upper left of the canvas.")
+  /* @SimpleEvent(
+      description = "Event handler called when the user stops touching an enabled %type% " +
+          "(lifting their finger after a TouchDown event). This provides the " +
+          "x and y coordinates of the touch, relative to the upper left of the canvas.") */
     public void TouchUp(float x, float y) {
         postEvent(this, "TouchUp", x, y);
     }
@@ -626,10 +629,10 @@ public abstract class Sprite extends VisibleComponent
      * @param x x-coordinate of touched point
      * @param y y-coordinate of touched point
      */
-    @SimpleEvent(
-            description = "Event handler called when the user begins touching an enabled %type% " +
-                    "(placing their finger on a %type% and leaving it there). This provides the " +
-                    "x and y coordinates of the touch, relative to the upper left of the canvas.")
+  /* @SimpleEvent(
+      description = "Event handler called when the user begins touching an enabled %type% " +
+          "(placing their finger on a %type% and leaving it there). This provides the " +
+          "x and y coordinates of the touch, relative to the upper left of the canvas.") */
     public void TouchDown(float x, float y) {
         postEvent(this, "TouchDown", x, y);
     }
@@ -646,10 +649,10 @@ public abstract class Sprite extends VisibleComponent
      *             of; this should be one of the values of
      *             {@link com.google.appinventor.components.common.Direction}.
      */
-    @SimpleFunction(
-            description = "Makes the %type% bounce, as if off a wall. " +
-                    "For normal bouncing, the edge argument should be the one returned by EdgeReached.")
-    public void Bounce(@Options(Direction.class) int edge) {
+  /* @SimpleFunction(
+    description = "Makes the %type% bounce, as if off a wall. " +
+        "For normal bouncing, the edge argument should be the one returned by EdgeReached.") */
+    public void Bounce(/* @Options(Direction.class) */ int edge) {
         // Make sure that "edge" is a valid Direction.
         Direction dir = Direction.fromUnderlyingValue(edge);
         if (dir == null) {
@@ -714,9 +717,9 @@ public abstract class Sprite extends VisibleComponent
      * @return {@code true} if a collision event has been raised for the pair of
      * sprites and they still are in collision, {@code false} otherwise.
      */
-    @SimpleFunction(
-            description = "Indicates whether a collision has been registered between this %type% " +
-                    "and the passed sprite (Ball or ImageSprite).")
+  /* @SimpleFunction(
+      description = "Indicates whether a collision has been registered between this %type% " +
+          "and the passed sprite (Ball or ImageSprite).") */
     public boolean CollidingWith(Sprite other) {
         return registeredCollisions.contains(other);
     }
@@ -728,12 +731,12 @@ public abstract class Sprite extends VisibleComponent
      * canvas. If the sprite is too tall to fit on the canvas, this aligns the
      * top side of the sprite with the top side of the canvas.
      */
-    @SimpleFunction(
-            description = "Moves the %type% back in bounds if part of it extends out of bounds, " +
-                    "having no effect otherwise. If the %type% is too wide to fit on the " +
-                    "canvas, this aligns the left side of the %type% with the left side of the " +
-                    "canvas. If the %type% is too tall to fit on the canvas, this aligns the " +
-                    "top side of the %type% with the top side of the canvas.")
+  /* @SimpleFunction(
+      description = "Moves the %type% back in bounds if part of it extends out of bounds, " +
+          "having no effect otherwise. If the %type% is too wide to fit on the " +
+          "canvas, this aligns the left side of the %type% with the left side of the " +
+          "canvas. If the %type% is too tall to fit on the canvas, this aligns the " +
+          "top side of the %type% with the top side of the canvas.") */
     public void MoveIntoBounds() {
         moveIntoBounds(canvas.Width(), canvas.Height());
     }
@@ -756,9 +759,9 @@ public abstract class Sprite extends VisibleComponent
      * @param coordinates a list of length 2 where the first item is the x-coordinate and the
      *                    second item is the y-coordinate.
      */
-    @SimpleFunction(
-            description = "Moves the origin of %type% to the position of the cooordinates given "
-                    + " by the list formatted as [x-coordinate, y-coordinate].")
+  /* @SimpleFunction(
+      description = "Moves the origin of %type% to the position of the cooordinates given "
+          + " by the list formatted as [x-coordinate, y-coordinate].") */
     public void MoveToPoint(YailList coordinates) {
         MoveTo(coerceToDouble(coordinates.getObject(0)), coerceToDouble(coordinates.getObject(1)));
     }
@@ -769,10 +772,10 @@ public abstract class Sprite extends VisibleComponent
      *
      * @param target the other sprite to point towards
      */
-    @SimpleFunction(
-            description = "Turns the %type% to point towards a designated " +
-                    "target sprite (Ball or ImageSprite). The new heading will be parallel to the line joining " +
-                    "the centerpoints of the two sprites.")
+  /* @SimpleFunction(
+    description = "Turns the %type% to point towards a designated " +
+        "target sprite (Ball or ImageSprite). The new heading will be parallel to the line joining " +
+        "the centerpoints of the two sprites.") */
     public void PointTowards(Sprite target) {
         Heading(-Math.toDegrees(Math.atan2(target.yCenter - yCenter, target.xCenter - xCenter)));
     }
@@ -785,9 +788,9 @@ public abstract class Sprite extends VisibleComponent
      * @param x parameter of the point to turn to
      * @param y parameter of the point to turn to
      */
-    @SimpleFunction(
-            description = "Sets the heading of the %type% toward the point " +
-                    "with the coordinates (x, y).")
+  /* @SimpleFunction(
+    description = "Sets the heading of the %type% toward the point " +
+        "with the coordinates (x, y).") */
     public void PointInDirection(double x, double y) {
         Heading(-Math.toDegrees(Math.atan2(y - yCenter, x - xCenter)));
     }

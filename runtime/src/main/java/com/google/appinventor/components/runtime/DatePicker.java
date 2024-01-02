@@ -8,9 +8,9 @@ package com.google.appinventor.components.runtime;
 
 import android.app.DatePickerDialog;
 import android.os.Handler;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.Dates;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 
@@ -29,7 +29,13 @@ import java.util.GregorianCalendar;
  * unlike the other pickers, the DatePicker does not need to launch a new
  * activity and get a result. The DatePicker is launched as a dialog.
  */
-public class DatePicker extends ButtonBase {
+/* @DesignerComponent(version = YaVersion.DATEPICKER_COMPONENT_VERSION,
+    category = ComponentCategory.USERINTERFACE,
+    description = "<p>A button that, when clicked on, launches a popup" +
+        " dialog to allow the user to select a date.<//p>",
+    iconName = "images//datePicker.png") */
+/* @SimpleObject
+ */public class DatePicker extends ButtonBase {
 
     private DatePickerDialog date;
     //month is the property that AI devs see, and it's always javaMonth + 1; month is 0-based in Java
@@ -94,7 +100,8 @@ public class DatePicker extends ButtonBase {
      *
      * @return the year in numeric format
      */
-    @SimpleProperty(description = "the Year that was last picked using the DatePicker")
+  /* @SimpleProperty(description = "the Year that was last picked using the DatePicker",
+      category = PropertyCategory.APPEARANCE) */
     public int Year() {
         return year;
     }
@@ -104,8 +111,9 @@ public class DatePicker extends ButtonBase {
      *
      * @return the month in numeric format
      */
-    @SimpleProperty(description = "the number of the Month that was last picked using the " +
-            "DatePicker. Note that months start in 1 = January, 12 = December.")
+  /* @SimpleProperty(description = "the number of the Month that was last picked using the " +
+      "DatePicker. Note that months start in 1 = January, 12 = December.",
+      category = PropertyCategory.APPEARANCE) */
     public int Month() {
         return month;
     }
@@ -115,8 +123,9 @@ public class DatePicker extends ButtonBase {
      *
      * @return the month in textual format.
      */
-    @SimpleProperty(description = "Returns the name of the Month that was last picked using the " +
-            "DatePicker, in textual format.")
+  /* @SimpleProperty(description = "Returns the name of the Month that was last picked using the " +
+      "DatePicker, in textual format.",
+      category = PropertyCategory.APPEARANCE) */
     public String MonthInText() {
         return localizedMonths[javaMonth];
     }
@@ -126,7 +135,8 @@ public class DatePicker extends ButtonBase {
      *
      * @return the day in numeric format
      */
-    @SimpleProperty(description = "the Day of the month that was last picked using the DatePicker.")
+  /* @SimpleProperty(description = "the Day of the month that was last picked using the DatePicker.",
+    category = PropertyCategory.APPEARANCE) */
     public int Day() {
         return day;
     }
@@ -136,13 +146,14 @@ public class DatePicker extends ButtonBase {
      *
      * @return instant of the date
      */
-    @SimpleProperty(description = "the instant of the date that was last picked using the DatePicker.")
+  /* @SimpleProperty(description = "the instant of the date that was last picked using the DatePicker.",
+    category = PropertyCategory.APPEARANCE) */
     public Calendar Instant() {
         return instant;
     }
 
-    @SimpleFunction(description = "Allows the user to set the date to be displayed when the date picker opens.\n" +
-            "Valid values for the month field are 1-12 and 1-31 for the day field.\n")
+    /* @SimpleFunction(description = "Allows the user to set the date to be displayed when the date picker opens.\n" +
+      "Valid values for the month field are 1-12 and 1-31 for the day field.\n") */
     public void SetDateToDisplay(int year, int month, int day) {
         int jMonth = month - 1;
         try {
@@ -157,7 +168,7 @@ public class DatePicker extends ButtonBase {
         customDate = true;
     }
 
-    @SimpleFunction(description = "Allows the user to set the date from the instant to be displayed when the date picker opens.")
+    /* @SimpleFunction(description = "Allows the user to set the date from the instant to be displayed when the date picker opens.") */
     public void SetDateToDisplayFromInstant(Calendar instant) {
         int year = Dates.Year(instant);
         int month = Dates.Month(instant);
@@ -171,7 +182,7 @@ public class DatePicker extends ButtonBase {
      * Launches the DatePicker dialog. The {@link #AfterDateSet()} event will be run after the user
      * confirms their selection.
      */
-    @SimpleFunction(description = "Launches the DatePicker dialog.")
+    /* @SimpleFunction(description="Launches the DatePicker dialog.") */
     public void LaunchPicker() {
         click();
     }
@@ -197,7 +208,7 @@ public class DatePicker extends ButtonBase {
     /**
      * Event that runs after the user chooses a Date in the dialog.
      */
-    @SimpleEvent(description = "Event that runs after the user chooses a Date in the dialog")
+    /* @SimpleEvent(description = "Event that runs after the user chooses a Date in the dialog") */
     public void AfterDateSet() {
         EventDispatcher.dispatchEvent(this, "AfterDateSet");
     }

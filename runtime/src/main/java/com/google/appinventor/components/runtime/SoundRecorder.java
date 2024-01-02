@@ -6,31 +6,41 @@
 
 package com.google.appinventor.components.runtime;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
+
 import android.os.Environment;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.errors.PermissionException;
+
 import com.google.appinventor.components.runtime.util.BulkPermissionRequest;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.FileUtil;
 
 import java.io.IOException;
 
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
 /**
  * ![SoundRecorder icon](images/soundrecorder.png)
  * <p>
  * Multimedia component that records audio.
  */
+/* @DesignerComponent(version = YaVersion.SOUND_RECORDER_COMPONENT_VERSION,
+    description = "<p>Multimedia component that records audio.<//p>",
+    category = ComponentCategory.MEDIA,
+    nonVisible = true,
+    iconName = "images//soundRecorder.png") */
+/* @SimpleObject
+ *//* @UsesPermissions({RECORD_AUDIO}) */
 public final class SoundRecorder extends AndroidNonvisibleComponent
         implements Component, OnErrorListener, OnInfoListener {
 
@@ -71,12 +81,13 @@ public final class SoundRecorder extends AndroidNonvisibleComponent
      *
      * @return savedRecording path to recording
      */
-    @SimpleProperty(
-            description = "Specifies the path to the file where the recording should be stored. " +
-                    "If this property is the empty string, then starting a recording will create a file in " +
-                    "an appropriate location.  If the property is not the empty string, it should specify " +
-                    "a complete path to a file in an existing directory, including a file name with the " +
-                    "extension .3gp.")
+  /* @SimpleProperty(
+      description = "Specifies the path to the file where the recording should be stored. " +
+          "If this property is the empty string, then starting a recording will create a file in " +
+          "an appropriate location.  If the property is not the empty string, it should specify " +
+          "a complete path to a file in an existing directory, including a file name with the " +
+          "extension .3gp." ,
+          category = PropertyCategory.BEHAVIOR) */
     public String SavedRecording() {
         return savedRecording;
     }
@@ -87,9 +98,10 @@ public final class SoundRecorder extends AndroidNonvisibleComponent
      * @param pathName path to saved recording
      * @suppressdoc
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void SavedRecording(String pathName) {
         savedRecording = pathName;
     }
@@ -97,7 +109,8 @@ public final class SoundRecorder extends AndroidNonvisibleComponent
     /**
      * Starts recording.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Start() {
         // Need to check if we have RECORD_AUDIO and WRITE_EXTERNAL permissions
         String uri = FileUtil.resolveFileName(form, savedRecording, form.DefaultFileScope());
@@ -218,7 +231,8 @@ public final class SoundRecorder extends AndroidNonvisibleComponent
     /**
      * Stops recording.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Stop() {
         if (controller == null) {
             Log.i(TAG, "Stop() called, but already stopped.");
@@ -238,17 +252,17 @@ public final class SoundRecorder extends AndroidNonvisibleComponent
         }
     }
 
-    @SimpleEvent(description = "Provides the location of the newly created sound.")
+    /* @SimpleEvent(description = "Provides the location of the newly created sound.") */
     public void AfterSoundRecorded(final String sound) {
         EventDispatcher.dispatchEvent(this, "AfterSoundRecorded", sound);
     }
 
-    @SimpleEvent(description = "Indicates that the recorder has started, and can be stopped.")
+    /* @SimpleEvent(description = "Indicates that the recorder has started, and can be stopped.") */
     public void StartedRecording() {
         EventDispatcher.dispatchEvent(this, "StartedRecording");
     }
 
-    @SimpleEvent(description = "Indicates that the recorder has stopped, and can be started again.")
+    /* @SimpleEvent(description = "Indicates that the recorder has stopped, and can be started again.") */
     public void StoppedRecording() {
         EventDispatcher.dispatchEvent(this, "StoppedRecording");
     }

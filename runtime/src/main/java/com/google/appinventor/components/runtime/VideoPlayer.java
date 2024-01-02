@@ -6,6 +6,8 @@
 
 package com.google.appinventor.components.runtime;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -18,21 +20,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
 import android.widget.VideoView;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.errors.PermissionException;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.FullScreenVideoUtil;
 import com.google.appinventor.components.runtime.util.MediaUtil;
 import com.google.appinventor.components.runtime.util.SdkLevel;
+import com.google.appinventor.components.runtime.util.TiramisuUtil;
 
 import java.io.IOException;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
 /**
  * TODO: This copies the video from the application's asset directory to a temp
@@ -102,6 +102,33 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
  * @author halabelson@google.com (Hal Abelson)
  */
 
+/* @DesignerComponent(
+    version = YaVersion.VIDEOPLAYER_COMPONENT_VERSION,
+    description = "A multimedia component capable of playing videos. "
+        + "When the application is run, the VideoPlayer will be displayed as a "
+        + "rectangle on-screen.  If the user touches the rectangle, controls will "
+        + "appear to play//pause, skip ahead, and skip backward within the video.  "
+        + "The application can also control behavior by calling the "
+        + "<code>Start<//code>, <code>Pause<//code>, and <code>SeekTo<//code> methods.  "
+        + "<p>Video files should be in "
+        + "3GPP (.3gp) or MPEG-4 (.mp4) formats.  For more details about legal "
+        + "formats, see "
+        + "<a href=\"http:////developer.android.com//guide//appendix//media-formats.html\""
+        + " target=\"_blank\">Android Supported Media Formats<//a>.<//p>"
+        + "<p>App Inventor for Android only permits video files under 1 MB and "
+        + "limits the total size of an application to 5 MB, not all of which is "
+        + "available for media (video, audio, and sound) files.  If your media "
+        + "files are too large, you may get errors when packaging or installing "
+        + "your application, in which case you should reduce the number of media "
+        + "files or their sizes.  Most video editing software, such as Windows "
+        + "Movie Maker and Apple iMovie, can help you decrease the size of videos "
+        + "by shortening them or re-encoding the video into a more compact format.<//p>"
+        + "<p>You can also set the media source to a URL that points to a streaming video, "
+        + "but the URL must point to the video file itself, not to a program that plays the video.",
+    category = ComponentCategory.MEDIA,
+    iconName = "images//videoPlayer.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
 public final class VideoPlayer extends AndroidViewComponent implements
         OnDestroyListener, Deleteable, OnCompletionListener, OnErrorListener,
         OnPreparedListener {
@@ -165,25 +192,27 @@ public final class VideoPlayer extends AndroidViewComponent implements
      * @param path
      *          the path to the video source
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
-            defaultValue = "")
-    @SimpleProperty(
-            description = "The \"path\" to the video.  Usually, this will be the "
-                    + "name of the video file, which should be added in the Designer.")
-    public void Source(String path) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+      defaultValue = "") */
+  /* @SimpleProperty(
+      description = "The \"path\" to the video.  Usually, this will be the "
+          + "name of the video file, which should be added in the Designer.",
+      category = PropertyCategory.BEHAVIOR) */
+    /* @UsesPermissions(READ_EXTERNAL_STORAGE) */
+    public void Source(/* @Asset  */String path) {
         final String tempPath = (path == null) ? "" : path;
-        if (MediaUtil.isExternalFile(container.$context(), tempPath)
-                && container.$form().isDeniedPermission(READ_EXTERNAL_STORAGE)) {
-            container.$form().askPermission(READ_EXTERNAL_STORAGE, new PermissionResultHandler() {
-                @Override
-                public void HandlePermissionResponse(String permission, boolean granted) {
-                    if (granted) {
-                        VideoPlayer.this.Source(tempPath);
-                    } else {
-                        container.$form().dispatchPermissionDeniedEvent(VideoPlayer.this, "Source", permission);
+        if (TiramisuUtil.requestVideoPermissions(container.$form(), path,
+                new PermissionResultHandler() {
+                    @Override
+                    public void HandlePermissionResponse(String permission, boolean granted) {
+                        if (granted) {
+                            VideoPlayer.this.Source(tempPath);
+                        } else {
+                            container.$form().dispatchPermissionDeniedEvent(VideoPlayer.this, "Source",
+                                    permission);
+                        }
                     }
-                }
-            });
+                })) {
             return;
         }
 
@@ -232,7 +261,7 @@ public final class VideoPlayer extends AndroidViewComponent implements
      * These won't normally be used in the most elementary applications, because
      * videoView brings up its own player controls when the video is touched.
      */
-    @SimpleFunction(description = "Starts playback of the video.")
+    /* @SimpleFunction(description = "Starts playback of the video.") */
     public void Start() {
         Log.i("VideoPlayer", "Calling Start");
         if (inFullScreen) {
@@ -247,20 +276,20 @@ public final class VideoPlayer extends AndroidViewComponent implements
         }
     }
 
-
     /**
      * Sets the volume property to a number between 0 and 100. Values less than 0
      * will be treated as 0, and values greater than 100 will be treated as 100.
      *
      * @param vol  the desired volume level
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-            defaultValue = "50")
-    @SimpleProperty(
-            description = "Sets the volume to a number between 0 and 100. " +
-                    "Values less than 0 will be treated as 0, and values greater than 100 " +
-                    "will be treated as 100.")
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = "50") */
+  /* @SimpleProperty(
+      description = "Sets the volume to a number between 0 and 100. " +
+      "Values less than 0 will be treated as 0, and values greater than 100 " +
+      "will be treated as 100.",
+      category = PropertyCategory.BEHAVIOR) */
     public void Volume(int vol) {
         // clip volume to range [0, 100]
         vol = Math.max(vol, 0);
@@ -269,7 +298,6 @@ public final class VideoPlayer extends AndroidViewComponent implements
             mPlayer.setVolume(((float) vol) / 100, ((float) vol) / 100);
         }
     }
-
 
     /**
      * Method for starting the VideoPlayer once the media has been loaded.
@@ -284,9 +312,9 @@ public final class VideoPlayer extends AndroidViewComponent implements
      * Pauses playback of the video.  Playback can be resumed at the same location by calling the
      * {@link #Start()} method.
      */
-    @SimpleFunction(
-            description = "Pauses playback of the video.  Playback can be resumed "
-                    + "at the same location by calling the <code>Start</code> method.")
+  /* @SimpleFunction(
+      description = "Pauses playback of the video.  Playback can be resumed "
+      + "at the same location by calling the <code>Start<//code> method.") */
     public void Pause() {
         Log.i("VideoPlayer", "Calling Pause");
         if (inFullScreen) {
@@ -299,8 +327,8 @@ public final class VideoPlayer extends AndroidViewComponent implements
         }
     }
 
-    @SimpleFunction(
-            description = "Resets to start of video and pauses it if video was playing.")
+    /* @SimpleFunction(
+        description = "Resets to start of video and pauses it if video was playing.") */
     public void Stop() {
         Log.i("VideoPlayer", "Calling Stop");
         // Call start() to ensure frame shown is updated;
@@ -311,11 +339,11 @@ public final class VideoPlayer extends AndroidViewComponent implements
         Pause();
     }
 
-    @SimpleFunction(
-            description = "Seeks to the requested time (specified in milliseconds) in the video. " +
-                    "If the video is paused, the frame shown will not be updated by the seek. " +
-                    "The player can jump only to key frames in the video, so seeking to times that " +
-                    "differ by short intervals may not actually move to different frames.")
+    /* @SimpleFunction(
+        description = "Seeks to the requested time (specified in milliseconds) in the video. " +
+        "If the video is paused, the frame shown will not be updated by the seek. " +
+        "The player can jump only to key frames in the video, so seeking to times that " +
+        "differ by short intervals may not actually move to different frames.") */
     public void SeekTo(int ms) {
         Log.i("VideoPlayer", "Calling SeekTo");
         if (ms < 0) {
@@ -330,8 +358,8 @@ public final class VideoPlayer extends AndroidViewComponent implements
         }
     }
 
-    @SimpleFunction(
-            description = "Returns duration of the video in milliseconds.")
+    /* @SimpleFunction(
+        description = "Returns duration of the video in milliseconds.") */
     public int GetDuration() {
         Log.i("VideoPlayer", "Calling GetDuration");
         if (inFullScreen) {
@@ -357,7 +385,8 @@ public final class VideoPlayer extends AndroidViewComponent implements
     /**
      * Indicates that the video has reached the end
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void Completed() {
         EventDispatcher.dispatchEvent(this, "Completed");
     }
@@ -398,8 +427,9 @@ public final class VideoPlayer extends AndroidViewComponent implements
         }
     }
 
-    @SimpleEvent(description = "The VideoPlayerError event is no longer used. "
-            + "Please use the Screen.ErrorOccurred event instead.")
+    /* @SimpleEvent(description = "The VideoPlayerError event is no longer used. "
+        + "Please use the Screen.ErrorOccurred event instead.",
+        userVisible = false) */
     public void VideoPlayerError(String message) {
     }
 
@@ -442,8 +472,8 @@ public final class VideoPlayer extends AndroidViewComponent implements
      */
 
     @Override
-    @SimpleProperty
-    public int Width() {
+    /* @SimpleProperty
+     */ public int Width() {
         return super.Width();
     }
 
@@ -454,7 +484,7 @@ public final class VideoPlayer extends AndroidViewComponent implements
      */
 
     @Override
-    @SimpleProperty(userVisible = true)
+    /* @SimpleProperty(userVisible = true) */
     public void Width(int width) {
         super.Width(width);
 
@@ -469,8 +499,8 @@ public final class VideoPlayer extends AndroidViewComponent implements
      */
 
     @Override
-    @SimpleProperty
-    public int Height() {
+    /* @SimpleProperty
+     */ public int Height() {
         return super.Height();
     }
 
@@ -481,7 +511,7 @@ public final class VideoPlayer extends AndroidViewComponent implements
      *          in pixels
      */
     @Override
-    @SimpleProperty(userVisible = true)
+    /* @SimpleProperty(userVisible = true) */
     public void Height(int height) {
         super.Height(height);
 
@@ -494,7 +524,8 @@ public final class VideoPlayer extends AndroidViewComponent implements
      * shown in fullscreen mode or not.
      * @return True if video is being shown in fullscreen. False otherwise.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public boolean FullScreen() {
         return inFullScreen;
     }
@@ -507,7 +538,7 @@ public final class VideoPlayer extends AndroidViewComponent implements
      * mode will be exited. If False and {@link VideoPlayer#FullScreen()}
      * returns False, nothing occurs.
      */
-    @SimpleProperty(userVisible = true)
+    /* @SimpleProperty(userVisible = true) */
     public void FullScreen(boolean value) {
 
         if (value && (SdkLevel.getLevel() <= SdkLevel.LEVEL_DONUT)) {

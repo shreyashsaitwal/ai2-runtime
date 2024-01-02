@@ -5,7 +5,9 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleFunction;
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
 import com.google.appinventor.components.runtime.util.Ev3Constants;
@@ -19,7 +21,14 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3Sound extends LegoMindstormsEv3Base {
+/* @DesignerComponent(version = YaVersion.EV3_SOUND_COMPONENT_VERSION,
+                   description = "A component that provides a high-level interface to " +
+                                 "sound functionalities on LEGO MINDSTORMS EV3 robot.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3Sound extends LegoMindstormsEv3Base {
     /**
      * Creates a new Ev3Sound component.
      */
@@ -30,7 +39,7 @@ public class Ev3Sound extends LegoMindstormsEv3Base {
     /**
      * Make the robot play a tone.
      */
-    @SimpleFunction(description = "Make the robot play a tone.")
+    /* @SimpleFunction(description = "Make the robot play a tone.") */
     public void PlayTone(int volume, int frequency, int milliseconds) {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
 
@@ -54,7 +63,7 @@ public class Ev3Sound extends LegoMindstormsEv3Base {
     /**
      * Stop any sound on the robot.
      */
-    @SimpleFunction(description = "Stop any sound on the robot.")
+    /* @SimpleFunction(description = "Stop any sound on the robot.") */
     public void StopSound() {
         String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
         byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.SOUND,

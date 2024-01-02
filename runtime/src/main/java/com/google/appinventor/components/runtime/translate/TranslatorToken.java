@@ -1136,7 +1136,6 @@ public final class TranslatorToken {
                 return super.mergeUnknownFields(unknownFields);
             }
 
-
             // @@protoc_insertion_point(builder_scope:unsigned)
         }
 
@@ -1959,7 +1958,6 @@ public final class TranslatorToken {
                     final com.google.protobuf.UnknownFieldSet unknownFields) {
                 return super.mergeUnknownFields(unknownFields);
             }
-
 
             // @@protoc_insertion_point(builder_scope:token)
         }
@@ -3277,7 +3275,6 @@ public final class TranslatorToken {
                 return super.mergeUnknownFields(unknownFields);
             }
 
-
             // @@protoc_insertion_point(builder_scope:request)
         }
 
@@ -4029,7 +4026,6 @@ public final class TranslatorToken {
                     final com.google.protobuf.UnknownFieldSet unknownFields) {
                 return super.mergeUnknownFields(unknownFields);
             }
-
 
             // @@protoc_insertion_point(builder_scope:response)
         }

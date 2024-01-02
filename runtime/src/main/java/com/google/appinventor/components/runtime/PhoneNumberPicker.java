@@ -6,6 +6,12 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.HoneycombMR1Util;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.SdkLevel;
+
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -13,11 +19,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.Contacts;
 import android.util.Log;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.HoneycombMR1Util;
-import com.google.appinventor.components.runtime.util.SdkLevel;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +43,27 @@ import java.util.List;
  * @author sharon@google.com (Sharon Perl)
  * @author markf@google.com (Mark Friedman)
  */
+/* @DesignerComponent(version = YaVersion.PHONENUMBERPICKER_COMPONENT_VERSION,
+    description = "A button that, when clicked on, displays a list of " +
+    "the contacts' phone numbers to choose among. After the user has made a " +
+    "selection, the following properties will be set to information about " +
+    "the chosen contact: <ul>\n" +
+    "<li> <code>ContactName<//code>: the contact's name <//li>\n "  +
+    "<li> <code>PhoneNumber<//code>: the contact's phone number <//li>\n " +
+    "<li> <code>EmailAddress<//code>: the contact's email address <//li> " +
+    "<li> <code>Picture<//code>: the name of the file containing the contact's " +
+    "image, which can be used as a <code>Picture<//code> property value for " +
+    "the <code>Image<//code> or <code>ImageSprite<//code> component.<//li><//ul>\n" +
+    "<//p><p>Other properties affect the appearance of the button " +
+    "(<code>TextAlignment<//code>, <code>BackgroundColor<//code>, etc.) and " +
+    "whether it can be clicked on (<code>Enabled<//code>).<//p>\n" +
+    "<p>The PhoneNumberPicker component may not work on all Android " +
+    "devices. For example, on Android systems before system 3.0, the " +
+    "returned lists of phone numbers and email addresses will be empty.\n",
+    category = ComponentCategory.SOCIAL,
+    iconName = "images//phoneNumberPicker.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.READ_CONTACTS") */
 public class PhoneNumberPicker extends ContactPicker {
 
     private static final String[] PROJECTION = {
@@ -69,8 +93,8 @@ public class PhoneNumberPicker extends ContactPicker {
      * Returns the primary phone number associated with the selected contact, or the empty string if
      * no phone number is associated with the contact.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String PhoneNumber() {
         return ensureNotNull(phoneNumber);
     }
@@ -141,7 +165,6 @@ public class PhoneNumberPicker extends ContactPicker {
             AfterPicking();
         } // ends if (requestCode ...
     }
-
 
     /**
      * For versions before Honeycomb, we get all the contact info from the same table.

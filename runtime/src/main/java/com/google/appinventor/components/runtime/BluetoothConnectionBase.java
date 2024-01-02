@@ -1,23 +1,29 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2023 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
 package com.google.appinventor.components.runtime;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothSocket;
+import android.os.Build;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
 import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.util.BluetoothReflection;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.SdkLevel;
+import com.google.appinventor.components.runtime.util.SUtil;
 import com.google.appinventor.components.runtime.util.YailList;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,19 +34,20 @@ import java.util.List;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
+/* @SimpleObject
+ */public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
         implements Component, OnDestroyListener, Deleteable {
 
     protected final String logTag;
+    protected final BluetoothAdapter adapter;
     private final List<BluetoothConnectionListener> bluetoothConnectionListeners =
-            new ArrayList<BluetoothConnectionListener>();
-    private final int sdkLevel;
+            new ArrayList<>();
     protected boolean disconnectOnError;
     protected boolean secure;
     private ByteOrder byteOrder;
     private String encoding;
     private byte delimiter;
-    private Object connectedBluetoothSocket;
+    private BluetoothSocket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
 
@@ -48,15 +55,15 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * Creates a new BluetoothConnectionBase.
      */
     protected BluetoothConnectionBase(ComponentContainer container, String logTag) {
-        this(container.$form(), logTag, SdkLevel.getLevel());
+        this(container.$form(), logTag);
         form.registerForOnDestroy(this);
     }
 
-    private BluetoothConnectionBase(Form form, String logTag, int sdkLevel) {
+    private BluetoothConnectionBase(Form form, String logTag) {
         super(form);
         this.logTag = logTag;
-        this.sdkLevel = sdkLevel;
         this.disconnectOnError = false;
+        this.adapter = SUtil.getAdapter(form);
 
         HighByteFirst(false); // Lego Mindstorms NXT is low-endian, so false is a good default.
         CharacterEncoding("UTF-8");
@@ -68,8 +75,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * This constructor is for testing purposes only.
      */
     protected BluetoothConnectionBase(OutputStream outputStream, InputStream inputStream) {
-        this((Form) null, (String) null, SdkLevel.LEVEL_ECLAIR_MR1);
-        this.connectedBluetoothSocket = "Not Null";
+        this((Form) null, null);
+        this.socket = null;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
     }
@@ -110,8 +117,9 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     public final void Initialize() {
     }
 
-    @SimpleEvent(description = "The BluetoothError event is no longer used. " +
-            "Please use the Screen.ErrorOccurred event instead.")
+    /* @SimpleEvent(description = "The BluetoothError event is no longer used. " +
+        "Please use the Screen.ErrorOccurred event instead.",
+        userVisible = false) */
     public void BluetoothError(String functionName, String message) {
     }
 
@@ -125,13 +133,10 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @return true if Bluetooth is available on the device, false otherwise
      */
-    @SimpleProperty(description = "Whether Bluetooth is available on the device")
+  /* @SimpleProperty(description = "Whether Bluetooth is available on the device",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Available() {
-        Object bluetoothAdapter = BluetoothReflection.getBluetoothAdapter();
-        if (bluetoothAdapter != null) {
-            return true;
-        }
-        return false;
+        return adapter != null;
     }
 
     /**
@@ -139,58 +144,54 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @return true if Bluetooth is enabled, false otherwise
      */
-    @SimpleProperty(description = "Whether Bluetooth is enabled")
+  /* @SimpleProperty(description = "Whether Bluetooth is enabled",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Enabled() {
-        Object bluetoothAdapter = BluetoothReflection.getBluetoothAdapter();
-        if (bluetoothAdapter != null) {
-            if (BluetoothReflection.isBluetoothEnabled(bluetoothAdapter)) {
-                return true;
-            }
+        if (adapter == null) {
+            return false;
         }
-        return false;
+        return adapter.isEnabled();
     }
 
-    protected final void setConnection(Object bluetoothSocket) throws IOException {
-        connectedBluetoothSocket = bluetoothSocket;
-        inputStream = new BufferedInputStream(
-                BluetoothReflection.getInputStream(connectedBluetoothSocket));
-        outputStream = new BufferedOutputStream(
-                BluetoothReflection.getOutputStream(connectedBluetoothSocket));
+    protected final void setConnection(BluetoothSocket bluetoothSocket) throws IOException {
+        socket = bluetoothSocket;
+        inputStream = new BufferedInputStream(socket.getInputStream());
+        outputStream = new BufferedOutputStream(socket.getOutputStream());
         fireAfterConnectEvent();
     }
 
     /**
      * Disconnects from the connected Bluetooth device.
      */
-    @SimpleFunction(description = "Disconnect from the connected Bluetooth device.")
+    /* @SimpleFunction(description = "Disconnect from the connected Bluetooth device.") */
     public final void Disconnect() {
-        if (connectedBluetoothSocket != null) {
+        if (socket != null) {
             fireBeforeDisconnectEvent();
             try {
-                BluetoothReflection.closeBluetoothSocket(connectedBluetoothSocket);
+                socket.close();
                 Log.i(logTag, "Disconnected from Bluetooth device.");
             } catch (IOException e) {
                 Log.w(logTag, "Error while disconnecting: " + e.getMessage());
             }
-            connectedBluetoothSocket = null;
+            socket = null;
         }
         inputStream = null;
         outputStream = null;
     }
 
     /**
-     * Returns `frue`{:.logic.block} if a connection to a Bluetooth device has been made.
+     * Returns `true`{:.logic.block} if a connection to a Bluetooth device has been made.
      */
-    @SimpleProperty(
-            description = "On devices with API level 14 (LEVEL_ICE_CREAM_SANDWICH) or higher, " +
-                    "this property returned is accurate. But on old devices with API level lower than 14, " +
-                    "it may not return the current state of connection(e.g., it might be disconnected but you " +
-                    "may not know until you attempt to read/write the socket.")
-    public final boolean IsConnected() {
-        if (sdkLevel >= SdkLevel.LEVEL_ICE_CREAM_SANDWICH) {
-            return (connectedBluetoothSocket != null && BluetoothReflection.isBluetoothSocketConnected(connectedBluetoothSocket));
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "On devices with API level 14 (LEVEL_ICE_CREAM_SANDWICH) or higher, " +
+      "this property returned is accurate. But on old devices with API level lower than 14, " +
+      "it may not return the current state of connection(e.g., it might be disconnected but you " +
+      "may not know until you attempt to read//write the socket.") */
+    public boolean IsConnected() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            return (socket != null && socket.isConnected());
         } else {
-            return (connectedBluetoothSocket != null);
+            return (socket != null);
         }
     }
 
@@ -205,11 +206,11 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @return whether a secure connection should be used.
      */
-    @SimpleProperty(
-            description = "Whether to invoke SSP (Simple Secure Pairing), which is supported on " +
-                    "devices with Bluetooth v2.1 or higher. When working with embedded Bluetooth devices, " +
-                    "this property may need to be set to False. For Android 2.0-2.2, this property setting " +
-                    "will be ignored.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Whether to invoke SSP (Simple Secure Pairing), which is supported on " +
+      "devices with Bluetooth v2.1 or higher. When working with embedded Bluetooth devices, " +
+      "this property may need to be set to False. For Android 2.0-2.2, this property setting " +
+      "will be ignored.") */
     public boolean Secure() {
         return secure;
     }
@@ -219,9 +220,10 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @param secure {@code true} to use a secure connection
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void Secure(boolean secure) {
         this.secure = secure;
     }
@@ -234,7 +236,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * @return {@code true} for high byte first, {@code false} for low byte
      * first
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean HighByteFirst() {
         return byteOrder == ByteOrder.BIG_ENDIAN;
     }
@@ -246,9 +248,10 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * @param highByteFirst {@code true} for high byte first, {@code false} for
      *                      low byte first
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void HighByteFirst(boolean highByteFirst) {
         byteOrder = highByteFirst ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
     }
@@ -257,8 +260,9 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * Sets the character encoding to use when sending and receiving text. The
      * default value is `"UTF-8"`{:.text.block}.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "UTF-8")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "UTF-8") */
+    /* @SimpleProperty
+     */
     public void CharacterEncoding(String encoding) {
         try {
             // Check whether the new encoding is supported.
@@ -273,7 +277,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Returns the character encoding to use when sending and receiving text.
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public String CharacterEncoding() {
         return encoding;
     }
@@ -285,9 +289,10 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * they encounter the value specified here. The default delimiter is 0, the
      * null byte.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "0")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "0") */
+    /* @SimpleProperty
+     */
     public void DelimiterByte(int number) {
         String functionName = "DelimiterByte";
         int n = number;
@@ -306,7 +311,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * numberOfBytes parameter when calling ReceiveText, ReceiveSignedBytes, or
      * ReceiveUnsignedBytes.
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public int DelimiterByte() {
         return delimiter;
     }
@@ -316,7 +321,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @param text the text to write
      */
-    @SimpleFunction(description = "Send text to the connected Bluetooth device.")
+    /* @SimpleFunction(description = "Send text to the connected Bluetooth device.") */
     public void SendText(String text) {
         byte[] bytes;
         try {
@@ -342,7 +347,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @param number the number to write
      */
-    @SimpleFunction(description = "Send a 1-byte number to the connected Bluetooth device.")
+    /* @SimpleFunction(description = "Send a 1-byte number to the connected Bluetooth device.") */
     public void Send1ByteNumber(String number) {
         String functionName = "Send1ByteNumber";
         int n;
@@ -373,7 +378,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @param number the number to write
      */
-    @SimpleFunction(description = "Send a 2-byte number to the connected Bluetooth device.")
+    /* @SimpleFunction(description = "Send a 2-byte number to the connected Bluetooth device.") */
     public void Send2ByteNumber(String number) {
         String functionName = "Send2ByteNumber";
         int n;
@@ -413,7 +418,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @param number the number to write
      */
-    @SimpleFunction(description = "Send a 4-byte number to the connected Bluetooth device.")
+    /* @SimpleFunction(description = "Send a 4-byte number to the connected Bluetooth device.") */
     public void Send4ByteNumber(String number) {
         String functionName = "Send4ByteNumber";
         long n;
@@ -461,7 +466,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      *
      * @param list the list of numeric values to write
      */
-    @SimpleFunction(description = "Send a list of byte values to the connected Bluetooth device.")
+    /* @SimpleFunction(description = "Send a list of byte values to the connected Bluetooth device.") */
     public void SendBytes(YailList list) {
         String functionName = "SendBytes";
         Object[] array = list.toArray();
@@ -545,8 +550,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Returns number of bytes available from the input stream.
      */
-    @SimpleFunction(description = "Returns an estimate of the number of bytes that can be " +
-            "received without blocking")
+  /* @SimpleFunction(description = "Returns an estimate of the number of bytes that can be " +
+      "received without blocking") */
     public int BytesAvailableToReceive() {
         String functionName = "BytesAvailableToReceive";
         if (!IsConnected()) {
@@ -576,8 +581,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * @param numberOfBytes the number of bytes to read; a negative number
      *                      indicates to read until a delimiter byte value is read
      */
-    @SimpleFunction(description = "Receive text from the connected Bluetooth device. " +
-            "If numberOfBytes is less than 0, read until a delimiter byte value is received.")
+  /* @SimpleFunction(description = "Receive text from the connected Bluetooth device. " +
+      "If numberOfBytes is less than 0, read until a delimiter byte value is received.") */
     public String ReceiveText(int numberOfBytes) {
         byte[] bytes = read("ReceiveText", numberOfBytes);
         try {
@@ -596,8 +601,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Reads a signed 1-byte number.
      */
-    @SimpleFunction(description = "Receive a signed 1-byte number from the connected " +
-            "Bluetooth device.")
+  /* @SimpleFunction(description = "Receive a signed 1-byte number from the connected " +
+      "Bluetooth device.") */
     public int ReceiveSigned1ByteNumber() {
         byte[] bytes = read("ReceiveSigned1ByteNumber", 1);
         if (bytes.length != 1) {
@@ -610,8 +615,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Reads an unsigned 1-byte number.
      */
-    @SimpleFunction(description = "Receive an unsigned 1-byte number from the connected " +
-            "Bluetooth device.")
+  /* @SimpleFunction(description = "Receive an unsigned 1-byte number from the connected " +
+      "Bluetooth device.") */
     public int ReceiveUnsigned1ByteNumber() {
         byte[] bytes = read("ReceiveUnsigned1ByteNumber", 1);
         if (bytes.length != 1) {
@@ -624,8 +629,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Reads a signed 2-byte number.
      */
-    @SimpleFunction(description = "Receive a signed 2-byte number from the connected " +
-            "Bluetooth device.")
+  /* @SimpleFunction(description = "Receive a signed 2-byte number from the connected " +
+      "Bluetooth device.") */
     public int ReceiveSigned2ByteNumber() {
         byte[] bytes = read("ReceiveSigned2ByteNumber", 2);
         if (bytes.length != 2) {
@@ -642,8 +647,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Reads an unsigned 2-byte number.
      */
-    @SimpleFunction(description = "Receive a unsigned 2-byte number from the connected " +
-            "Bluetooth device.")
+  /* @SimpleFunction(description = "Receive a unsigned 2-byte number from the connected " +
+      "Bluetooth device.") */
     public int ReceiveUnsigned2ByteNumber() {
         byte[] bytes = read("ReceiveUnsigned2ByteNumber", 2);
         if (bytes.length != 2) {
@@ -660,8 +665,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Reads a signed 4-byte number.
      */
-    @SimpleFunction(description = "Receive a signed 4-byte number from the connected " +
-            "Bluetooth device.")
+  /* @SimpleFunction(description = "Receive a signed 4-byte number from the connected " +
+      "Bluetooth device.") */
     public long ReceiveSigned4ByteNumber() {
         byte[] bytes = read("ReceiveSigned4ByteNumber", 4);
         if (bytes.length != 4) {
@@ -684,8 +689,8 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     /**
      * Reads an unsigned 4-byte number.
      */
-    @SimpleFunction(description = "Receive a unsigned 4-byte number from the connected " +
-            "Bluetooth device.")
+  /* @SimpleFunction(description = "Receive a unsigned 4-byte number from the connected " +
+      "Bluetooth device.") */
     public long ReceiveUnsigned4ByteNumber() {
         byte[] bytes = read("ReceiveUnsigned4ByteNumber", 4);
         if (bytes.length != 4) {
@@ -715,9 +720,9 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * @param numberOfBytes the number of bytes to read; a negative number
      *                      indicates to read until a delimiter byte value is read
      */
-    @SimpleFunction(description = "Receive multiple signed byte values from the connected " +
-            "Bluetooth device. If numberOfBytes is less than 0, read until a delimiter byte value " +
-            "is received.")
+  /* @SimpleFunction(description = "Receive multiple signed byte values from the connected " +
+      "Bluetooth device. If numberOfBytes is less than 0, read until a delimiter byte value " +
+      "is received.") */
     public List<Integer> ReceiveSignedBytes(int numberOfBytes) {
         byte[] bytes = read("ReceiveSignedBytes", numberOfBytes);
         List<Integer> list = new ArrayList<Integer>();
@@ -738,9 +743,9 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
      * @param numberOfBytes the number of bytes to read; a negative number
      *                      indicates to read until a delimiter byte value is read
      */
-    @SimpleFunction(description = "Receive multiple unsigned byte values from the connected " +
-            "Bluetooth device. If numberOfBytes is less than 0, read until a delimiter byte value " +
-            "is received.")
+  /* @SimpleFunction(description = "Receive multiple unsigned byte values from the connected " +
+      "Bluetooth device. If numberOfBytes is less than 0, read until a delimiter byte value " +
+      "is received.") */
     public List<Integer> ReceiveUnsignedBytes(int numberOfBytes) {
         byte[] bytes = read("ReceiveUnsignedBytes", numberOfBytes);
         List<Integer> list = new ArrayList<Integer>();
@@ -838,7 +843,7 @@ public abstract class BluetoothConnectionBase extends AndroidNonvisibleComponent
     }
 
     private void prepareToDie() {
-        if (connectedBluetoothSocket != null) {
+        if (socket != null) {
             Disconnect();
         }
     }

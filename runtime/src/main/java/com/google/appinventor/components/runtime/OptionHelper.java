@@ -5,11 +5,6 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,28 +38,29 @@ public class OptionHelper {
             // Doesn't exist or not relevant.
             return value;
         }
-        Options annotation = calledFunc.getAnnotation(Options.class);
-        if (annotation == null) {
-            return value;
-        }
-        Class<?> optionListClass = annotation.value();
-        try {
-            Method fromValue = optionListClass.getMethod("fromUnderlyingValue", value.getClass());
-            // Java generally shouldn't return values that aren't defined in the OptionList, but
-            // extensions might override a function to return values that aren't included. If the value
-            // isn't included, just return the concrete value.
-            Object abstractVal = fromValue.invoke(optionListClass, value);
-            if (abstractVal != null) {
-                return abstractVal;
-            }
-            return value;
-        } catch (NoSuchMethodException e) {
-            return value;
-        } catch (IllegalAccessException e) {
-            return value;
-        } catch (InvocationTargetException e) {
-            return value;
-        }
+//    Options annotation = calledFunc.getAnnotation(Options.class);
+//    if (annotation == null) {
+//      return value;
+//    }
+//    Class<?> optionListClass = annotation.value();
+//    try {
+//      Method fromValue = optionListClass.getMethod("fromUnderlyingValue", value.getClass());
+//      // Java generally shouldn't return values that aren't defined in the OptionList, but
+//      // extensions might override a function to return values that aren't included. If the value
+//      // isn't included, just return the concrete value.
+//      Object abstractVal = fromValue.invoke(optionListClass, value);
+//      if (abstractVal != null) {
+//        return abstractVal;
+//      }
+//      return value;
+//    } catch (NoSuchMethodException e) {
+//      return value;
+//    } catch (IllegalAccessException e) {
+//      return value;
+//    } catch (InvocationTargetException e) {
+//      return value;
+//    }
+        return null;
     }
 
     /**
@@ -89,27 +85,27 @@ public class OptionHelper {
         int i = 0;
         for (Annotation[] annotations : paramAnnotations) {
             for (Annotation annotation : annotations) {
-                if (annotation.annotationType() == Options.class) {
-                    Options castAnnotation = (Options) annotation;
-                    Class<?> optionListClass = castAnnotation.value();
-                    try {
-                        Method fromValue = optionListClass.getMethod("fromUnderlyingValue", args[i].getClass());
-                        // Extensions might send values to events which aren't covered by the OptionList
-                        // definition. In that case send the concrete value. See here for an example:
-                        // https://github.com/BeksOmega/appinventor-sources/pull/24#discussion_r480355676
-                        Object abstractVal = fromValue.invoke(optionListClass, args[i]);
-                        if (abstractVal != null) {
-                            args[i] = abstractVal;
-                        }
-                    } catch (NoSuchMethodException e) {
-                        // If it doesn't exist just continue.
-                    } catch (IllegalAccessException e) {
-                        // If it's not accessible just continue.
-                    } catch (InvocationTargetException e) {
-                        // If it doesn't work just continue.
-                    }
-                    break;
-                }
+//        if (annotation.annotationType() == Options.class) {
+//          Options castAnnotation = (Options) annotation;
+//          Class<?> optionListClass = castAnnotation.value();
+//          try {
+//            Method fromValue = optionListClass.getMethod("fromUnderlyingValue", args[i].getClass());
+//            // Extensions might send values to events which aren't covered by the OptionList
+//            // definition. In that case send the concrete value. See here for an example:
+//            // https://github.com/BeksOmega/appinventor-sources/pull/24#discussion_r480355676
+//            Object abstractVal = fromValue.invoke(optionListClass, args[i]);
+//            if (abstractVal != null) {
+//              args[i] = abstractVal;
+//            }
+//          } catch (NoSuchMethodException e) {
+//            // If it doesn't exist just continue.
+//          } catch (IllegalAccessException e) {
+//            // If it's not accessible just continue.
+//          } catch (InvocationTargetException e) {
+//            // If it doesn't work just continue.
+//          }
+//          break;
+//        }
             }
             i++;
         }
@@ -153,23 +149,23 @@ public class OptionHelper {
             String methodKey = m.getName();
 
             // Always add events.
-            SimpleEvent event = m.getAnnotation(SimpleEvent.class);
-            if (event != null) {
-                methodMap.put(methodKey, m);
-                continue;
-            }
+//      SimpleEvent event = m.getAnnotation(SimpleEvent.class);
+//      if (event != null) {
+//        methodMap.put(methodKey, m);
+//        continue;
+//      }
 
             // Ignore void methods and property setters.
             if (m.getReturnType() != Void.TYPE) {
-                SimpleFunction func = m.getAnnotation(SimpleFunction.class);
-                if (func != null) {
-                    methodMap.put(methodKey, m);
-                    continue;
-                }
-                SimpleProperty prop = m.getAnnotation(SimpleProperty.class);
-                if (prop != null) {
-                    methodMap.put(methodKey, m);
-                }
+//        SimpleFunction func = m.getAnnotation(SimpleFunction.class);
+//        if (func != null) {
+//          methodMap.put(methodKey, m);
+//          continue;
+//        }
+//        SimpleProperty prop = m.getAnnotation(SimpleProperty.class);
+//        if (prop != null) {
+//          methodMap.put(methodKey, m);
+//        }
             }
         }
         return methodMap;

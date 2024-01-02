@@ -6,14 +6,13 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleProperty;
-
 /**
  * Superclass of visible components in the runtime libraries.
  * <p>
  * Defines standard properties and events.
  */
-public abstract class VisibleComponent implements Component {
+/* @SimpleObject
+ */public abstract class VisibleComponent implements Component {
     protected VisibleComponent() {
     }
 
@@ -22,8 +21,8 @@ public abstract class VisibleComponent implements Component {
      *
      * @return width property used by the layout
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public abstract int Width();
 
     /**
@@ -31,7 +30,8 @@ public abstract class VisibleComponent implements Component {
      *
      * @param width width property used by the layout
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public abstract void Width(int width);
 
     /**
@@ -42,8 +42,8 @@ public abstract class VisibleComponent implements Component {
      *
      * @param wPercent width as a percent of its parent
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public abstract void WidthPercent(int wPercent);
 
     /**
@@ -51,8 +51,8 @@ public abstract class VisibleComponent implements Component {
      *
      * @return height property used by the layout
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public abstract int Height();
 
     /**
@@ -60,7 +60,8 @@ public abstract class VisibleComponent implements Component {
      *
      * @param height height property used by the layout
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public abstract void Height(int height);
 
     /**
@@ -71,7 +72,7 @@ public abstract class VisibleComponent implements Component {
      *
      * @param hPercent width as a percent of the height of its parent
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public abstract void HeightPercent(int hPercent);
 }

@@ -6,14 +6,24 @@
 
 package com.google.appinventor.components.runtime;
 
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import android.app.Activity;
+
 import android.content.ContentResolver;
 import android.content.Intent;
+
 import android.net.Uri;
+
 import android.provider.MediaStore;
+
 import android.util.Log;
+
 import android.webkit.MimeTypeMap;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.FileUtil;
 import com.google.appinventor.components.runtime.util.MediaUtil;
@@ -21,10 +31,9 @@ import com.google.appinventor.components.runtime.util.QUtil;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.Comparator;
-
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 /**
  * A special-purpose button. When the user taps an `ImagePicker`, the device's image gallery
@@ -35,7 +44,16 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  *
  * @author halabelson@google.com (Hal Abelson)
  */
-public class ImagePicker extends Picker implements ActivityResultListener {
+/* @DesignerComponent(version = YaVersion.IMAGEPICKER_COMPONENT_VERSION,
+    description = "A special-purpose button. When the user taps an image picker, the " +
+          "device's image gallery appears, and the user can choose an image. After an image is " +
+          "picked, it is saved, and the <code>Selected<//code> " +
+          "property will be the name of the file where the image is stored. In order to not " +
+          "fill up storage, a maximum of 10 images will be stored.  Picking more images " +
+          "will delete previous images, in order from oldest to newest.",
+    category = ComponentCategory.MEDIA) */
+/* @SimpleObject
+ */public class ImagePicker extends Picker implements ActivityResultListener {
 
     private static final String LOG_TAG = "ImagePicker";
 
@@ -69,7 +87,8 @@ public class ImagePicker extends Picker implements ActivityResultListener {
     /**
      * Path to the file containing the image that was selected.
      */
-    @SimpleProperty(description = "Path to the file containing the image that was selected.")
+  /* @SimpleProperty(description = "Path to the file containing the image that was selected.",
+      category = PropertyCategory.BEHAVIOR) */
     public String Selection() {
         return selectionSavedImage;
     }

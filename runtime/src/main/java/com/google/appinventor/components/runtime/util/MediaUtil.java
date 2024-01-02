@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2020 MIT, All rights reserved
+// Copyright 2011-2023 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.*;
 
 /**
  * Utilities for loading media.
@@ -94,12 +94,17 @@ public class MediaUtil {
 
         } else if (mediaPath.startsWith("content://")) {
             return MediaSource.CONTENT_URI;
+        } else if (mediaPath.startsWith("/data/")) {
+            return MediaSource.PRIVATE_DATA;
         }
 
         try {
-            new URL(mediaPath);
+            URL url = new URL(mediaPath);
             // It's a well formed URL.
             if (mediaPath.startsWith("file:")) {
+                if (url.getPath().startsWith("/android_asset/")) {
+                    return MediaSource.ASSET;
+                }
                 return MediaSource.FILE_URL;
             }
 
@@ -252,14 +257,35 @@ public class MediaUtil {
             throws IOException {
         switch (mediaSource) {
             case ASSET:
+                if (mediaPath.startsWith("file:")) {
+                    mediaPath = mediaPath.substring(mediaPath.indexOf("/android_asset/")
+                            + "/android_asset/".length());
+                }
                 return getAssetsIgnoreCaseInputStream(form, mediaPath);
+
+            case PRIVATE_DATA:
+                return new FileInputStream(mediaPath);
 
             case REPL_ASSET:
                 if (RUtil.needsFilePermission(form, mediaPath, null)) {
                     // App specific storage does not need read permission
                     form.assertPermission(READ_EXTERNAL_STORAGE);
                 }
-                return new FileInputStream(new java.io.File(URI.create(form.getAssetPath(mediaPath))));
+                try {
+                    return new FileInputStream(new java.io.File(URI.create(form.getAssetPath(mediaPath))));
+                } catch (Exception e) {
+                    // URI.create can throw IllegalArgumentException under certain cirumstances
+                    // on certain platforms. This crashes the Companion, which makes our crash
+                    // statistics that big-G looks at, look not so good. So turn them into any
+                    // Exception into an IOException which we handle without crashing.
+                    if (SdkLevel.getLevel() < SdkLevel.LEVEL_GINGERBREAD) {
+                        Log.d(LOG_TAG, "Error in REPL_ASSET Fetching: " + Log.getStackTraceString(e));
+                        FroyoUtil.throwIOException(e);
+                        // doesn't return
+                    } else {
+                        throw new IOException(e);
+                    }
+                }
 
             case SDCARD:
                 if (RUtil.needsFilePermission(form, mediaPath, null)) {
@@ -656,14 +682,16 @@ public class MediaUtil {
 
             case SDCARD:
                 if (RUtil.needsFilePermission(form, mediaPath, null)) {
-                    form.assertPermission(READ_EXTERNAL_STORAGE);
+                    form.assertPermission(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ? READ_MEDIA_AUDIO : READ_EXTERNAL_STORAGE);
                 }
                 return soundPool.load(mediaPath, 1);
 
             case FILE_URL:
                 if (isExternalFileUrl(form, mediaPath)
                         || RUtil.needsFilePermission(form, mediaPath, null)) {
-                    form.assertPermission(READ_EXTERNAL_STORAGE);
+                    form.assertPermission(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ? READ_MEDIA_AUDIO : READ_EXTERNAL_STORAGE);
                 }
                 return soundPool.load(fileUrlToFilePath(mediaPath), 1);
 
@@ -705,7 +733,6 @@ public class MediaUtil {
                 }
                 return;
 
-
             case REPL_ASSET:
                 if (RUtil.needsFilePermission(form, mediaPath, null)) {
                     form.assertPermission(READ_EXTERNAL_STORAGE);
@@ -715,7 +742,8 @@ public class MediaUtil {
 
             case SDCARD:
                 if (RUtil.needsFilePermission(form, mediaPath, null)) {
-                    form.assertPermission(READ_EXTERNAL_STORAGE);
+                    form.assertPermission(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ? READ_MEDIA_AUDIO : READ_EXTERNAL_STORAGE);
                 }
                 mediaPlayer.setDataSource(mediaPath);
                 return;
@@ -723,7 +751,8 @@ public class MediaUtil {
             case FILE_URL:
                 if (isExternalFileUrl(form, mediaPath)
                         || RUtil.needsFilePermission(form, mediaPath, null)) {
-                    form.assertPermission(READ_EXTERNAL_STORAGE);
+                    form.assertPermission(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ? READ_MEDIA_AUDIO : READ_EXTERNAL_STORAGE);
                 }
                 mediaPlayer.setDataSource(fileUrlToFilePath(mediaPath));
                 return;
@@ -775,7 +804,8 @@ public class MediaUtil {
 
             case SDCARD:
                 if (RUtil.needsFilePermission(form, mediaPath, null)) {
-                    form.assertPermission(READ_EXTERNAL_STORAGE);
+                    form.assertPermission(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ? READ_MEDIA_VIDEO : READ_EXTERNAL_STORAGE);
                 }
                 videoView.setVideoPath(mediaPath);
                 return;
@@ -783,7 +813,8 @@ public class MediaUtil {
             case FILE_URL:
                 if (isExternalFileUrl(form, mediaPath)
                         || RUtil.needsFilePermission(form, mediaPath, null)) {
-                    form.assertPermission(READ_EXTERNAL_STORAGE);
+                    form.assertPermission(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ? READ_MEDIA_VIDEO : READ_EXTERNAL_STORAGE);
                 }
                 videoView.setVideoPath(fileUrlToFilePath(mediaPath));
                 return;
@@ -800,7 +831,16 @@ public class MediaUtil {
 
     // MediaPlayer related methods
 
-    private enum MediaSource {ASSET, REPL_ASSET, SDCARD, FILE_URL, URL, CONTENT_URI, CONTACT_URI}
+    private enum MediaSource {
+        ASSET,
+        REPL_ASSET,
+        SDCARD,
+        FILE_URL,
+        URL,
+        CONTENT_URI,
+        CONTACT_URI,
+        PRIVATE_DATA
+    }
 
     // VideoView related methods
 

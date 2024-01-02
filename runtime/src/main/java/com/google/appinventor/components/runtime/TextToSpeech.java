@@ -6,18 +6,26 @@
 
 package com.google.appinventor.components.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+
 import android.media.AudioManager;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.collect.Maps;
-import com.google.appinventor.components.runtime.util.*;
 
-import java.util.Map;
-import java.util.*;
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.collect.Maps;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.ExternalTextToSpeech;
+import com.google.appinventor.components.runtime.util.ITextToSpeech;
+import com.google.appinventor.components.runtime.util.InternalTextToSpeech;
+import com.google.appinventor.components.runtime.util.SdkLevel;
+import com.google.appinventor.components.runtime.util.YailList;
 
 /**
  * The `TextToSpeech` component speaks a given text aloud. You can set the pitch
@@ -38,8 +46,23 @@ import java.util.*;
  */
 // TODO(hal): This language and country code method using strings as abbreviations was
 // deprecated in API level 21.
-public class TextToSpeech extends AndroidNonvisibleComponent
-        implements Component, OnStopListener, OnResumeListener, OnDestroyListener /*, ActivityResultListener  */ {
+/* @DesignerComponent(version = YaVersion.TEXTTOSPEECH_COMPONENT_VERSION,
+description = "The TextToSpeech component speaks a given text aloud.  You can set " +
+    "the pitch and the rate of speech. " +
+    "<p>You can also set a language by supplying a language code.  This changes the pronunciation " +
+    "of words, not the actual language spoken.  For example, setting the language to French " +
+    "and speaking English text will sound like someone speaking English (en) with a French accent.<//p> " +
+    "<p>You can also specify a country by supplying a country code. This can affect the " +
+    "pronunciation.  For example, British English (GBR) will sound different from US English " +
+    "(USA).  Not every country code will affect every language.<//p> " +
+    "<p>The languages and countries available depend on the particular device, and can be listed " +
+    "with the AvailableLanguages and AvailableCountries properties.<//p>",
+    category = ComponentCategory.MEDIA,
+    nonVisible = true,
+    iconName = "images//textToSpeech.png") */
+/* @SimpleObject
+ */public class TextToSpeech extends AndroidNonvisibleComponent
+        implements Component, OnStopListener, OnResumeListener, OnDestroyListener, OnClearListener {
 
     private static final Map<String, Locale> iso3LanguageToLocaleMap = Maps.newHashMap();
     private static final Map<String, Locale> iso3CountryToLocaleMap = Maps.newHashMap();
@@ -155,8 +178,8 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      * Returns `true`{:.logic.block} if the text was successfully converted to
      * speech, otherwise `false`{:.logic.block}.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Result() {
         return result;
     }
@@ -169,12 +192,12 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      * @param language is the ISO2 (i.e. 2 letter) or ISO3 (i.e. 3 letter) language code to set this
      *                 TextToSpeech component to.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXT_TO_SPEECH_LANGUAGES,
-            defaultValue = Component.DEFAULT_VALUE_TEXT_TO_SPEECH_LANGUAGE)
-    @SimpleProperty(
-            description = "Sets the language for TextToSpeech. This changes the way that words are " +
-                    "pronounced, not the actual language that is spoken.  For example setting the language to " +
-                    "and speaking English text with sound like someone speaking English with a French accent.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXT_TO_SPEECH_LANGUAGES,
+    defaultValue = Component.DEFAULT_VALUE_TEXT_TO_SPEECH_LANGUAGE) */
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+  description = "Sets the language for TextToSpeech. This changes the way that words are " +
+      "pronounced, not the actual language that is spoken.  For example setting the language to " +
+      "and speaking English text with sound like someone speaking English with a French accent.") */
     public void Language(String language) {
         Locale locale;
         switch (language.length()) {
@@ -204,11 +227,11 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      *
      * @param pitch a pitch level between 0 and 2
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT, defaultValue = "1.0")
-    @SimpleProperty(description = "Sets the Pitch for " +
-            "TextToSpeech The values should " +
-            "be between 0 and 2 where lower values lower the tone of synthesized voice and greater values " +
-            "raise it.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT, defaultValue = "1.0") */
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Sets the Pitch for " +
+      "TextToSpeech The values should " +
+      "be between 0 and 2 where lower values lower the tone of synthesized voice and greater values " +
+      "raise it.") */
     public void Pitch(float pitch) {
         if (pitch < 0 || pitch > 2) {
             Log.i(LOG_TAG, "Pitch value should be between 0 and 2, but user specified: " + pitch);
@@ -228,7 +251,7 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleProperty(description = "Returns current value of Pitch")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Returns current value of Pitch") */
     public float Pitch() {
         return this.pitch;
     }
@@ -245,10 +268,10 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      *                   speech (0.5 is half the normal speech rate), greater values
      *                   accelerate it (2.0 is twice the normal speech rate).
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT, defaultValue = "1.0")
-    @SimpleProperty(description = "Sets the SpeechRate for TextToSpeech. " +
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT, defaultValue = "1.0") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Sets the SpeechRate for TextToSpeech. " +
             "The values should be between 0 and 2 where lower values slow down the pitch and greater values " +
-            "accelerate it.")
+            "accelerate it.") */
     public void SpeechRate(float speechRate) {
         if (speechRate < 0 || speechRate > 2) {
             Log.i(LOG_TAG, "speechRate value should be between 0 and 2, but user specified: " + speechRate);
@@ -268,7 +291,7 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleProperty(description = "Returns current value of SpeechRate")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Returns current value of SpeechRate") */
     public float SpeechRate() {
         return this.speechRate;
     }
@@ -280,7 +303,8 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      * @return the language code for this TextToSpeech component.
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public String Language() {
         return language;
     }
@@ -293,11 +317,12 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      * @param country is the ISO2 (i.e. 2 letter) or ISO3 (i.e. 3 letter) country code to set this
      *                TextToSpeech component to.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXT_TO_SPEECH_COUNTRIES,
-            defaultValue = Component.DEFAULT_VALUE_TEXT_TO_SPEECH_COUNTRY)
-    @SimpleProperty(description = "Country code to use for speech generation.  This can affect the " +
-            "pronounciation.  For example, British English (GBR) will sound different from US English " +
-            "(USA).  Not every country code will affect every language.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXT_TO_SPEECH_COUNTRIES,
+    defaultValue = Component.DEFAULT_VALUE_TEXT_TO_SPEECH_COUNTRY) */
+  /* @SimpleProperty(description = "Country code to use for speech generation.  This can affect the " +
+      "pronounciation.  For example, British English (GBR) will sound different from US English " +
+      "(USA).  Not every country code will affect every language.",
+      category = PropertyCategory.BEHAVIOR) */
     public void Country(String country) {
         Locale locale;
         switch (country.length()) {
@@ -324,22 +349,23 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      * @return country code for this TextToSpeech component.
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public String Country() {
         return country;
     }
 
-    @SimpleProperty(description = "List of the languages available on this device " +
-            "for use with TextToSpeech.  Check the Android developer documentation under supported " +
-            "languages to find the meanings of these abbreviations.")
+    /* @SimpleProperty(description = "List of the languages available on this device " +
+        "for use with TextToSpeech.  Check the Android developer documentation under supported " +
+        "languages to find the meanings of these abbreviations.") */
     public YailList AvailableLanguages() {
         prepareLanguageAndCountryProperties();
         return allLanguages;
     }
 
-    @SimpleProperty(description = "List of the country codes available on this device " +
-            "for use with TextToSpeech.  Check the Android developer documentation under supported " +
-            "languages to find the meanings of these abbreviations.")
+    /* @SimpleProperty(description = "List of the country codes available on this device " +
+        "for use with TextToSpeech.  Check the Android developer documentation under supported " +
+        "languages to find the meanings of these abbreviations.") */
     public YailList AvailableCountries() {
         prepareLanguageAndCountryProperties();
         return allCountries;
@@ -400,18 +426,29 @@ public class TextToSpeech extends AndroidNonvisibleComponent
     /**
      * Speaks the given message.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Speak(final String message) {
         BeforeSpeaking();
         final Locale loc = new Locale(iso2Language, iso2Country);
         tts.speak(message, loc);
     }
 
+    /**
+     * Stops any current speech.
+     */
+    /* @SimpleFunction
+     */
+    public void Stop() {
+        tts.stop();
+        AfterSpeaking(false);
+    }
 
     /**
      * Event to raise when Speak is invoked, before the message is spoken.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void BeforeSpeaking() {
         EventDispatcher.dispatchEvent(this, "BeforeSpeaking");
     }
@@ -423,8 +460,8 @@ public class TextToSpeech extends AndroidNonvisibleComponent
      *
      * @param result whether the message was successfully spoken
      */
-    @SimpleEvent(description = "Event to raise after the message is spoken. The result will be true "
-            + "if the message is spoken successfully, otherwise it will be false.")
+  /* @SimpleEvent(description = "Event to raise after the message is spoken. The result will be true "
+      + "if the message is spoken successfully, otherwise it will be false.") */
     public void AfterSpeaking(boolean result) {
         EventDispatcher.dispatchEvent(this, "AfterSpeaking", result);
     }
@@ -445,4 +482,8 @@ public class TextToSpeech extends AndroidNonvisibleComponent
         tts.onDestroy();
     }
 
+    @Override
+    public void onClear() {
+        tts.onDestroy();
+    }
 }

@@ -7,7 +7,14 @@ package com.google.appinventor.components.runtime.util;
 
 import android.util.Log;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +61,29 @@ public class JavaStringUtils {
             Log.i(LOG_TAG_JOIN_STRINGS, "calling joinStrings");
         }
         return join(listOfStrings, separator);
+    }
+
+    /**
+     * Splits the given {@code text} into one or more parts separated by {@code at}. This version
+     * attempts to match the behavior of Java 8+ where:
+     *
+     * <p><quote>
+     * When there is a positive-width match at the beginning of this string then an empty leading
+     * substring is included at the beginning of the resulting array. A zero-width match at the
+     * beginning however never produces such empty leading substring.
+     * </quote></p>
+     *
+     * @param text the string to split
+     * @param at   the substring to split on
+     * @return a YailList of one or more substrings
+     */
+    public static YailList split(String text, String at) {
+        List<String> parts = new ArrayList<>();
+        Collections.addAll(parts, text.split(at));
+        if (Pattern.quote("").equals(at) && parts.get(0).equals("")) {
+            parts.remove(0);
+        }
+        return YailList.makeList(parts);
     }
 
     private static String join(List<Object> list, String separator) {

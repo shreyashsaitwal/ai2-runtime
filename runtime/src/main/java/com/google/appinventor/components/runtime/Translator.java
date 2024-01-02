@@ -6,29 +6,39 @@
 package com.google.appinventor.components.runtime;
 
 import android.app.Activity;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
+
 import com.google.appinventor.components.runtime.translate.TranslatorToken;
+
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.Base58Util;
-import org.json.JSONException;
 
-import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import java.net.URL;
+
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+import org.json.JSONException;
 
 /**
  * Use this component to translate words and sentences between
@@ -45,7 +55,27 @@ import java.security.cert.X509Certificate;
  * **Note:** Translation happens asynchronously in the background. When the translation is complete,
  * the {@link #GotTranslation(String, String)} event is triggered.
  */
-public final class Translator extends AndroidNonvisibleComponent {
+/* @DesignerComponent(version = YaVersion.TRANSLATOR_COMPONENT_VERSION,
+    description = "Use this component to translate words and sentences between different" +
+                  "languages. This component needs Internet access, as it will request" +
+                  "translations from a server at MIT (which in turn will request" +
+                  "translations from a commercial translation service).  Specify the" +
+                  "source and target language in the form source-target using two letter" +
+                  "language codes.  So \"en-es\" will translate from English to Spanish" +
+                  "while \"es-ru\" will translate from Spanish to Russian. If you leave out" +
+                  "the source language, the service will attempt to detect the source" +
+                  "language. So providing just \"es\" will attempt to detect the source" +
+                  "language and translate it to Spanish.  <i>Note<//i>: Translation" +
+                  "happens asynchronously in the background. When the translation is" +
+                  "complete, the <b>GotTranslation(String, String)<//b> event is" +
+                    "triggered.",
+    category = ComponentCategory.MEDIA,
+    nonVisible = true,
+    iconName = "images//translator.png") */
+/* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
+/* @UsesLibraries(libraries = "protobuf-java-3.0.0.jar") */
+/* @SimpleObject
+ */public final class Translator extends AndroidNonvisibleComponent {
 
     public static final String TRANSLATOR_SERVICE_URL =
             "https://tr.appinventor.mit.edu/tr/v1";
@@ -240,13 +270,13 @@ public final class Translator extends AndroidNonvisibleComponent {
      * prepending it to the language translation, e.g., es-ru will specify Spanish to Russian
      * translation.
      */
-    @SimpleFunction(description = "By providing a target language to translate to (for instance, " +
-            "'es' for Spanish, 'en' for English, or 'ru' for Russian), and a word or sentence to " +
-            "translate, this method will request a translation.\n" +
-            "Once the text is translated by the external service, the event GotTranslation will be " +
-            "executed.\nNote: Translate will attempt to detect the source language. You can " +
-            "also specify prepending it to the language translation. I.e., es-ru will specify Spanish " +
-            "to Russian translation.")
+  /* @SimpleFunction(description = "By providing a target language to translate to (for instance, " +
+      "'es' for Spanish, 'en' for English, or 'ru' for Russian), and a word or sentence to " +
+      "translate, this method will request a translation.\n" +
+      "Once the text is translated by the external service, the event GotTranslation will be " +
+      "executed.\nNote: Translate will attempt to detect the source language. You can " +
+      "also specify prepending it to the language translation. I.e., es-ru will specify Spanish " +
+      "to Russian translation.") */
     public void RequestTranslation(final String languageToTranslateTo,
                                    final String textToTranslate) {
 
@@ -341,10 +371,10 @@ public final class Translator extends AndroidNonvisibleComponent {
      * @param responseCode the response code from the server
      * @param translation  the response content from the server
      */
-    @SimpleEvent(description = "Event triggered when the Translate service returns the " +
-            "translated text. This event also provides a response code for error handling. If the " +
-            "responseCode is not 200, then something went wrong with the call, and the translation will " +
-            "not be available.")
+  /* @SimpleEvent(description = "Event triggered when the Translate service returns the " +
+      "translated text. This event also provides a response code for error handling. If the " +
+      "responseCode is not 200, then something went wrong with the call, and the translation will " +
+      "not be available.") */
     public void GotTranslation(final String responseCode, final String translation) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -359,11 +389,11 @@ public final class Translator extends AndroidNonvisibleComponent {
      * value in. You should not need to change it.
      */
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty(description = "The API Key to use. MIT App Inventor will automatically fill this " +
-            "value in. You should not need to change it.",
-            userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+  /* @SimpleProperty(description = "The API Key to use. MIT App Inventor will automatically fill this " +
+    "value in. You should not need to change it.",
+      userVisible = true, category = PropertyCategory.ADVANCED) */
     public void ApiKey(String apiKey) {
         this.apiKey = apiKey;
     }

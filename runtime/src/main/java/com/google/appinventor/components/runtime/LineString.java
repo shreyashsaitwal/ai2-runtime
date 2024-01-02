@@ -5,29 +5,35 @@
 
 package com.google.appinventor.components.runtime;
 
+import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLatitude;
+import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLongitude;
+
 import android.util.Log;
 import androidx.annotation.NonNull;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.MapFeature;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.errors.DispatchableError;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.GeometryUtil;
 import com.google.appinventor.components.runtime.util.MapFactory;
-import com.google.appinventor.components.runtime.util.MapFactory.*;
+import com.google.appinventor.components.runtime.util.MapFactory.MapCircle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureVisitor;
+import com.google.appinventor.components.runtime.util.MapFactory.MapLineString;
+import com.google.appinventor.components.runtime.util.MapFactory.MapMarker;
+import com.google.appinventor.components.runtime.util.MapFactory.MapPolygon;
+import com.google.appinventor.components.runtime.util.MapFactory.MapRectangle;
 import com.google.appinventor.components.runtime.util.YailList;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.locationtech.jts.geom.Geometry;
-import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLatitude;
-import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLongitude;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.locationtech.jts.geom.Geometry;
+import org.osmdroid.util.GeoPoint;
 
 /**
  * `LineString` is a component for drawing an open, continuous sequence of lines on a `Map`. To add
@@ -35,7 +41,12 @@ import static com.google.appinventor.components.runtime.util.GeometryUtil.isVali
  * line to introduce a new vertex. Move a vertex by clicking and dragging the vertex to a new
  * location. Clicking on a vertex will delete the vertex, unless only two remain.
  */
-public class LineString extends MapFeatureBase implements MapLineString {
+/* @DesignerComponent(version = YaVersion.LINESTRING_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "LineString is a component for drawing an open, continuous sequence of lines on a Map. To add new points to a LineString in the designer, drag the midpoint of any segment away from the line to introduce a new vertex. Move a vertex by clicking and dragging the vertex to a new location. Clicking on a vertex will delete the vertex, unless only two remain.",
+    iconName = "images//linestring.png") */
+/* @SimpleObject
+ */public class LineString extends MapFeatureBase implements MapLineString {
     private static final String TAG = LineString.class.getSimpleName();
     private static final MapFeatureVisitor<Double> distanceComputation = new MapFeatureVisitor<Double>() {
         @Override
@@ -91,11 +102,11 @@ public class LineString extends MapFeatureBase implements MapLineString {
         container.addFeature(this);
     }
 
-    @SimpleProperty(
-            description = "Returns the type of the map feature. For LineString, this returns "
-                    + "MapFeature.LineString (\"LineString\").")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "Returns the type of the map feature. For LineString, this returns "
+            + "MapFeature.LineString (\"LineString\").") */
     @Override
-    public @Options(MapFeature.class) String Type() {
+    public /* @Options(MapFeature.class) */ String Type() {
         return TypeAbstract().toUnderlyingValue();
     }
 
@@ -109,9 +120,9 @@ public class LineString extends MapFeatureBase implements MapLineString {
         return MapFeature.LineString;
     }
 
-    @SimpleProperty(
-            description = "A list of latitude and longitude pairs that represent the line segments " +
-                    "of the polyline.")
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+        description = "A list of latitude and longitude pairs that represent the line segments " +
+        "of the polyline.") */
     @Override
     public YailList Points() {
         return GeometryUtil.pointsListToYailList(points);
@@ -122,7 +133,8 @@ public class LineString extends MapFeatureBase implements MapLineString {
      *
      * @param points the new coordinates for the LineString.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     @Override
     public void Points(@NonNull YailList points) {
         if (points.size() < 2) {
@@ -146,8 +158,8 @@ public class LineString extends MapFeatureBase implements MapLineString {
      *
      * @param points String containing a sequence of points for the LineString.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA)
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA) */
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
     public void PointsFromString(String points) {
         final String functionName = "PointsFromString";
         try {
@@ -195,9 +207,9 @@ public class LineString extends MapFeatureBase implements MapLineString {
      * @param width the outline width
      */
     @Override
-    @DesignerProperty(defaultValue = "3")
-    @SimpleProperty
-    public void StrokeWidth(int width) {
+    /* @DesignerProperty(defaultValue = "3") */
+    /* @SimpleProperty
+     */ public void StrokeWidth(int width) {
         super.StrokeWidth(width);
     }
 

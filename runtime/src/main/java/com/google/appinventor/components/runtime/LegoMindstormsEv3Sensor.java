@@ -5,12 +5,10 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
 import com.google.appinventor.components.runtime.util.Ev3Constants;
+import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
 
 /**
  * The base class for EV3 sensors.
@@ -18,7 +16,8 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class LegoMindstormsEv3Sensor extends LegoMindstormsEv3Base {
+/* @SimpleObject
+ */public class LegoMindstormsEv3Sensor extends LegoMindstormsEv3Base {
     protected static final String DEFAULT_SENSOR_PORT = "1";
     protected int sensorPortNumber;
 
@@ -27,8 +26,9 @@ public class LegoMindstormsEv3Sensor extends LegoMindstormsEv3Base {
         SensorPort(DEFAULT_SENSOR_PORT);
     }
 
-    @SimpleProperty(description = "The sensor port that the sensor is connected to.",
-            userVisible = false)
+    /* @SimpleProperty(description = "The sensor port that the sensor is connected to.",
+                    category = PropertyCategory.BEHAVIOR,
+                    userVisible = false) */
     public String SensorPort() {
         return portNumberToSensorPortLetter(sensorPortNumber);
     }
@@ -37,9 +37,10 @@ public class LegoMindstormsEv3Sensor extends LegoMindstormsEv3Base {
      * Specifies the sensor port that the sensor is connected to.
      * **Must be set in the Designer.**
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_SENSOR_PORT,
-            defaultValue = DEFAULT_SENSOR_PORT)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_SENSOR_PORT,
+                    defaultValue = DEFAULT_SENSOR_PORT) */
+    /* @SimpleProperty
+     */
     public void SensorPort(String sensorPortLetter) {
         String functionName = "SensorPort";
         setSensorPort(functionName, sensorPortLetter);

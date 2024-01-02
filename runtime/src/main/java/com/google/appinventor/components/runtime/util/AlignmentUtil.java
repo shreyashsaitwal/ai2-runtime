@@ -111,8 +111,3 @@ public class AlignmentUtil {
     }
 }
 
-
-
-
-
-

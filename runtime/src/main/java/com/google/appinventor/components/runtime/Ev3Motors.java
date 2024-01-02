@@ -5,15 +5,13 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.Ev3Constants;
+import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import android.os.Handler;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
@@ -24,7 +22,14 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3Motors extends LegoMindstormsEv3Base {
+/* @DesignerComponent(version = YaVersion.EV3_MOTORS_COMPONENT_VERSION,
+                   description = "A component that provides both high- and low-level interfaces to a LEGO MINDSTORMS EV3 " +
+                                 "robot, with functions that can control the motors.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3Motors extends LegoMindstormsEv3Base {
     private static final int DELAY_MILLISECONDS = 50;
     private static final String DEFAULT_MOTOR_PORTS = "ABC";
     private static final double DEFAULT_WHEEL_DIAMETER = 4.32;
@@ -79,8 +84,9 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns the motor port.
      */
-    @SimpleProperty(description = "The motor ports that the motors are connected to. The ports are specified by a sequence of port letters.",
-            userVisible = false)
+  /* @SimpleProperty(description = "The motor ports that the motors are connected to. The ports are specified by a sequence of port letters.",
+                  category = PropertyCategory.BEHAVIOR,
+                  userVisible = false) */
     public String MotorPorts() {
         return bitFieldToMotorPortLetters(motorPortBitField);
     }
@@ -88,9 +94,10 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Specifies the motor port.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = DEFAULT_MOTOR_PORTS)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+                    defaultValue = DEFAULT_MOTOR_PORTS) */
+    /* @SimpleProperty
+     */
     public void MotorPorts(String motorPortLetters) {
         String functionName = "MotorPorts";
         try {
@@ -103,9 +110,10 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Specifies the diameter of the wheels attached on motors.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "" + DEFAULT_WHEEL_DIAMETER)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+                    defaultValue = "" + DEFAULT_WHEEL_DIAMETER) */
+    /* @SimpleProperty
+     */
     public void WheelDiameter(double diameter) {
         wheelDiameter = diameter;
     }
@@ -113,8 +121,9 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns the diameter of the wheels attached on motors.
      */
-    @SimpleProperty(description = "The diameter of the wheels attached on the motors in centimeters.",
-            userVisible = false)
+  /* @SimpleProperty(description = "The diameter of the wheels attached on the motors in centimeters.",
+                  category = PropertyCategory.BEHAVIOR,
+                  userVisible = false) */
     public double WheelDiameter() {
         return wheelDiameter;
     }
@@ -122,9 +131,10 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Set whether the direction of motors is reversed or not.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ReverseDirection(boolean reversed) {
         String functionName = "ReverseDirection";
         try {
@@ -138,7 +148,8 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns if the direction of the motors is reversed.
      */
-    @SimpleProperty(description = "It specifies if the direction of the motors is reversed.")
+  /* @SimpleProperty(description = "It specifies if the direction of the motors is reversed.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean ReverseDirection() {
         return directionReversed;
     }
@@ -146,9 +157,10 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Specifies whether to keep motor rotation at constant speed.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void EnableSpeedRegulation(boolean enabled) {
         regulationEnabled = enabled;
     }
@@ -156,7 +168,8 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns whether to keep motor rotation at constant speed.
      */
-    @SimpleProperty(description = "The robot adjusts the power to maintain the speed if speed regulation is enabled.")
+  /* @SimpleProperty(description = "The robot adjusts the power to maintain the speed if speed regulation is enabled.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean EnableSpeedRegulation() {
         return regulationEnabled;
     }
@@ -164,7 +177,8 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns whether to stop the motor before disconnecting.
      */
-    @SimpleProperty(description = "Whether to stop the motor before disconnecting.")
+  /* @SimpleProperty(description = "Whether to stop the motor before disconnecting.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean StopBeforeDisconnect() {
         return stopBeforeDisconnect;
     }
@@ -174,9 +188,10 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
      *
      * @param stopBeforeDisconnect whether to stop the motors before disconnecting
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void StopBeforeDisconnect(boolean stopBeforeDisconnect) {
         this.stopBeforeDisconnect = stopBeforeDisconnect;
     }
@@ -184,7 +199,8 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns whether the TachoCountChanged event should fire when the motor angle is increaing.
      */
-    @SimpleProperty(description = "Whether the TachoCountChanged event should fire when the angle is changed.")
+  /* @SimpleProperty(description = "Whether the TachoCountChanged event should fire when the angle is changed.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean TachoCountChangedEventEnabled() {
         return tachoCountChangedEventEnabled;
     }
@@ -192,9 +208,10 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Returns whether the TachoCountChanged event should fire when the motor angle is increaing.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void TachoCountChangedEventEnabled(boolean enabled) {
         tachoCountChangedEventEnabled = enabled;
     }
@@ -202,7 +219,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Start to rotate the motors.
      */
-    @SimpleFunction(description = "Start to rotate the motors.")
+    /* @SimpleFunction(description = "Start to rotate the motors.") */
     public void RotateIndefinitely(int power) {
         String functionName = "RotateIndefinitely";
         try {
@@ -220,7 +237,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Rotate the motors in a number of tacho counts.
      */
-    @SimpleFunction(description = "Rotate the motors in a number of tacho counts.")
+    /* @SimpleFunction(description = "Rotate the motors in a number of tacho counts.") */
     public void RotateInTachoCounts(int power, int tachoCounts, boolean useBrake) {
         String functionName = "RotateInTachoCounts";
         try {
@@ -236,7 +253,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Rotate the motors in a period of time.
      */
-    @SimpleFunction(description = "Rotate the motors in a period of time.")
+    /* @SimpleFunction(description = "Rotate the motors in a period of time.") */
     public void RotateInDuration(int power, int milliseconds, boolean useBrake) {
         String functionName = "RotateInDuration";
         try {
@@ -252,7 +269,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Rotate the motors in a distance.
      */
-    @SimpleFunction(description = "Rotate the motors in a distance.")
+    /* @SimpleFunction(description = "Rotate the motors in a distance.") */
     public void RotateInDistance(int power, double distance, boolean useBrake) {
         String functionName = "RotateInDistance";
         int tachoCounts = (int) (distance * 360.0 / wheelDiameter / Math.PI);
@@ -270,7 +287,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Start to rotate the motors at the same speed.
      */
-    @SimpleFunction(description = "Start to rotate the motors at the same speed.")
+    /* @SimpleFunction(description = "Start to rotate the motors at the same speed.") */
     public void RotateSyncIndefinitely(int power, int turnRatio) {
         String functionName = "RotateSyncIndefinitely";
 
@@ -291,7 +308,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Rotate the motors at the same speed for a distance in cm.
      */
-    @SimpleFunction(description = "Rotate the motors at the same speed for a distance in cm.")
+    /* @SimpleFunction(description = "Rotate the motors at the same speed for a distance in cm.") */
     public void RotateSyncInDistance(int power, int distance, int turnRatio, boolean useBrake) {
         String functionName = "RotateSyncInDuration";
         int tachoCounts = (int) (distance * 360.0 / wheelDiameter / Math.PI);
@@ -313,7 +330,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Rotate the motors at the same speed in a period of time.
      */
-    @SimpleFunction(description = "Rotate the motors at the same speed in a period of time.")
+    /* @SimpleFunction(description = "Rotate the motors at the same speed in a period of time.") */
     public void RotateSyncInDuration(int power, int milliseconds, int turnRatio, boolean useBrake) {
         String functionName = "RotateSyncInDuration";
 
@@ -334,7 +351,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Rotate the motors at the same speed in a number of tacho counts.
      */
-    @SimpleFunction(description = "Rotate the motors at the same speed in a number of tacho counts.")
+    /* @SimpleFunction(description = "Rotate the motors at the same speed in a number of tacho counts.") */
     public void RotateSyncInTachoCounts(int power, int tachoCounts, int turnRatio, boolean useBrake) {
         String functionName = "RotateSyncInTachoCounts";
 
@@ -355,7 +372,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Stop the motors of the robot.
      */
-    @SimpleFunction(description = "Stop the motors of the robot.")
+    /* @SimpleFunction(description = "Stop the motors of the robot.") */
     public void Stop(boolean useBrake) {
         String functionName = "Stop";
         try {
@@ -368,7 +385,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Toggle the direction of motors.
      */
-    @SimpleFunction(description = "Toggle the direction of motors.")
+    /* @SimpleFunction(description = "Toggle the direction of motors.") */
     public void ToggleDirection() {
         String functionName = "ToggleDirection";
         try {
@@ -382,7 +399,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Set the current tacho count to zero.
      */
-    @SimpleFunction(description = "Set the current tacho count to zero.")
+    /* @SimpleFunction(description = "Set the current tacho count to zero.") */
     public void ResetTachoCount() {
         String functionName = "ResetTachoCount";
         try {
@@ -395,7 +412,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Get the current tacho count.
      */
-    @SimpleFunction(description = "Get the current tacho count.")
+    /* @SimpleFunction(description = "Get the current tacho count.") */
     public int GetTachoCount() {
         String functionName = "GetTachoCount";
         try {
@@ -409,7 +426,7 @@ public class Ev3Motors extends LegoMindstormsEv3Base {
     /**
      * Called when the tacho count has changed.
      */
-    @SimpleEvent(description = "Called when the tacho count has changed.")
+    /* @SimpleEvent(description = "Called when the tacho count has changed.") */
     public void TachoCountChanged(int tachoCount) {
         EventDispatcher.dispatchEvent(this, "TachoCountChanged", tachoCount);
     }

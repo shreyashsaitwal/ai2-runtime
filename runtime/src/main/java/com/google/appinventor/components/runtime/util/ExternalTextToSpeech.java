@@ -6,11 +6,12 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import com.google.appinventor.components.runtime.ActivityResultListener;
+import com.google.appinventor.components.runtime.ComponentContainer;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.speech.tts.TextToSpeech;
-import com.google.appinventor.components.runtime.ActivityResultListener;
-import com.google.appinventor.components.runtime.ComponentContainer;
 
 import java.util.Locale;
 
@@ -88,6 +89,11 @@ public class ExternalTextToSpeech implements ITextToSpeech, ActivityResultListen
         } else {
             callback.onFailure();
         }
+    }
+
+    @Override
+    public void stop() {
+        // Not supported on external
     }
 
     // External TextToSpeech is obsolete, so we'll just report that no languages are available

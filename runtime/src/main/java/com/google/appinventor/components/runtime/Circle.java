@@ -5,12 +5,7 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.MapFeature;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.GeometryUtil;
 import com.google.appinventor.components.runtime.util.MapFactory;
@@ -33,7 +28,12 @@ import static com.google.appinventor.components.runtime.util.GeometryUtil.isVali
  * [`LocationSensor`](sensors.html#LocationSensor), you can determine whether a user's location is
  * inside or outside of the `Circle`. You can use this feature to trigger additional actions.
  */
-public class Circle extends PolygonBase implements MapCircle {
+/* @DesignerComponent(version = YaVersion.CIRCLE_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "Circle",
+    iconName = "images//circle.png") */
+/* @SimpleObject
+ */public class Circle extends PolygonBase implements MapCircle {
     private static final MapFeatureVisitor<Double> distanceComputation = new MapFeatureVisitor<Double>() {
         @Override
         public Double visit(MapMarker marker, Object... arguments) {
@@ -103,9 +103,9 @@ public class Circle extends PolygonBase implements MapCircle {
     }
 
     @Override
-    @SimpleProperty(description = "Returns the type of the feature. For Circles, "
-            + "this returns MapFeature.Circle (\"Circle\").")
-    public @Options(MapFeature.class) String Type() {
+  /* @SimpleProperty(description = "Returns the type of the feature. For Circles, "
+      + "this returns MapFeature.Circle (\"Circle\").") */
+    public /* @Options(MapFeature.class) */ String Type() {
         return TypeAbstract().toUnderlyingValue();
     }
 
@@ -120,10 +120,10 @@ public class Circle extends PolygonBase implements MapCircle {
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-            defaultValue = "0")
-    @SimpleProperty
-    public void Radius(double radius) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = "0") */
+    /* @SimpleProperty
+     */ public void Radius(double radius) {
         this.radius = radius;
         clearGeometry();
         map.getController().updateFeaturePosition(this);
@@ -133,17 +133,17 @@ public class Circle extends PolygonBase implements MapCircle {
      * Sets or gets the radius of the circle, in meters.
      */
     @Override
-    @SimpleProperty(
-            description = "The radius of the circle in meters.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The radius of the circle in meters.") */
     public double Radius() {
         return radius;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
-            defaultValue = "0")
-    @SimpleProperty
-    public void Latitude(double latitude) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
+      defaultValue = "0") */
+    /* @SimpleProperty
+     */ public void Latitude(double latitude) {
         if (isValidLatitude(latitude)) {
             this.latitude = latitude;
             this.center.setLatitude(latitude);
@@ -161,17 +161,17 @@ public class Circle extends PolygonBase implements MapCircle {
      * latitude and longitude simultaneously, use the {@link #SetLocation(double, double)} method.
      */
     @Override
-    @SimpleProperty(
-            description = "The latitude of the center of the circle.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The latitude of the center of the circle.") */
     public double Latitude() {
         return latitude;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
-            defaultValue = "0")
-    @SimpleProperty
-    public void Longitude(double longitude) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
+      defaultValue = "0") */
+    /* @SimpleProperty
+     */ public void Longitude(double longitude) {
         if (isValidLongitude(longitude)) {
             this.longitude = longitude;
             this.center.setLongitude(longitude);
@@ -189,8 +189,8 @@ public class Circle extends PolygonBase implements MapCircle {
      * the latitude and longitude simultaneously, use the {@link #SetLocation(double, double)} method.
      */
     @Override
-    @SimpleProperty(
-            description = "The longitude of the center of the circle.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The longitude of the center of the circle.") */
     public double Longitude() {
         return longitude;
     }
@@ -203,7 +203,7 @@ public class Circle extends PolygonBase implements MapCircle {
      * @param longitude the new longitude of the circle center, in decimal degrees.
      */
     @Override
-    @SimpleFunction(description = "Set the center of the Circle.")
+    /* @SimpleFunction(description = "Set the center of the Circle.") */
     public void SetLocation(double latitude, double longitude) {
         if (!isValidLatitude(latitude)) {
             getDispatchDelegate().dispatchErrorOccurredEvent(this, "SetLocation",

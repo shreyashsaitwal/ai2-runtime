@@ -6,13 +6,14 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 
 /**
  * Users enter passwords in a password text box component, which hides the text that has been typed in it.
@@ -29,7 +30,20 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
  * Password text box components are usually used with a {@link Button} component. The user taps the
  * {@code Button} after entering text.
  */
-public final class PasswordTextBox extends TextBoxBase {
+/* @DesignerComponent(version = YaVersion.PASSWORDTEXTBOX_COMPONENT_VERSION,
+    description = "<p>A box for entering passwords.  This is the same as " +
+    "the ordinary <code>TextBox<//code> component except this does not " +
+    "display the characters typed by the user.<//p><p>The value of the text " +
+    "in the box can be found or set through the <code>Text<//code> property. " +
+    "If blank, the <code>Hint<//code> property, which appears as faint text " +
+    "in the box, can provide the user with guidance as to what to type.<//p> " +
+    "<p>Text boxes are usually used with the <code>Button<//code> " +
+    "component, with the user clicking on the button when text entry is " +
+    "complete.<//p>",
+    category = ComponentCategory.USERINTERFACE,
+    iconName = "images//passwordTextBox.png") */
+/* @SimpleObject
+ */public final class PasswordTextBox extends TextBoxBase {
 
     private boolean passwordVisible;
 
@@ -58,7 +72,7 @@ public final class PasswordTextBox extends TextBoxBase {
 
     }
 
-    @SimpleProperty(description = "Visibility of password.")
+    /* @SimpleProperty(description = "Visibility of password.") */
     public void PasswordVisible(boolean visible) {
         passwordVisible = visible;
         setPasswordInputType(acceptsNumbersOnly, visible);
@@ -69,7 +83,7 @@ public final class PasswordTextBox extends TextBoxBase {
      *
      * @return true if the password should be shown, otherwise false.
      */
-    @SimpleProperty(description = "Visibility of password.")
+    /* @SimpleProperty(description = "Visibility of password.") */
     public boolean PasswordVisible() {
         return passwordVisible;
     }
@@ -80,11 +94,12 @@ public final class PasswordTextBox extends TextBoxBase {
      * @return {@code true} indicates that the password textbox accepts numbers only, {@code false} indicates
      * that it accepts any text
      */
-    @SimpleProperty(
-            description = "If true, then this password text box accepts only numbers as keyboard input.  " +
-                    "Numbers can include a decimal point and an optional leading minus sign.  " +
-                    "This applies to keyboard input only.  Even if NumbersOnly is true, you " +
-                    "can use [set Text to] to enter any text at all.")
+  /* @SimpleProperty(
+    category = PropertyCategory.BEHAVIOR,
+    description = "If true, then this password text box accepts only numbers as keyboard input.  " +
+      "Numbers can include a decimal point and an optional leading minus sign.  " +
+      "This applies to keyboard input only.  Even if NumbersOnly is true, you " +
+      "can use [set Text to] to enter any text at all.") */
     public boolean NumbersOnly() {
         return acceptsNumbersOnly;
     }
@@ -98,12 +113,12 @@ public final class PasswordTextBox extends TextBoxBase {
      * @param acceptsNumbersOnly {@code true} restricts input to numeric,
      *                           {@code false} allows any text
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty(
-            description = "If true, then this password text box accepts only numbers as keyboard input.  " +
-                    "Numbers can include a decimal point and an optional leading minus sign.  " +
-                    "This applies to keyboard input only.  Even if NumbersOnly is true, you " +
-                    "can use [set Text to] to enter any text at all.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+  /* @SimpleProperty(
+    description = "If true, then this password text box accepts only numbers as keyboard input.  " +
+      "Numbers can include a decimal point and an optional leading minus sign.  " +
+      "This applies to keyboard input only.  Even if NumbersOnly is true, you " +
+      "can use [set Text to] to enter any text at all.") */
     public void NumbersOnly(boolean acceptsNumbersOnly) {
         this.acceptsNumbersOnly = acceptsNumbersOnly;
         setPasswordInputType(acceptsNumbersOnly, passwordVisible);

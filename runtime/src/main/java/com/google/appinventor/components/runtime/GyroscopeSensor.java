@@ -6,15 +6,15 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,8 +22,17 @@ import java.util.Set;
 /**
  * Component providing data from the device's gyroscope sensor.
  */
+/* @DesignerComponent(version = YaVersion.GYROSCOPESENSOR_COMPONENT_VERSION,
+    description = "<p>Non-visible component that can measure angular velocity in three " +
+    "dimensions in units of degrees per second.<//p>" +
+    "<p>In order to function, the component must have its <code>Enabled<//code> property set to " +
+    "True, and the device must have a gyroscope sensor.<//p>",
+    category = ComponentCategory.SENSORS,
+    nonVisible = true,
+    iconName = "images//gyroscopesensor.png") */
 
-public class GyroscopeSensor extends AndroidNonvisibleComponent
+/* @SimpleObject
+ */public class GyroscopeSensor extends AndroidNonvisibleComponent
         implements SensorEventListener, Deleteable, OnPauseListener, OnResumeListener,
         RealTimeDataSource<String, Float> {
 
@@ -84,8 +93,8 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleEvent(description = "Indicates that the gyroscope sensor data has changed. The " +
-            "timestamp parameter is the time in nanoseconds at which the event occurred.")
+  /* @SimpleEvent(description = "Indicates that the gyroscope sensor data has changed. The " +
+      "timestamp parameter is the time in nanoseconds at which the event occurred.") */
     public void GyroscopeChanged(
             float xAngularVelocity, float yAngularVelocity, float zAngularVelocity, long timestamp) {
         EventDispatcher.dispatchEvent(this, "GyroscopeChanged",
@@ -101,7 +110,8 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      * {@code false} that it isn't
      * @suppressdoc
      */
-    @SimpleProperty(description = "Indicates whether a gyroscope sensor is available.")
+  /* @SimpleProperty(description = "Indicates whether a gyroscope sensor is available.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Available() {
         return sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE).size() > 0;
     }
@@ -113,7 +123,7 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      * {@code false} that it doesn't
      * @suppressdoc
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public boolean Enabled() {
         return enabled;
     }
@@ -125,11 +135,11 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      *                {@code false} disables it
      * @suppressdoc
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty(description = "If enabled, then sensor events will be generated and " +
-            "XAngularVelocity, YAngularVelocity, and ZAngularVelocity properties will have " +
-            "meaningful values.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+  /* @SimpleProperty(description = "If enabled, then sensor events will be generated and " +
+      "XAngularVelocity, YAngularVelocity, and ZAngularVelocity properties will have " +
+      "meaningful values.") */
     public void Enabled(boolean enabled) {
         if (this.enabled != enabled) {
             this.enabled = enabled;
@@ -149,7 +159,8 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      * @return current angular velocity around x axis
      * @suppressdoc
      */
-    @SimpleProperty(description = "The angular velocity around the X axis, in degrees per second.")
+  /* @SimpleProperty(description = "The angular velocity around the X axis, in degrees per second.",
+      category = PropertyCategory.BEHAVIOR) */
     public float XAngularVelocity() {
         return xAngularVelocity;
     }
@@ -162,7 +173,8 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      * @return current angular velocity around y axis
      * @suppressdoc
      */
-    @SimpleProperty(description = "The angular velocity around the Y axis, in degrees per second.")
+  /* @SimpleProperty(description = "The angular velocity around the Y axis, in degrees per second.",
+      category = PropertyCategory.BEHAVIOR) */
     public float YAngularVelocity() {
         return yAngularVelocity;
     }
@@ -175,7 +187,8 @@ public class GyroscopeSensor extends AndroidNonvisibleComponent
      * @return current angular velocity around z axis
      * @suppressdoc
      */
-    @SimpleProperty(description = "The angular velocity around the Z axis, in degrees per second.")
+  /* @SimpleProperty(description = "The angular velocity around the Z axis, in degrees per second.",
+      category = PropertyCategory.BEHAVIOR) */
     public float ZAngularVelocity() {
         return zAngularVelocity;
     }

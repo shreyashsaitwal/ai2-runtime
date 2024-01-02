@@ -13,10 +13,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SeekBar;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 
 /**
@@ -41,7 +37,17 @@ import com.google.appinventor.components.runtime.util.SdkLevel;
  * @author kashi01@gmail.com (M. Hossein Amerkashi)
  * @author hal@mit.edu (Hal Abelson)
  */
-public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarChangeListener {
+/* @DesignerComponent(version = YaVersion.SLIDER_COMPONENT_VERSION,
+    description = "A Slider is a progress bar that adds a draggable thumb. You can touch " +
+        "the thumb and drag left or right to set the slider thumb position. " +
+        "As the Slider thumb is dragged, it will trigger the PositionChanged event, " +
+        "reporting the position of the Slider thumb. The reported position of the " +
+        "Slider thumb can be used to dynamically update another component " +
+        "attribute, such as the font size of a TextBox or the radius of a Ball.",
+    category = ComponentCategory.USERINTERFACE,
+    iconName = "images//slider.png") */
+/* @SimpleObject
+ */public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarChangeListener {
     private final static String LOG_TAG = "Slider";
     private static final boolean DEBUG = false;
     private final static int initialRightColor = Component.COLOR_GRAY;
@@ -159,10 +165,10 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      *
      * @param enabled Whether or not the slider thumb should be shown
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty(description = "Sets whether or not to display the slider thumb.",
-            userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+    defaultValue = "True") */
+  /* @SimpleProperty(description = "Sets whether or not to display the slider thumb.",
+     userVisible = true) */
     public void ThumbEnabled(boolean enabled) {
         thumbEnabled = enabled;
         int alpha = thumbEnabled ? 255 : 0;
@@ -184,9 +190,9 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      *
      * @return Whether or not the slider thumb is being be shown
      */
-    @SimpleProperty(
-            description = "Returns whether or not the slider thumb is being be shown",
-            userVisible = true)
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Returns whether or not the slider thumb is being be shown",
+      userVisible = true) */
     public boolean ThumbEnabled() {
         return thumbEnabled;
     }
@@ -200,12 +206,12 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      *                 sliderMinValue and sliderMaxValue. If this value is not within the min and
      *                 max, then it will be calculated.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = Component.SLIDER_THUMB_VALUE + "")
-    @SimpleProperty(description = "Sets the position of the slider thumb. " +
-            "If this value is greater than MaxValue, then it will be set to same value as MaxValue. " +
-            "If this value is less than MinValue, then it will be set to same value as MinValue.",
-            userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = Component.SLIDER_THUMB_VALUE + "") */
+  /* @SimpleProperty(description = "Sets the position of the slider thumb. " +
+      "If this value is greater than MaxValue, then it will be set to same value as MaxValue. " +
+      "If this value is less than MinValue, then it will be set to same value as MinValue.",
+      userVisible = true) */
     public void ThumbPosition(float position) {
         // constrain thumbPosition between minValue and maxValue
         thumbPosition = Math.max(Math.min(position, maxValue), minValue);
@@ -222,8 +228,8 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @return the slider thumb position
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "Returns the position of slider thumb", userVisible = true)
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Returns the position of slider thumb", userVisible = true) */
     public float ThumbPosition() {
         return thumbPosition;
     }
@@ -235,14 +241,14 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * and {@link #MaxValue()} and signals the {@link #PositionChanged(float)}`
      * event.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = Component.SLIDER_MIN_VALUE + "")
-    @SimpleProperty(description = "Sets the minimum value of slider.  Changing the minimum value " +
-            "also resets Thumbposition to be halfway between the (new) minimum and the maximum. " +
-            "If the new minimum is greater than the current maximum, then minimum and maximum will " +
-            "both be set to this value.  Setting MinValue resets the thumb position to halfway " +
-            "between MinValue and MaxValue and signals the PositionChanged event.",
-            userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = Component.SLIDER_MIN_VALUE + "") */
+  /* @SimpleProperty(description = "Sets the minimum value of slider.  Changing the minimum value " +
+      "also resets Thumbposition to be halfway between the (new) minimum and the maximum. " +
+      "If the new minimum is greater than the current maximum, then minimum and maximum will " +
+      "both be set to this value.  Setting MinValue resets the thumb position to halfway " +
+      "between MinValue and MaxValue and signals the PositionChanged event.",
+      userVisible = true) */
     public void MinValue(float value) {
         minValue = value;
         // increase maxValue if necessary to accommodate the new minimum
@@ -260,8 +266,8 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @return the value of slider min value.
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "Returns the value of slider min value.", userVisible = true)
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Returns the value of slider min value.", userVisible = true) */
     public float MinValue() {
         return minValue;
     }
@@ -272,14 +278,14 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * Setting `MaxValue` resets the thumb position to halfway between {@link #MinValue()}
      * and `MaxValue` and signals the {@link #PositionChanged(float)}` event.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = Component.SLIDER_MAX_VALUE + "")
-    @SimpleProperty(description = "Sets the maximum value of slider.  Changing the maximum value " +
-            "also resets Thumbposition to be halfway between the minimum and the (new) maximum. " +
-            "If the new maximum is less than the current minimum, then minimum and maximum will both " +
-            "be set to this value.  Setting MaxValue resets the thumb position to halfway " +
-            "between MinValue and MaxValue and signals the PositionChanged event.",
-            userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = Component.SLIDER_MAX_VALUE + "") */
+  /* @SimpleProperty(description = "Sets the maximum value of slider.  Changing the maximum value " +
+      "also resets Thumbposition to be halfway between the minimum and the (new) maximum. " +
+      "If the new maximum is less than the current minimum, then minimum and maximum will both " +
+      "be set to this value.  Setting MaxValue resets the thumb position to halfway " +
+      "between MinValue and MaxValue and signals the PositionChanged event.",
+      userVisible = true) */
     public void MaxValue(float value) {
         maxValue = value;
         minValue = Math.min(value, minValue);
@@ -296,8 +302,8 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @return the slider max value
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "Returns the slider max value.", userVisible = true)
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Returns the slider max value.", userVisible = true) */
     public float MaxValue() {
         return maxValue;
     }
@@ -310,8 +316,11 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @return left color in the format 0xAARRGGBB, which includes
      * alpha, red, green, and blue components
      */
-    @SimpleProperty(
-            description = "The color of slider to the left of the thumb.")
+  /* @SimpleProperty(
+      description = "The color of slider to the left of the thumb.",
+      category = PropertyCategory.APPEARANCE) */
+    /* @IsColor
+     */
     public int ColorLeft() {
         return leftColor;
     }
@@ -324,9 +333,10 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @param argb background color in the format 0xAARRGGBB, which
      *             includes alpha, red, green, and blue components
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = initialLeftColorString)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = initialLeftColorString) */
+    /* @SimpleProperty
+     */
     public void ColorLeft(int argb) {
         leftColor = argb;
         setSliderColors();
@@ -340,8 +350,11 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @return right color in the format 0xAARRGGBB, which includes
      * alpha, red, green, and blue components
      */
-    @SimpleProperty(
-            description = "The color of slider to the right of the thumb.")
+  /* @SimpleProperty(
+      description = "The color of slider to the right of the thumb.",
+      category = PropertyCategory.APPEARANCE) */
+    /* @IsColor
+     */
     public int ColorRight() {
         return rightColor;
     }
@@ -354,9 +367,10 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
      * @param argb background color in the format 0xAARRGGBB, which
      *             includes alpha, red, green, and blue components
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = initialRightColorString)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = initialRightColorString) */
+    /* @SimpleProperty
+     */
     public void ColorRight(int argb) {
         rightColor = argb;
         setSliderColors();
@@ -388,7 +402,8 @@ public class Slider extends AndroidViewComponent implements SeekBar.OnSeekBarCha
     /**
      * Indicates that position of the slider thumb has changed.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void PositionChanged(float thumbPosition) {
         EventDispatcher.dispatchEvent(this, "PositionChanged", thumbPosition);
     }

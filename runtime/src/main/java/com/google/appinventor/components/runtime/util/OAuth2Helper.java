@@ -1,16 +1,17 @@
 package com.google.appinventor.components.runtime.util;
 
-import android.accounts.*;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-//import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
 
 import java.io.IOException;
-
 
 /**
  * This helper class uses AccountManager to handle OAuth 2.0 authorization,
@@ -168,34 +169,34 @@ public class OAuth2Helper {
                                                                  String accountName) {
 
         AccountManagerFuture<Bundle> future = null;
-//        GoogleAccountManager accountManager = new GoogleAccountManager(activity);
+//    GoogleAccountManager accountManager = new GoogleAccountManager(activity);
 
         // Force the return of fresh token by invalidating the current token
         // Doing this on every OAuth request, avoids the need to determine whether the
         // authToken has expired, usually after 1 hour, and then getting
         // another one using the refresh token.
 
-//        accountManager.invalidateAuthToken(credential.getAccessToken());
-//        AccountManager.get(activity).invalidateAuthToken(authTokenType, null);
+//    accountManager.invalidateAuthToken(credential.getAccessToken());
+//    AccountManager.get(activity).invalidateAuthToken(authTokenType, null);
 
         // Try to get the user's account by account name. Might return null
 
-//        Account account = accountManager.getAccountByName(accountName);
+//    Account account = accountManager.getAccountByName(accountName);
 
         // Here is where AccountManager may prompt user to select an account
-//        if (account != null) {
-
-            // We have the user's account at this point, so AccountManager simply returns the token
-//            Log.i(TAG, "Getting token by account");
-//            future = accountManager.getAccountManager().getAuthToken(account, authTokenType, true, null, null);
-
-//        } else {
-
-            // AccountManager uses 'features' to get the authToken, possibly prompting the user to choose an account
-//            Log.i(TAG, "Getting token by features, possibly prompting user to select an account");
-//            future = accountManager.getAccountManager().getAuthTokenByFeatures(GoogleAccountManager.ACCOUNT_TYPE,
-//                    authTokenType, null, activity, null, null, null, null);
-//        }
+//    if (account != null) {
+//
+//      // We have the user's account at this point, so AccountManager simply returns the token
+//      Log.i(TAG, "Getting token by account");
+//      future = accountManager.getAccountManager().getAuthToken(account, authTokenType, true, null, null);
+//
+//    } else {
+//
+//      // AccountManager uses 'features' to get the authToken, possibly prompting the user to choose an account
+//      Log.i(TAG, "Getting token by features, possibly prompting user to select an account");
+//      future = accountManager.getAccountManager().getAuthTokenByFeatures(GoogleAccountManager.ACCOUNT_TYPE,
+//          authTokenType, null, activity, null, null, null, null);
+//    }
 
         // Return the whole bundle containing the authToken, account name, and other data.
         return future;

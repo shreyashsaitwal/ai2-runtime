@@ -27,7 +27,6 @@ public final class ScreenDensityUtil {
     public static final float MAXIMUM_ASPECT_RATIO = (854f / 480f);
     private static final String LOG_TAG = "ScreenDensityUtil";
 
-
     private ScreenDensityUtil() {
     }
 

@@ -7,7 +7,7 @@ package com.google.appinventor.components.runtime.util;
 
 import android.content.Context;
 import android.graphics.Canvas;
-//import android.graphics.Paint;
+import android.graphics.Paint;
 import android.graphics.Picture;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,28 +27,66 @@ import android.widget.RelativeLayout;
 import androidx.core.view.ViewCompat;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
-//import com.google.appinventor.components.common.ComponentConstants;
+import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.MapType;
 import com.google.appinventor.components.common.ScaleUnits;
 import com.google.appinventor.components.runtime.Form;
 import com.google.appinventor.components.runtime.LocationSensor;
-import com.google.appinventor.components.runtime.util.MapFactory.*;
+import com.google.appinventor.components.runtime.util.MapFactory.HasFill;
+import com.google.appinventor.components.runtime.util.MapFactory.HasStroke;
+import com.google.appinventor.components.runtime.util.MapFactory.MapCircle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapController;
+import com.google.appinventor.components.runtime.util.MapFactory.MapEventListener;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeature;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureCollection;
+import com.google.appinventor.components.runtime.util.MapFactory.MapLineString;
+import com.google.appinventor.components.runtime.util.MapFactory.MapMarker;
+import com.google.appinventor.components.runtime.util.MapFactory.MapPolygon;
+import com.google.appinventor.components.runtime.util.MapFactory.MapRectangle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapScaleUnits;
 import com.google.appinventor.components.runtime.view.ZoomControlView;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.MapTile;
+import org.osmdroid.tileprovider.MapTileProviderBase;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
+import org.osmdroid.tileprovider.modules.IFilesystemCache;
+import org.osmdroid.tileprovider.modules.MapTileFilesystemProvider;
+import org.osmdroid.tileprovider.modules.MapTileSqlCacheProvider;
+import org.osmdroid.tileprovider.modules.TileWriter;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.OnTapListener;
-import org.osmdroid.views.overlay.*;
+import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Marker.OnMarkerClickListener;
 import org.osmdroid.views.overlay.Marker.OnMarkerDragListener;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayWithIW;
+import org.osmdroid.views.overlay.OverlayWithIWVisitor;
+import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay.UnitsOfMeasure;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
@@ -57,11 +95,6 @@ import org.osmdroid.views.overlay.infowindow.OverlayInfoWindow;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 
 class NativeOpenStreetMapController implements MapController, MapListener {
     /* copied from SVG */
@@ -119,7 +152,7 @@ class NativeOpenStreetMapController implements MapController, MapListener {
         }
         this.form = form;
         this.touch = new TouchOverlay();
-        view = new CustomMapView(form.getApplicationContext());
+        view = createCustomMapView(form.getApplicationContext());
         locationProvider = new AppInventorLocationSensorAdapter();
         defaultInfoWindow = new OverlayInfoWindow(view);
         view.setTilesScaledToDpi(true);
@@ -156,25 +189,32 @@ class NativeOpenStreetMapController implements MapController, MapListener {
         zoomControls.setVisibility(View.GONE);  // not shown by default
     }
 
-//    private static float getBestGuessWidth(SVG.Svg svg) {
-//        if (svg.width != null) {
-//            return svg.width.floatValue();
-//        } else if (svg.viewBox != null) {
-//            return svg.viewBox.width;
-//        } else {
-//            return ComponentConstants.MARKER_PREFERRED_WIDTH;
-//        }
+    private static float getBestGuessWidth(Object svg) {
+//    if (svg.width != null) {
+//      return svg.width.floatValue();
+//    } else if (svg.viewBox != null) {
+//      return svg.viewBox.width;
+//    } else {
+//      return ComponentConstants.MARKER_PREFERRED_WIDTH;
 //    }
+        return 0f;
+    }
 
-//    private static float getBestGuessHeight(SVG.Svg svg) {
-//        if (svg.height != null) {
-//            return svg.height.floatValue();
-//        } else if (svg.viewBox != null) {
-//            return svg.viewBox.height;
-//        } else {
-//            return ComponentConstants.MARKER_PREFERRED_HEIGHT;
-//        }
+    private static float getBestGuessHeight(Object svg) {
+//    if (svg.height != null) {
+//      return svg.height.floatValue();
+//    } else if (svg.viewBox != null) {
+//      return svg.viewBox.height;
+//    } else {
+//      return ComponentConstants.MARKER_PREFERRED_HEIGHT;
 //    }
+        return 0f;
+    }
+
+    CustomMapView createCustomMapView(Context context) {
+        return new CustomMapView(context, new CustomMapTileProviderBasic(context,
+                TileSourceFactory.DEFAULT_TILE_SOURCE, new TileWriter()));
+    }
 
     @Override
     public View getView() {
@@ -774,7 +814,7 @@ class NativeOpenStreetMapController implements MapController, MapListener {
         getMarkerDrawable(aiMarker, new AsyncCallbackPair<Drawable>() {
             @Override
             public void onFailure(String message) {
-                Log.d(TAG, "Cannot find default marker");
+                Log.wtf(TAG, "Cannot find default marker");
             }
 
             @Override
@@ -866,62 +906,63 @@ class NativeOpenStreetMapController implements MapController, MapListener {
     }
 
     private Drawable rasterizeSVG(MapMarker aiMarker, SVG markerSvg) {
-//        SVG.Svg svg = markerSvg.getRootElement();
-//        final float density = view.getContext().getResources().getDisplayMetrics().density;
-//        float height = aiMarker.Height() <= 0 ? getBestGuessHeight(svg) : aiMarker.Height();
-//        float width = aiMarker.Width() <= 0 ? getBestGuessWidth(svg) : aiMarker.Width();
-//        float scaleH = height / getBestGuessHeight(svg);
-//        float scaleW = width / getBestGuessWidth(svg);
-//        float scale = (float) Math.sqrt(scaleH * scaleH + scaleW * scaleW);
-//
-//         update fill color of SVG <path>
-//        Paint fillPaint = new Paint();
-//        Paint strokePaint = new Paint();
-//        PaintUtil.changePaint(fillPaint, aiMarker.FillColor());
-//        PaintUtil.changePaint(strokePaint, aiMarker.StrokeColor());
-//        SVG.Length strokeWidth = new SVG.Length(aiMarker.StrokeWidth() / scale);
-//        for (SVG.SvgObject element : svg.getChildren()) {
-//            if (element instanceof SVG.SvgConditionalElement) {
-//                SVG.SvgConditionalElement path = (SVG.SvgConditionalElement) element;
-//                path.baseStyle.fill = new SVG.Colour(fillPaint.getColor());
-//                path.baseStyle.fillOpacity = fillPaint.getAlpha() / 255.0f;
-//                path.baseStyle.stroke = new SVG.Colour(strokePaint.getColor());
-//                path.baseStyle.strokeOpacity = strokePaint.getAlpha() / 255.0f;
-//                path.baseStyle.strokeWidth = strokeWidth;
-//                path.baseStyle.specifiedFlags = 0x3d;
-//                if (path.style != null) {
-//                    if ((path.style.specifiedFlags & SPECIFIED_FILL) == 0) {
-//                        path.style.fill = new SVG.Colour(fillPaint.getColor());
-//                        path.style.specifiedFlags |= SPECIFIED_FILL;
-//                    }
-//                    if ((path.style.specifiedFlags & SPECIFIED_FILL_OPACITY) == 0) {
-//                        path.style.fillOpacity = fillPaint.getAlpha() / 255.0f;
-//                        path.style.specifiedFlags |= SPECIFIED_FILL_OPACITY;
-//                    }
-//                    if ((path.style.specifiedFlags & SPECIFIED_STROKE) == 0) {
-//                        path.style.stroke = new SVG.Colour(strokePaint.getColor());
-//                        path.style.specifiedFlags |= SPECIFIED_STROKE;
-//                    }
-//                    if ((path.style.specifiedFlags & SPECIFIED_STROKE_OPACITY) == 0) {
-//                        path.style.strokeOpacity = strokePaint.getAlpha() / 255.0f;
-//                        path.style.specifiedFlags |= SPECIFIED_STROKE_OPACITY;
-//                    }
-//                    if ((path.style.specifiedFlags & SPECIFIED_STROKE_WIDTH) == 0) {
-//                        path.style.strokeWidth = strokeWidth;
-//                        path.style.specifiedFlags |= SPECIFIED_STROKE_WIDTH;
-//                    }
-//                }
-//            }
+//    SVG.Svg svg = markerSvg.getRootElement();
+        Object svg = null;
+        final float density = view.getContext().getResources().getDisplayMetrics().density;
+        float height = aiMarker.Height() <= 0 ? getBestGuessHeight(svg) : aiMarker.Height();
+        float width = aiMarker.Width() <= 0 ? getBestGuessWidth(svg) : aiMarker.Width();
+        float scaleH = height / getBestGuessHeight(svg);
+        float scaleW = width / getBestGuessWidth(svg);
+        float scale = (float) Math.sqrt(scaleH * scaleH + scaleW * scaleW);
+
+        // update fill color of SVG <path>
+        Paint fillPaint = new Paint();
+        Paint strokePaint = new Paint();
+        PaintUtil.changePaint(fillPaint, aiMarker.FillColor());
+        PaintUtil.changePaint(strokePaint, aiMarker.StrokeColor());
+//    SVG.Length strokeWidth = new SVG.Length(aiMarker.StrokeWidth() / scale);
+//    for (SVG.SvgObject element : svg.getChildren()) {
+//      if (element instanceof SVG.SvgConditionalElement) {
+//        SVG.SvgConditionalElement path = (SVG.SvgConditionalElement) element;
+//        path.baseStyle.fill = new SVG.Colour(fillPaint.getColor());
+//        path.baseStyle.fillOpacity = fillPaint.getAlpha()/255.0f;
+//        path.baseStyle.stroke = new SVG.Colour(strokePaint.getColor());
+//        path.baseStyle.strokeOpacity = strokePaint.getAlpha()/255.0f;
+//        path.baseStyle.strokeWidth = strokeWidth;
+//        path.baseStyle.specifiedFlags = 0x3d;
+//        if (path.style != null) {
+//          if ((path.style.specifiedFlags & SPECIFIED_FILL) == 0) {
+//            path.style.fill = new SVG.Colour(fillPaint.getColor());
+//            path.style.specifiedFlags |= SPECIFIED_FILL;
+//          }
+//          if ((path.style.specifiedFlags & SPECIFIED_FILL_OPACITY) == 0) {
+//            path.style.fillOpacity = fillPaint.getAlpha()/255.0f;
+//            path.style.specifiedFlags |= SPECIFIED_FILL_OPACITY;
+//          }
+//          if ((path.style.specifiedFlags & SPECIFIED_STROKE) == 0) {
+//            path.style.stroke = new SVG.Colour(strokePaint.getColor());
+//            path.style.specifiedFlags |= SPECIFIED_STROKE;
+//          }
+//          if ((path.style.specifiedFlags & SPECIFIED_STROKE_OPACITY) == 0) {
+//            path.style.strokeOpacity = strokePaint.getAlpha()/255.0f;
+//            path.style.specifiedFlags |= SPECIFIED_STROKE_OPACITY;
+//          }
+//          if ((path.style.specifiedFlags & SPECIFIED_STROKE_WIDTH) == 0) {
+//            path.style.strokeWidth = strokeWidth;
+//            path.style.specifiedFlags |= SPECIFIED_STROKE_WIDTH;
+//          }
 //        }
+//      }
+//    }
 
         // draw SVG to Picture and create a BitmapDrawable for rendering
         Picture picture = markerSvg.renderToPicture();
         Picture scaledPicture = new Picture();
-//        Canvas canvas = scaledPicture.beginRecording((int) ((width + 2.0f * aiMarker.StrokeWidth()) * density),
-//                (int) ((height + 2.0f * aiMarker.StrokeWidth()) * density));
-//        canvas.scale(density * scaleW, density * scaleH);
-//        canvas.translate(strokeWidth.floatValue(), strokeWidth.floatValue());
-//        picture.draw(canvas);
+        Canvas canvas = scaledPicture.beginRecording((int) ((width + 2.0f * aiMarker.StrokeWidth()) * density),
+                (int) ((height + 2.0f * aiMarker.StrokeWidth()) * density));
+        canvas.scale(density * scaleW, density * scaleH);
+//    canvas.translate(strokeWidth.floatValue(), strokeWidth.floatValue());
+        picture.draw(canvas);
         scaledPicture.endRecording();
         return new PictureDrawable(scaledPicture);
     }
@@ -1270,6 +1311,19 @@ class NativeOpenStreetMapController implements MapController, MapListener {
         }
     }
 
+    private static class CustomMapTileProviderBasic extends MapTileProviderBasic {
+        public CustomMapTileProviderBasic(Context context, ITileSource tileSource,
+                                          IFilesystemCache cacheWriter) {
+            super(context, tileSource, cacheWriter);
+            for (int i = 0; i < this.mTileProviderList.size(); i++) {
+                if (this.mTileProviderList.get(i) instanceof MapTileSqlCacheProvider) {
+                    this.mTileProviderList.set(i,
+                            new MapTileFilesystemProvider(mRegisterReceiver, tileSource));
+                }
+            }
+        }
+    }
+
     static class MultiPolygon extends Polygon {
 
         private List<Polygon> children = new ArrayList<Polygon>();
@@ -1548,6 +1602,10 @@ class NativeOpenStreetMapController implements MapController, MapListener {
     private class CustomMapView extends MapView {
         public CustomMapView(Context context) {
             super(context, null, new MapReadyHandler());
+        }
+
+        public CustomMapView(Context context, MapTileProviderBase tileProvider) {
+            super(context, tileProvider, new MapReadyHandler());
         }
 
         @Override

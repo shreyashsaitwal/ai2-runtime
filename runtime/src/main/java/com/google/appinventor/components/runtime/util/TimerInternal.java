@@ -6,8 +6,9 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import android.os.Handler;
 import com.google.appinventor.components.runtime.AlarmHandler;
+
+import android.os.Handler;
 
 /**
  * Helper class for components containing timers, such as Timer and Sprite.

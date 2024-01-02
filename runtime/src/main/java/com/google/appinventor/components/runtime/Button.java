@@ -6,14 +6,20 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleEvent;
-
 /**
  * Button with the ability to detect clicks. Many aspects of its appearance can be changed, as well
  * as whether it is clickable (`Enabled`). Its properties can be changed in the Designer or in the
  * Blocks Editor.
  */
-public final class Button extends ButtonBase {
+/* @DesignerComponent(version = YaVersion.BUTTON_COMPONENT_VERSION,
+    category = ComponentCategory.USERINTERFACE,
+    description = "Button with the ability to detect clicks.  Many aspects " +
+    "of its appearance can be changed, as well as whether it is clickable " +
+    "(<code>Enabled<//code>), can be changed in the Designer or in the Blocks " +
+    "Editor.",
+    iconName = "images//button.png") */
+/* @SimpleObject
+ */public final class Button extends ButtonBase {
 
     /**
      * Creates a new Button component.
@@ -34,7 +40,7 @@ public final class Button extends ButtonBase {
     /**
      * Indicates that the user tapped and released the `Button`.
      */
-    @SimpleEvent(description = "User tapped and released the button.")
+    /* @SimpleEvent(description = "User tapped and released the button.") */
     public void Click() {
         EventDispatcher.dispatchEvent(this, "Click");
     }
@@ -49,7 +55,7 @@ public final class Button extends ButtonBase {
     /**
      * Indicates that the user held the `Button` down.
      */
-    @SimpleEvent(description = "User held the button down.")
+    /* @SimpleEvent(description = "User held the button down.") */
     public boolean LongClick() {
         return EventDispatcher.dispatchEvent(this, "LongClick");
     }

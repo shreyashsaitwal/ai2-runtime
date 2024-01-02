@@ -10,7 +10,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.telephony.SmsManager;
@@ -18,20 +22,38 @@ import android.telephony.SmsMessage;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-import com.google.appinventor.components.annotations.*;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.ReceivingState;
-import com.google.appinventor.components.runtime.util.*;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.FileUtil;
+import com.google.appinventor.components.runtime.util.OAuth2Helper;
+import com.google.appinventor.components.runtime.util.OnInitializeListener;
+import com.google.appinventor.components.runtime.util.SdkLevel;
+import com.google.appinventor.components.runtime.util.SmsBroadcastReceiver;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.CookieManager;
+import java.net.HttpCookie;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * ![Texting component icon](images/texting.png)
@@ -76,7 +98,61 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author ram8647@gmail.com (Ralph Morelli)
  */
 @SuppressWarnings("deprecation")
+/* @DesignerComponent(version = YaVersion.TEXTING_COMPONENT_VERSION,
+  description = "<p>A component that will, when the <code>SendMessage<//code> method is " +
+  "called, send the text message specified in the <code>Message<//code> " +
+  "property to the phone number specified in the <code>PhoneNumber<//code> " +
+  "property.<//p> " +
+  "<p>If the <code>ReceivingEnabled<//code> property is set to 1 messages " +
+  "will <b>not<//b> be received. If <code>ReceivingEnabled<//code> is set " +
+  "to 2 messages will be received only when the application is " +
+  "running. Finally if <code>ReceivingEnabled<//code> is set to 3, " +
+  "messages will be received when the application is running <b>and<//b> " +
+  "when the application is not running they will be queued and a " +
+  "notification displayed to the user.<//p> " +
+  "<p>When a message arrives, the <code>MessageReceived<//code> event is " +
+  "raised and provides the sending number and message.<//p> " +
+  "<p> An app that includes this component will receive messages even " +
+  "when it is in the background (i.e. when it's not visible on the " +
+  "screen) and, moreso, even if the app is not running, so long as it's " +
+  "installed on the phone. If the phone receives a text message when the " +
+  "app is not in the foreground, the phone will show a notification in " +
+  "the notification bar.  Selecting the notification will bring up the " +
+  "app.  As an app developer, you'll probably want to give your users the " +
+  "ability to control ReceivingEnabled so that they can make the phone " +
+  "ignore text messages.<//p> " +
+  "<p>If the GoogleVoiceEnabled property is true, messages can be sent " +
+  "over Wifi using Google Voice. This option requires that the user have " +
+  "a Google Voice account and that the mobile Voice app is installed on " +
+  "the phone. The Google Voice option works only on phones that support " +
+  "Android 2.0 (Eclair) or higher.<//p> " +
+  "<p>To specify the phone number (e.g., 650-555-1212), set the " +
+  "<code>PhoneNumber<//code> property to a Text string with the specified " +
+  "digits (e.g., 6505551212).  Dashes, dots, and parentheses may be " +
+  "included (e.g., (650)-555-1212) but will be ignored; spaces may not be " +
+  "included.<//p> " +
+  "<p>Another way for an app to specify a phone number would be to " +
+  "include a <code>PhoneNumberPicker<//code> component, which lets the " +
+  "users select a phone numbers from the ones stored in the the phone's " +
+  "contacts.<//p>",
+  category = ComponentCategory.SOCIAL,
+  nonVisible = true,
+  iconName = "images//texting.png") */
 
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames =
+  "com.google.android.apps.googlevoice.permission.RECEIVE_SMS, " +
+  "com.google.android.apps.googlevoice.permission.SEND_SMS, " +
+  "android.permission.ACCOUNT_MANAGER, android.permission.MANAGE_ACCOUNTS, " +
+  "android.permission.GET_ACCOUNTS, android.permission.USE_CREDENTIALS") */
+/* @UsesLibraries(libraries =
+  "google-api-client.jar," +
+  "google-api-client-android2-beta.jar," +
+  "google-http-client.jar," +
+  "google-http-client-android2-beta.jar," +
+  "google-http-client-android3-beta.jar," +
+  "google-oauth-client.jar," +
+  "guava.jar") */
 public class Texting extends AndroidNonvisibleComponent
         implements Component, OnResumeListener, OnPauseListener, OnInitializeListener, OnStopListener,
         Deleteable, ActivityResultListener {
@@ -97,7 +173,6 @@ public class Texting extends AndroidNonvisibleComponent
     public static final String GV_PACKAGE_NAME = "com.google.android.apps.googlevoice";
     public static final String GV_SMS_SEND_URL = "https://www.google.com/voice/b/0/sms/send/";
     public static final String GV_URL = "https://www.google.com/voice/b/0/redirection/voice";
-
 
     // Meta data key and value that identify an app for handling incoming SMS
     // Used by Texting component
@@ -207,7 +282,8 @@ public class Texting extends AndroidNonvisibleComponent
      * @param number      the phone number that the text message was sent from.
      * @param messageText the text of the message.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public static void MessageReceived(String number, String messageText) {
         if (receivingState == ReceivingState.Off) {
             return;
@@ -349,8 +425,8 @@ public class Texting extends AndroidNonvisibleComponent
      *
      * @param phoneNumber a phone number to call
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty()
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void PhoneNumber(String phoneNumber) {
         Log.i(TAG, "PhoneNumber set: " + phoneNumber);
         this.phoneNumber = phoneNumber;
@@ -362,12 +438,12 @@ public class Texting extends AndroidNonvisibleComponent
      * and parentheses may be included (e.g., (650)-555-1212) but will be ignored; spaces
      * should not be included.
      */
-    @SimpleProperty(
-            description = "The number that the message will be sent to when the SendMessage method " +
-                    "is called. The " +
-                    "number is a text string with the specified digits (e.g., 6505551212).  Dashes, dots, " +
-                    "and parentheses may be included (e.g., (650)-555-1212) but will be ignored; spaces " +
-                    "should not be included.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description =  "The number that the message will be sent to when the SendMessage method " +
+    "is called. The "  +
+    "number is a text string with the specified digits (e.g., 6505551212).  Dashes, dots, " +
+    "and parentheses may be included (e.g., (650)-555-1212) but will be ignored; spaces " +
+    "should not be included.") */
     public String PhoneNumber() {
         return phoneNumber;
     }
@@ -379,9 +455,9 @@ public class Texting extends AndroidNonvisibleComponent
      *
      * @param message the message to send when the SendMessage function is called.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(
-            description = "The message that will be sent when the SendMessage method is called.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description = "The message that will be sent when the SendMessage method is called.") */
     public void Message(String message) {
         Log.i(TAG, "Message set: " + message);
         this.message = message;
@@ -392,7 +468,8 @@ public class Texting extends AndroidNonvisibleComponent
      *
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public String Message() {
         return message;
     }
@@ -400,7 +477,8 @@ public class Texting extends AndroidNonvisibleComponent
     /**
      * Launch the phone's default text messaging app with the message and phone number prepopulated.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void SendMessage() {
         String phoneNumber = this.phoneNumber;
         String message = this.message;
@@ -419,7 +497,9 @@ public class Texting extends AndroidNonvisibleComponent
      * [dangerous permissions](https://developer.android.com/guide/topics/permissions/overview#dangerous_permissions)
      * that will require additional approval if your app is submitted to the Google Play Store.**
      */
-    @SimpleFunction
+    /* @UsesPermissions({Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE}) */
+    /* @SimpleFunction
+     */
     public void SendMessageDirect() {
         Log.i(TAG, "Sending message " + message + " to " + phoneNumber);
 
@@ -483,12 +563,12 @@ public class Texting extends AndroidNonvisibleComponent
      * @return 'true' or 'false' depending on whether you want to
      * use Google Voice for sending/receiving messages.
      */
-    @SimpleProperty(
-            description = "If true, then SendMessage will attempt to send messages over Wifi " +
-                    "using Google Voice.  This requires that the Google Voice app must be installed " +
-                    "and set up on the phone or tablet, with a Google Voice account.  If GoogleVoiceEnabled " +
-                    "is false, the device must have phone and texting service in order to send or " +
-                    "receive messages with this component.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description = "If true, then SendMessage will attempt to send messages over Wifi " +
+    "using Google Voice.  This requires that the Google Voice app must be installed " +
+    "and set up on the phone or tablet, with a Google Voice account.  If GoogleVoiceEnabled " +
+    "is false, the device must have phone and texting service in order to send or " +
+    "receive messages with this component.") */
     public boolean GoogleVoiceEnabled() {
         return googleVoiceEnabled;
     }
@@ -500,8 +580,16 @@ public class Texting extends AndroidNonvisibleComponent
      * @param enabled Set to 'true' or 'false' depending on whether you want to
      *                use Google Voice to send/receive messages.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty()
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty() */
+  /* @UsesBroadcastReceivers(receivers = {
+      @ReceiverElement(name = "com.google.appinventor.components.runtime.util.SmsBroadcastReceiver",
+          intentFilters = {
+              @IntentFilterElement(actionElements = {
+                  @ActionElement(name = "com.google.android.apps.googlevoice.SMS_RECEIVED")
+              })
+          })
+  }) */
     public void GoogleVoiceEnabled(boolean enabled) {
         if (SdkLevel.getLevel() >= SdkLevel.LEVEL_ECLAIR) {
             this.googleVoiceEnabled = enabled;
@@ -524,18 +612,18 @@ public class Texting extends AndroidNonvisibleComponent
      * new text message is received.
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "If set to 1 (OFF) no messages will be received.  If set to 2 (FOREGROUND) or" +
-                    "3 (ALWAYS) the component will respond to messages if it is running. If the " +
-                    "app is not running then the message will be discarded if set to 2 " +
-                    "(FOREGROUND). If set to 3 (ALWAYS) and the app is not running the phone will " +
-                    "show a notification.  Selecting the notification will bring up the app " +
-                    "and signal the MessageReceived event.  Messages received when the app " +
-                    "is dormant will be queued, and so several MessageReceived events might " +
-                    "appear when the app awakens.  As an app developer, it would be a good " +
-                    "idea to give your users control over this property, so they can make " +
-                    "their phones ignore text messages when your app is installed.")
-    public @Options(ReceivingState.class) int ReceivingEnabled() {
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+    description = "If set to 1 (OFF) no messages will be received.  If set to 2 (FOREGROUND) or" +
+    "3 (ALWAYS) the component will respond to messages if it is running. If the " +
+    "app is not running then the message will be discarded if set to 2 " +
+    "(FOREGROUND). If set to 3 (ALWAYS) and the app is not running the phone will " +
+    "show a notification.  Selecting the notification will bring up the app " +
+    "and signal the MessageReceived event.  Messages received when the app " +
+    "is dormant will be queued, and so several MessageReceived events might " +
+    "appear when the app awakens.  As an app developer, it would be a good " +
+    "idea to give your users control over this property, so they can make " +
+    "their phones ignore text messages when your app is installed.") */
+    public /* @Options(ReceivingState.class) */ int ReceivingEnabled() {
         return ReceivingEnabledAbstract().toUnderlyingValue();
     }
 
@@ -576,11 +664,20 @@ public class Texting extends AndroidNonvisibleComponent
      *
      * @param enabled 0 = never receive, 1 = receive foreground only, 2 = receive always
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXT_RECEIVING,
-            alwaysSend = true,
-            defaultValue = "1") // Default is OFF (was FOREGROUND prior to Jan 2019)
-    @SimpleProperty()
-    public void ReceivingEnabled(@Options(ReceivingState.class) int enabled) {
+    /* @UsesPermissions(Manifest.permission.RECEIVE_SMS) */
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXT_RECEIVING,
+      alwaysSend = true,
+      defaultValue = "1") */ // Default is OFF (was FOREGROUND prior to Jan 2019)
+    /* @SimpleProperty() */
+  /* @UsesBroadcastReceivers(receivers = {
+      @ReceiverElement(name = "com.google.appinventor.components.runtime.util.SmsBroadcastReceiver",
+          intentFilters = {
+              @IntentFilterElement(actionElements = {
+                  @ActionElement(name = "android.provider.Telephony.SMS_RECEIVED"),
+              })
+          })
+  }) */
+    public void ReceivingEnabled(/* @Options(ReceivingState.class) */ int enabled) {
         // Make sure enabled is a valid ReceivingState.
         ReceivingState state = ReceivingState.fromUnderlyingValue(enabled);
         if (state == null) {
@@ -752,7 +849,8 @@ public class Texting extends AndroidNonvisibleComponent
         int numParts = parts.size();
         ArrayList<PendingIntent> pendingIntents = new ArrayList<PendingIntent>();
         for (int i = 0; i < numParts; i++)
-            pendingIntents.add(PendingIntent.getBroadcast(activity, 0, new Intent(SENT), 0));
+            pendingIntents.add(PendingIntent.getBroadcast(activity, 0, new Intent(SENT),
+                    PendingIntent.FLAG_IMMUTABLE));
 
         // Receiver for when the SMS is sent
         BroadcastReceiver sendReceiver = new BroadcastReceiver() {
@@ -899,7 +997,6 @@ public class Texting extends AndroidNonvisibleComponent
                 return "IO Error Message not sent";
             }
         }
-
 
         /**
          * Fetches the page Source Code for the Voice homepage. This file contains

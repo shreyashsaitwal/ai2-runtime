@@ -5,8 +5,13 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 package com.google.appinventor.components.runtime.util;
 
+import com.google.appinventor.components.runtime.WebViewer;
+
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.DialogInterface;
+
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;

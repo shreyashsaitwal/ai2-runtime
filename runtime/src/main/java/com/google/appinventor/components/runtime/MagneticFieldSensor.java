@@ -10,12 +10,20 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
 
-public class MagneticFieldSensor extends AndroidNonvisibleComponent implements SensorEventListener, Deleteable, OnPauseListener, OnResumeListener, OnStopListener, SensorComponent {
+/* @DesignerComponent(
+    category = ComponentCategory.SENSORS,
+    description = "<p>Non-visible component that measures the ambient geomagnetic field for all three physical axes " +
+        "(x, y, z) in Tesla https:////en.wikipedia.org//wiki//Tesla_(unit).<//p>",
+    iconName = "images//magneticSensor.png",
+    nonVisible = true,
+    version = YaVersion.MAGNETICFIELDSENSOR_COMPONENT_VERSION) */
+/* @SimpleObject
+
+ */public class MagneticFieldSensor extends AndroidNonvisibleComponent implements SensorEventListener, Deleteable, OnPauseListener, OnResumeListener, OnStopListener, SensorComponent {
     private final SensorManager sensorManager;
     private double absoluteStrength;
     private boolean enabled = true;
@@ -35,26 +43,27 @@ public class MagneticFieldSensor extends AndroidNonvisibleComponent implements S
         startListening();
     }
 
-    @SimpleProperty(description = "Indicates that there is a magnetic field " +
-            "sensor in the device and it is available.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates that there is a magnetic field " +
+        "sensor in the device and it is available.") */
     public boolean Available() {
         return sensorManager.getSensorList(2).size() > 0;
     }
 
-    @SimpleProperty(description = "Indicates the maximum range the magnetic " +
-            "sensor can reach.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates the maximum range the magnetic " +
+        "sensor can reach.") */
     public float MaximumRange() {
         return magneticSensor.getMaximumRange();
     }
 
-    @SimpleProperty(description = "Indicates whether or not the magnetic field " +
-            "sensor is enabled and working.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates whether or not the magnetic field " +
+        "sensor is enabled and working.") */
     public boolean Enabled() {
         return enabled;
     }
 
-    @DesignerProperty(defaultValue = "True", editorType = "boolean")
-    @SimpleProperty
+    /* @DesignerProperty(defaultValue = "True", editorType = "boolean") */
+    /* @SimpleProperty
+     */
     public void Enabled(boolean localEnabled) {
         if (enabled != localEnabled) {
             enabled = localEnabled;
@@ -66,27 +75,27 @@ public class MagneticFieldSensor extends AndroidNonvisibleComponent implements S
         }
     }
 
-    @SimpleEvent(description = "Triggers when magnetic field has changed, setting the new values in parameters.")
+    /* @SimpleEvent(description = "Triggers when magnetic field has changed, setting the new values in parameters.") */
     public void MagneticChanged(float xStrength, float yStrength, float zStrength, double absoluteStrength) {
         EventDispatcher.dispatchEvent(this, "MagneticChanged", xStrength, yStrength, zStrength, absoluteStrength);
     }
 
-    @SimpleProperty(description = "Indicates the absolute strength of the field.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates the absolute strength of the field.") */
     public double AbsoluteStrength() {
         return absoluteStrength;
     }
 
-    @SimpleProperty(description = "Indicates the field's strength in the X-axis.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates the field's strength in the X-axis.") */
     public float XStrength() {
         return xStrength;
     }
 
-    @SimpleProperty(description = "Indicates the field's strength in the Y-axis.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates the field's strength in the Y-axis.") */
     public float YStrength() {
         return yStrength;
     }
 
-    @SimpleProperty(description = "Indicates the field's strength in the Z-axis.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "Indicates the field's strength in the Z-axis.") */
     public float ZStrength() {
         return zStrength;
     }

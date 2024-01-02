@@ -7,27 +7,34 @@ package com.google.appinventor.components.runtime;
 
 import android.text.TextUtils;
 import android.util.Log;
+
 import androidx.annotation.VisibleForTesting;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.MapFeature;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.errors.DispatchableError;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.GeometryUtil;
 import com.google.appinventor.components.runtime.util.MapFactory;
-import com.google.appinventor.components.runtime.util.MapFactory.*;
+import com.google.appinventor.components.runtime.util.MapFactory.MapCircle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureVisitor;
+import com.google.appinventor.components.runtime.util.MapFactory.MapLineString;
+import com.google.appinventor.components.runtime.util.MapFactory.MapMarker;
+import com.google.appinventor.components.runtime.util.MapFactory.MapPolygon;
+import com.google.appinventor.components.runtime.util.MapFactory.MapRectangle;
 import com.google.appinventor.components.runtime.util.YailList;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.locationtech.jts.geom.Geometry;
-import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.locationtech.jts.geom.Geometry;
+import org.osmdroid.util.GeoPoint;
 
 /**
  * `Polygon` encloses an arbitrary 2-dimensional area on a {@link Map}. `Polygon`s can be used for
@@ -35,7 +42,12 @@ import java.util.List;
  * New vertices can be created by dragging the midpoint of a polygon away from the edge. Clicking
  * on a vertex will remove the vertex, but a minimum of 3 vertices must exist at all times.
  */
-public class Polygon extends PolygonBase implements MapPolygon {
+/* @DesignerComponent(version = YaVersion.POLYGON_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "Polygon encloses an arbitrary 2-dimensional area on a Map. Polygons can be used for drawing a perimeter, such as a campus, city, or country. Polygons begin as basic triangles. New vertices can be created by dragging the midpoint of a polygon away from the edge. Clicking on a vertex will remove the vertex, but a minimum of 3 vertices must exist at all times.",
+    iconName = "images//polygon.png") */
+/* @SimpleObject
+ */public class Polygon extends PolygonBase implements MapPolygon {
     private static final String TAG = Polygon.class.getSimpleName();
     private static final MapFeatureVisitor<Double> distanceComputation = new MapFeatureVisitor<Double>() {
         @Override
@@ -102,10 +114,10 @@ public class Polygon extends PolygonBase implements MapPolygon {
     }
 
     @Override
-    @SimpleProperty(
-            description = "Returns the type of the feature. For polygons, this returns "
-                    + "MapFeature.Polygon (\"Polygon\").")
-    public @Options(MapFeature.class) String Type() {
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Returns the type of the feature. For polygons, this returns "
+          + "MapFeature.Polygon (\"Polygon\").") */
+    public /* @Options(MapFeature.class) */ String Type() {
         return TypeAbstract().toUnderlyingValue();
     }
 
@@ -120,8 +132,8 @@ public class Polygon extends PolygonBase implements MapPolygon {
     }
 
     @Override
-    @SimpleProperty(
-            description = "Gets or sets the sequence of points used to draw the polygon.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Gets or sets the sequence of points used to draw the polygon.") */
     public YailList Points() {
         if (points.isEmpty()) {
             return YailList.makeEmptyList();
@@ -145,8 +157,8 @@ public class Polygon extends PolygonBase implements MapPolygon {
      * @param points a list of points defining the polygon.
      */
     @Override
-    @SimpleProperty
-    public void Points(YailList points) {
+    /* @SimpleProperty
+     */ public void Points(YailList points) {
         try {
             if (GeometryUtil.isPolygon(points)) {
                 multipolygon = false;
@@ -175,8 +187,9 @@ public class Polygon extends PolygonBase implements MapPolygon {
      * @param pointString
      */
     @SuppressWarnings("squid:S00100")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA)
-    @SimpleProperty(description = "Constructs a polygon from the given list of coordinates.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA) */
+  /* @SimpleProperty(description = "Constructs a polygon from the given list of coordinates.",
+      category = PropertyCategory.APPEARANCE) */
     public void PointsFromString(String pointString) {
         if (TextUtils.isEmpty(pointString)) {
             points = new ArrayList<List<GeoPoint>>();  // create a new list in case the user has saved a reference
@@ -207,8 +220,8 @@ public class Polygon extends PolygonBase implements MapPolygon {
     }
 
     @Override
-    @SimpleProperty(
-            description = "Gets or sets the sequence of points used to draw holes in the polygon.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Gets or sets the sequence of points used to draw holes in the polygon.") */
     public YailList HolePoints() {
         if (holePoints.isEmpty()) {
             return YailList.makeEmptyList();
@@ -230,8 +243,8 @@ public class Polygon extends PolygonBase implements MapPolygon {
      * @param points a list of lists of lists defining the holes in each part of the multipolygon.
      */
     @Override
-    @SimpleProperty
-    public void HolePoints(YailList points) {
+    /* @SimpleProperty
+     */ public void HolePoints(YailList points) {
         try {
             if (points.size() == 0) {
                 holePoints = new ArrayList<List<List<GeoPoint>>>();
@@ -263,8 +276,9 @@ public class Polygon extends PolygonBase implements MapPolygon {
      * @param pointString
      */
     @SuppressWarnings("squid:S00100")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA)
-    @SimpleProperty(description = "Constructs holes in a polygon from a given list of coordinates per hole.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA) */
+  /* @SimpleProperty(description = "Constructs holes in a polygon from a given list of coordinates per hole.",
+      category = PropertyCategory.APPEARANCE) */
     public void HolePointsFromString(String pointString) {
         if (TextUtils.isEmpty(pointString)) {
             holePoints = new ArrayList<List<List<GeoPoint>>>();  // create a new list in case the user has saved a reference
@@ -295,7 +309,7 @@ public class Polygon extends PolygonBase implements MapPolygon {
      * Gets the centroid of the `Polygon` as a `(latitude, longitude)` pair.
      */
     @Override
-    @SimpleFunction(description = "Returns the centroid of the Polygon as a (latitude, longitude) pair.")
+    /* @SimpleFunction(description = "Returns the centroid of the Polygon as a (latitude, longitude) pair.") */
     public YailList Centroid() {
         return super.Centroid();
     }

@@ -3,8 +3,9 @@
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
-
 package com.google.appinventor.components.runtime;
+
+import com.google.appinventor.components.common.PropertyTypeConstants;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -12,14 +13,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
+
+import java.util.List;
 
 /**
  * A sensors reporting a single value, such as temperature or humidity.
  */
-public abstract class SingleValueSensor extends AndroidNonvisibleComponent
+/* @SimpleObject
+ */public abstract class SingleValueSensor extends AndroidNonvisibleComponent
         implements OnPauseListener, OnResumeListener, SensorComponent,
         SensorEventListener, Deleteable {
     private static final int DEFAULT_REFRESH_TIME = 1000; // ms
@@ -67,8 +68,8 @@ public abstract class SingleValueSensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that the sensor is available,
      * {@code false} that it isn't
      */
-    @SimpleProperty(description = "Specifies whether or not the device has the "
-            + "hardware to support the %type% component.")
+  /* @SimpleProperty(description = "Specifies whether or not the device has the "
+      + "hardware to support the %type% component.") */
     public boolean Available() {
         return isAvailable();
     }
@@ -80,7 +81,7 @@ public abstract class SingleValueSensor extends AndroidNonvisibleComponent
      * @return {@code true} indicates that the sensor generates events,
      * {@code false} that it doesn't
      */
-    @SimpleProperty(description = "If enabled, then device will listen for changes.")
+    /* @SimpleProperty(description = "If enabled, then device will listen for changes.") */
     public boolean Enabled() {
         return enabled;
     }
@@ -93,9 +94,9 @@ public abstract class SingleValueSensor extends AndroidNonvisibleComponent
      * @param enabled {@code true} enables sensor event generation,
      *                {@code false} disables it
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void Enabled(boolean enabled) {
         setEnabled(enabled);
     }
@@ -106,10 +107,10 @@ public abstract class SingleValueSensor extends AndroidNonvisibleComponent
      * @return time in ms between updates
      * @suppressdoc
      */
-    @SimpleProperty(
-            description = "The requested minimum time in milliseconds between " +
-                    "changes in readings being reported. Android is not guaranteed to honor the request. " +
-                    "Setting this property has no effect on pre-Gingerbread devices.")
+  /* @SimpleProperty(
+      description = "The requested minimum time in milliseconds between " +
+      "changes in readings being reported. Android is not guaranteed to honor the request. " +
+      "Setting this property has no effect on pre-Gingerbread devices.") */
     public int RefreshTime() {
         return refreshTime;
     }
@@ -120,10 +121,10 @@ public abstract class SingleValueSensor extends AndroidNonvisibleComponent
      * @param time in ms between updates
      * @suppressdoc
      */
-    @DesignerProperty(
-            editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = DEFAULT_REFRESH_TIME + "")
-    @SimpleProperty
+  /* @DesignerProperty(
+      editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = DEFAULT_REFRESH_TIME + "") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void RefreshTime(int time) {
         refreshTime = time;
         if (enabled) {

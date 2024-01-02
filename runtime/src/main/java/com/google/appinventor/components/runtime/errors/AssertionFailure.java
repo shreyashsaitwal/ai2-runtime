@@ -9,7 +9,8 @@ package com.google.appinventor.components.runtime.errors;
 /**
  * Runtime error indicating an assert failure.
  */
-public class AssertionFailure extends RuntimeError {
+/* @SimpleObject
+ */public class AssertionFailure extends RuntimeError {
     /**
      * Creates a new error
      */

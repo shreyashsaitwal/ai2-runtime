@@ -7,20 +7,25 @@
 package com.google.appinventor.components.runtime;
 
 import android.app.Activity;
+
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+
 import android.net.Uri;
+
 import android.text.TextUtils;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
+
 import com.google.appinventor.components.runtime.util.AnimationUtil;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.NougatUtil;
@@ -60,7 +65,68 @@ import java.io.File;
  *
  * @author markf@google.com (Mark Friedman)
  */
-public class ActivityStarter extends AndroidNonvisibleComponent
+/* @DesignerComponent(version = YaVersion.ACTIVITYSTARTER_COMPONENT_VERSION,
+    designerHelpDescription = "A component that can launch an activity " +
+    "using the <code>StartActivity<//code> method." +
+    "<p>Activities that can be launched include: <ul> \n" +
+    "<li> starting other App Inventor for Android apps <//li> \n" +
+    "<li> starting the camera application <//li> \n" +
+    "<li> performing web search <//li> \n" +
+    "<li> opening a browser to a specified web page<//li> \n" +
+    "<li> opening the map application to a specified location<//li><//ul> \n" +
+    "You can also launch activities that return text data.  See the " +
+    "documentation on using the Activity Starter for examples.<//p>",
+
+    //// TODO(user): Add more information about bringing up maps when
+    //// the issues with html quoting (bug 2386151) are fixed.
+    description = "A component that can launch an activity using " +
+    "the <code>StartActivity<//code> method. \n" +
+    "<p>Activities that can be launched include:<ul> " +
+    "<li> Starting another App Inventor for Android app. \n To do so, first " +
+    "     find out the <em>class<//em> of the other application by " +
+    "     downloading the source code and using a file explorer or unzip " +
+    "     utility to find a file named " +
+    "     \"youngandroidproject//project.properties\".  \n The first line of " +
+    "     the file will start with \"main=\" and be followed by the class " +
+    "     name; for example, " +
+    "     <code>main=com.gmail.Bitdiddle.Ben.HelloPurr.Screen1<//code>.  " +
+    "     (The first components indicate that it was created by " +
+    "     Ben.Bitdiddle@gmail.com.)  \n To make your " +
+    "     <code>ActivityStarter<//code> launch this application, set the " +
+    "     following properties: <ul>\n " +
+    "     <li> <code>ActivityPackage<//code> to the class name, dropping the " +
+    "          last component (for example, " +
+    "          <code>com.gmail.Bitdiddle.Ben.HelloPurr<//code>)<//li>\n " +
+    "     <li> <code>ActivityClass<//code> to the entire class name (for " +
+    "          example, " +
+    "          <code>com.gmail.Bitdiddle.Ben.HelloPurr.Screen1<//code>)<//li> " +
+    "     <//ul><//li> \n" +
+    "<li> Starting the camera application by setting the following " +
+    "     properties:<ul> \n" +
+    "     <li> <code>Action: android.intent.action.MAIN<//code> <//li> \n" +
+    "     <li> <code>ActivityPackage: com.android.camera<//code> <//li> \n" +
+    "     <li> <code>ActivityClass: com.android.camera.Camera<//code><//li>\n " +
+    "     <//ul><//li>\n" +
+    "<li> Performing web search.  Assuming the term you want to search " +
+    "     for is \"vampire\" (feel free to substitute your own choice), \n" +
+    "     set the properties to:\n<ul><code>" +
+    "     <li>Action: android.intent.action.WEB_SEARCH<//li> " +
+    "     <li>ExtraKey: query<//li> " +
+    "     <li>ExtraValue: vampire<//li> " +
+    "     <li>ActivityPackage: com.google.android.providers.enhancedgooglesearch<//li>" +
+    "     <li>ActivityClass: com.google.android.providers.enhancedgooglesearch.Launcher<//li> " +
+    "     <//code><//ul><//li> \n" +
+    "<li> Opening a browser to a specified web page.  Assuming the page you " +
+    "     want to go to is \"www.facebook.com\" (feel free to substitute " +
+    "     your own choice), set the properties to:\n<ul><code> " +
+    "     <li>Action: android.intent.action.VIEW<//li> " +
+    "     <li>DataUri: http:////www.facebook.com<//li> <//code> <//ul> <//li> " +
+    "<//ul><//p>",
+    category = ComponentCategory.CONNECTIVITY,
+    nonVisible = true,
+    iconName = "images//activityStarter.png") */
+/* @SimpleObject
+ */public class ActivityStarter extends AndroidNonvisibleComponent
         implements ActivityResultListener, Component, Deleteable {
 
     private static final String LOG_TAG = "ActivityStarter";
@@ -102,8 +168,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the action that will be used to start the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String Action() {
         return action;
     }
@@ -111,9 +177,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Specifies the action that will be used to start the activity.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void Action(String action) {
         this.action = action.trim();
     }
@@ -137,9 +204,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
      * Returns the extra key that will be passed to the activity.
      * Obsolete. Should use Extras instead
      */
-    @SimpleProperty(
-            description = "Returns the extra key that will be passed to the activity.\n" +
-                    "DEPRECATED: New code should use Extras property instead.")
+  /* @SimpleProperty(
+      description = "Returns the extra key that will be passed to the activity.\n" +
+          "DEPRECATED: New code should use Extras property instead.",
+      category = PropertyCategory.BEHAVIOR) */
     public String ExtraKey() {
         return extraKey;
     }
@@ -148,21 +216,22 @@ public class ActivityStarter extends AndroidNonvisibleComponent
      * Specifies the extra key that will be passed to the activity.
      * Obsolete. Should use Extras instead
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ExtraKey(String extraKey) {
         this.extraKey = extraKey.trim();
     }
-
 
     /**
      * Returns the extra value that will be passed to the activity.
      * Obsolete. Should use Extras instead
      */
-    @SimpleProperty(
-            description = "Returns the extra value that will be passed to the activity.\n" +
-                    "DEPRECATED: New code should use Extras property instead.")
+  /* @SimpleProperty(
+      description = "Returns the extra value that will be passed to the activity.\n" +
+          "DEPRECATED: New code should use Extras property instead.",
+      category = PropertyCategory.BEHAVIOR) */
     public String ExtraValue() {
         return extraValue;
     }
@@ -171,9 +240,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
      * Specifies the extra value that will be passed to the activity.
      * Obsolete. Should use Extras instead
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ExtraValue(String extraValue) {
         this.extraValue = extraValue.trim();
     }
@@ -197,8 +267,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the name that will be used to retrieve a result from the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String ResultName() {
         return resultName;
     }
@@ -207,9 +277,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
      * Specifies the name that will be used to retrieve a result from the
      * activity.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ResultName(String resultName) {
         this.resultName = resultName.trim();
     }
@@ -217,8 +288,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the result from the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String Result() {
         return result;
     }
@@ -226,8 +297,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the data URI that will be used to start the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String DataUri() {
         return dataUri;
     }
@@ -235,9 +306,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Specifies the data URI that will be used to start the activity.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void DataUri(String dataUri) {
         this.dataUri = dataUri.trim();
     }
@@ -245,8 +317,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the MIME type to pass to the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String DataType() {
         return dataType;
     }
@@ -254,9 +326,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Specifies the MIME type to pass to the activity.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void DataType(String dataType) {
         this.dataType = dataType.trim();
     }
@@ -264,8 +337,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the package part of the specific component that will be started.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String ActivityPackage() {
         return activityPackage;
     }
@@ -273,9 +346,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Specifies the package part of the specific component that will be started.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ActivityPackage(String activityPackage) {
         this.activityPackage = activityPackage.trim();
     }
@@ -283,8 +357,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the class part of the specific component that will be started.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String ActivityClass() {
         return activityClass;
     }
@@ -292,9 +366,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Specifies the class part of the specific component that will be started.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ActivityClass(String activityClass) {
         this.activityClass = activityClass.trim();
     }
@@ -304,7 +379,7 @@ public class ActivityStarter extends AndroidNonvisibleComponent
      *
      * @param result The result returned by the activity
      */
-    @SimpleEvent(description = "Event raised after this ActivityStarter returns.")
+    /* @SimpleEvent(description = "Event raised after this ActivityStarter returns.") */
     public void AfterActivity(String result) {
         EventDispatcher.dispatchEvent(this, "AfterActivity", result);
     }
@@ -312,8 +387,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Event raised if this `ActivityStarter returns because the activity was canceled.
      */
-    @SimpleEvent(description =
-            "Event raised if this ActivityStarter returns because the activity was canceled.")
+  /* @SimpleEvent(description =
+      "Event raised if this ActivityStarter returns because the activity was canceled.") */
     public void ActivityCanceled() {
         EventDispatcher.dispatchEvent(this, "ActivityCanceled");
     }
@@ -321,8 +396,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the MIME type from the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String ResultType() {
         if (resultIntent != null) {
             String resultType = resultIntent.getType();
@@ -336,8 +411,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the URI from the activity.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String ResultUri() {
         if (resultIntent != null) {
             String resultUri = resultIntent.getDataString();
@@ -351,7 +426,8 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Specifies the list of key-value pairs that will be passed as extra data to the activity.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void Extras(YailList pairs) {
         for (Object pair : pairs.toArray()) {
             boolean isYailList = pair instanceof YailList;
@@ -367,18 +443,18 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Returns the list of key-value pairs that will be passed as extra data to the activity.
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public YailList Extras() {
         return extras;
     }
-
 
     /**
      * Returns the name of the activity that corresponds to this `ActivityStarter`,
      * or an empty string if no corresponding activity can be found.
      */
-    @SimpleFunction(description = "Returns the name of the activity that corresponds to this " +
-            "ActivityStarter, or an empty string if no corresponding activity can be found.")
+  /* @SimpleFunction(description = "Returns the name of the activity that corresponds to this " +
+      "ActivityStarter, or an empty string if no corresponding activity can be found.") */
     public String ResolveActivity() {
         Intent intent = buildActivityIntent();
         PackageManager pm = container.$context().getPackageManager();
@@ -392,7 +468,7 @@ public class ActivityStarter extends AndroidNonvisibleComponent
     /**
      * Start the activity corresponding to this `ActivityStarter`.
      */
-    @SimpleFunction(description = "Start the activity corresponding to this ActivityStarter.")
+    /* @SimpleFunction(description = "Start the activity corresponding to this ActivityStarter.") */
     public void StartActivity() {
         resultIntent = null;
         result = "";
@@ -507,8 +583,9 @@ public class ActivityStarter extends AndroidNonvisibleComponent
         }
     }
 
-    @SimpleEvent(description = "The ActivityError event is no longer used. " +
-            "Please use the Screen.ErrorOccurred event instead.")
+    /* @SimpleEvent(description = "The ActivityError event is no longer used. " +
+        "Please use the Screen.ErrorOccurred event instead.",
+        userVisible = false) */
     public void ActivityError(String message) {
     }
 

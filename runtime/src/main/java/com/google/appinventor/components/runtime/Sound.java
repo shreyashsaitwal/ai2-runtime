@@ -12,15 +12,11 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.errors.PermissionException;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.MediaUtil;
 import com.google.appinventor.components.runtime.util.SdkLevel;
+import com.google.appinventor.components.runtime.util.TiramisuUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,6 +39,24 @@ import java.util.Map;
  * sound is specified via filename.  See also
  * {@link android.media.SoundPool}.
  */
+/* @DesignerComponent(version = YaVersion.SOUND_COMPONENT_VERSION,
+    description = "<p>A multimedia component that plays sound " +
+    "files and optionally vibrates for the number of milliseconds " +
+    "(thousandths of a second) specified in the Blocks Editor.  The name of " +
+    "the sound file to play can be specified either in the Designer or in " +
+    "the Blocks Editor.<//p> <p>For supported sound file formats, see " +
+    "<a href=\"http:////developer.android.com//guide//appendix//media-formats.html\"" +
+    " target=\"_blank\">Android Supported Media Formats<//a>.<//p>" +
+    "<p>This <code>Sound<//code> component is best for short sound files, such as sound " +
+    "effects, while the <code>Player<//code> component is more efficient for " +
+    "longer sounds, such as songs.<//p>" +
+    "<p>You might get an error if you attempt to play a sound " +
+    "immeditely after setting the source.<//p>",
+    category = ComponentCategory.MEDIA,
+    nonVisible = true,
+    iconName = "images//soundEffect.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.VIBRATE, android.permission.INTERNET") */
 public class Sound extends AndroidNonvisibleComponent
         implements Component, OnResumeListener, OnStopListener, OnDestroyListener, Deleteable {
 
@@ -77,7 +91,6 @@ public class Sound extends AndroidNonvisibleComponent
     // number of retries remaining before signaling an error
     private int delayRetries;
 
-
     public Sound(ComponentContainer container) {
         super(container.$form());
         thisComponent = this;
@@ -101,13 +114,13 @@ public class Sound extends AndroidNonvisibleComponent
         }
     }
 
-
     /**
      * Returns the sound's filename.
      */
-    @SimpleProperty(
-            description = "The name of the sound file.  Only certain " +
-                    "formats are supported.  See http://developer.android.com/guide/appendix/media-formats.html.")
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR,
+      description = "The name of the sound file.  Only certain " +
+      "formats are supported.  See http:////developer.android.com//guide//appendix//media-formats.html.") */
     public String Source() {
         return sourcePath;
     }
@@ -120,11 +133,25 @@ public class Sound extends AndroidNonvisibleComponent
      * @internaldoc <p/>See {@link MediaUtil#determineMediaSource} for information about what
      * a path can be.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
-            defaultValue = "")
-    @SimpleProperty
-    public void Source(String path) {
-        sourcePath = (path == null) ? "" : path;
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
+    public void Source(/* @Asset  */String path) {
+        final String tempPath = (path == null) ? "" : path;
+        if (TiramisuUtil.requestAudioPermissions(form, path, new PermissionResultHandler() {
+            @Override
+            public void HandlePermissionResponse(String permission, boolean granted) {
+                if (granted) {
+                    Sound.this.Source(tempPath);
+                } else {
+                    form.dispatchPermissionDeniedEvent(Sound.this, "Source", permission);
+                }
+            }
+        })) {
+            return;
+        }
+        sourcePath = tempPath;
 
         // Clear the previous sound.
         if (streamId != 0) {
@@ -170,9 +197,10 @@ public class Sound extends AndroidNonvisibleComponent
      *
      * @return minimum interval in ms
      */
-    @SimpleProperty(
-            description = "The minimum interval, in milliseconds, between sounds.  If you play a sound, " +
-                    "all further Play() calls will be ignored until the interval has elapsed.")
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR,
+      description = "The minimum interval, in milliseconds, between sounds.  If you play a sound, " +
+      "all further Play() calls will be ignored until the interval has elapsed.") */
     public int MinimumInterval() {
         return minimumInterval;
     }
@@ -185,9 +213,10 @@ public class Sound extends AndroidNonvisibleComponent
      *
      * @param interval minimum interval in ms
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "500")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "500") */
+    /* @SimpleProperty
+     */
     public void MinimumInterval(int interval) {
         minimumInterval = interval;
     }
@@ -195,7 +224,7 @@ public class Sound extends AndroidNonvisibleComponent
     /**
      * Plays the sound.
      */
-    @SimpleFunction(description = "Plays the sound specified by the Source property.")
+    /* @SimpleFunction(description = "Plays the sound specified by the Source property.") */
     public void Play() {
         if (soundId != 0) {
             long currentTime = System.currentTimeMillis();
@@ -255,7 +284,7 @@ public class Sound extends AndroidNonvisibleComponent
     /**
      * Pauses playing the sound if it is being played.
      */
-    @SimpleFunction(description = "Pauses playing the sound if it is being played.")
+    /* @SimpleFunction(description = "Pauses playing the sound if it is being played.") */
     public void Pause() {
         if (streamId != 0) {
             soundPool.pause(streamId);
@@ -267,7 +296,7 @@ public class Sound extends AndroidNonvisibleComponent
     /**
      * Resumes playing the sound after a pause.
      */
-    @SimpleFunction(description = "Resumes playing the sound after a pause.")
+    /* @SimpleFunction(description = "Resumes playing the sound after a pause.") */
     public void Resume() {
         if (streamId != 0) {
             soundPool.resume(streamId);
@@ -279,7 +308,7 @@ public class Sound extends AndroidNonvisibleComponent
     /**
      * Stops playing the sound if it is being played.
      */
-    @SimpleFunction(description = "Stops playing the sound if it is being played.")
+    /* @SimpleFunction(description = "Stops playing the sound if it is being played.") */
     public void Stop() {
         if (streamId != 0) {
             soundPool.stop(streamId);
@@ -292,13 +321,14 @@ public class Sound extends AndroidNonvisibleComponent
     /**
      * Vibrates for the specified number of milliseconds.
      */
-    @SimpleFunction(description = "Vibrates for the specified number of milliseconds.")
+    /* @SimpleFunction(description = "Vibrates for the specified number of milliseconds.") */
     public void Vibrate(int millisecs) {
         vibe.vibrate(millisecs);
     }
 
-    @SimpleEvent(description = "The SoundError event is no longer used. " +
-            "Please use the Screen.ErrorOccurred event instead.")
+    /* @SimpleEvent(description = "The SoundError event is no longer used. " +
+        "Please use the Screen.ErrorOccurred event instead.",
+        userVisible = false) */
     public void SoundError(String message) {
     }
 

@@ -5,25 +5,35 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.MapFeature;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.GeometryUtil;
 import com.google.appinventor.components.runtime.util.MapFactory;
-import com.google.appinventor.components.runtime.util.MapFactory.*;
-import com.google.appinventor.components.runtime.util.YailList;
+import com.google.appinventor.components.runtime.util.MapFactory.MapCircle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureVisitor;
+import com.google.appinventor.components.runtime.util.MapFactory.MapLineString;
+import com.google.appinventor.components.runtime.util.MapFactory.MapMarker;
+import com.google.appinventor.components.runtime.util.MapFactory.MapPolygon;
+import com.google.appinventor.components.runtime.util.MapFactory.MapRectangle;
+
 import org.locationtech.jts.geom.Geometry;
 import org.osmdroid.util.GeoPoint;
+
+import com.google.appinventor.components.runtime.util.GeometryUtil;
+import com.google.appinventor.components.runtime.util.YailList;
 
 /**
  * `Rectangle`s are polygons with fixed latitudes and longitudes for the north, south, east, and
  * west boundaries. Moving a vertex of the `Rectangle` updates the appropriate edges accordingly.
  */
-public class Rectangle extends PolygonBase implements MapRectangle {
+/* @DesignerComponent(version = YaVersion.RECTANGLE_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "Rectangles are polygons with fixed latitudes and longitudes for the north, south, east, and west boundaries. Moving a vertex of the Rectangle updates the appropriate edges accordingly.",
+    iconName = "images//rectangle.png") */
+/* @SimpleObject
+ */public class Rectangle extends PolygonBase implements MapRectangle {
     private static final MapFeatureVisitor<Double> distanceComputation = new MapFeatureVisitor<Double>() {
         @Override
         public Double visit(MapMarker marker, Object... arguments) {
@@ -81,10 +91,10 @@ public class Rectangle extends PolygonBase implements MapRectangle {
     }
 
     @Override
-    @SimpleProperty(
-            description = "Returns the type of the feature. For rectangles, this returns "
-                    + "MapFeature.Rectangle (\"Rectangle\").")
-    public @Options(MapFeature.class) String Type() {
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Returns the type of the feature. For rectangles, this returns "
+          + "MapFeature.Rectangle (\"Rectangle\").") */
+    public /* @Options(MapFeature.class) */ String Type() {
         return TypeAbstract().toUnderlyingValue();
     }
 
@@ -104,11 +114,11 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @param east the new east bound of the rectangle, in decimal degrees. Range: [-180, 180]
      */
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0")
-    @SimpleProperty(
-            description = "The east edge of the rectangle, in decimal degrees east "
-                    + "of the prime meridian.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "0") */
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The east edge of the rectangle, in decimal degrees east "
+          + "of the prime meridian.") */
     public void EastLongitude(double east) {
         this.east = east;
         clearGeometry();
@@ -119,8 +129,8 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @suppressdoc
      */
     @Override
-    @SimpleProperty
-    public double EastLongitude() {
+    /* @SimpleProperty
+     */ public double EastLongitude() {
         return east;
     }
 
@@ -130,11 +140,11 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @param north the new northern bound of the rectangle, in decimal degrees. Range: [-90, 90]
      */
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0")
-    @SimpleProperty(
-            description = "The north edge of the rectangle, in decimal degrees north"
-                    + " of the equator.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "0") */
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The north edge of the rectangle, in decimal degrees north"
+          + " of the equator.") */
     public void NorthLatitude(double north) {
         this.north = north;
         clearGeometry();
@@ -145,8 +155,8 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @suppressdoc
      */
     @Override
-    @SimpleProperty
-    public double NorthLatitude() {
+    /* @SimpleProperty
+     */ public double NorthLatitude() {
         return north;
     }
 
@@ -156,11 +166,11 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @param south the new southern bound of the rectangle, in decimal degrees. Range: [-90, 90]
      */
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0")
-    @SimpleProperty(
-            description = "The south edge of the rectangle, in decimal degrees north"
-                    + " of the equator.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "0") */
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The south edge of the rectangle, in decimal degrees north"
+          + " of the equator.") */
     public void SouthLatitude(double south) {
         this.south = south;
         clearGeometry();
@@ -171,8 +181,8 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @suppressdoc
      */
     @Override
-    @SimpleProperty
-    public double SouthLatitude() {
+    /* @SimpleProperty
+     */ public double SouthLatitude() {
         return south;
     }
 
@@ -182,11 +192,11 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @param west the new western bound of the rectangle, in decimal degrees. Range: [-180, 180]
      */
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0")
-    @SimpleProperty(
-            description = "The west edge of the rectangle, in decimal degrees east"
-                    + " of the equator.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "0") */
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The west edge of the rectangle, in decimal degrees east"
+          + " of the equator.") */
     public void WestLongitude(double west) {
         this.west = west;
         clearGeometry();
@@ -197,8 +207,8 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @suppressdoc
      */
     @Override
-    @SimpleProperty
-    public double WestLongitude() {
+    /* @SimpleProperty
+     */ public double WestLongitude() {
         return west;
     }
 
@@ -206,8 +216,8 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * Returns the center of the `Rectangle` as a list of the form `(Latitude Longitude)`.
      */
     @Override
-    @SimpleFunction(description = "Returns the center of the Rectangle as a list of the form " +
-            "(Latitude Longitude).")
+  /* @SimpleFunction(description = "Returns the center of the Rectangle as a list of the form " +
+      "(Latitude Longitude).") */
     public YailList Center() {
         return GeometryUtil.asYailList(getCentroid());
     }
@@ -216,8 +226,8 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * Returns the bounding box of the `Rectangle` in the format `((North West) (South East))`.
      */
     @Override
-    @SimpleFunction(description = "Returns the bounding box of the Rectangle in the format " +
-            "((North West) (South East)).")
+  /* @SimpleFunction(description = "Returns the bounding box of the Rectangle in the format " +
+      "((North West) (South East)).") */
     public YailList Bounds() {
         YailList nw = YailList.makeList(new Double[]{north, west});
         YailList se = YailList.makeList(new Double[]{south, east});
@@ -232,9 +242,9 @@ public class Rectangle extends PolygonBase implements MapRectangle {
      * @param longitude the longitude of the new rectangle center.
      */
     @Override
-    @SimpleFunction(description = "Moves the Rectangle so that it is centered on the given " +
-            "latitude and longitude while attempting to maintain the width and height of the Rectangle " +
-            "as measured from the center to the edges.")
+  /* @SimpleFunction(description = "Moves the Rectangle so that it is centered on the given " +
+      "latitude and longitude while attempting to maintain the width and height of the Rectangle " +
+      "as measured from the center to the edges.") */
     public void SetCenter(double latitude, double longitude) {
         if (latitude < -90 || latitude > 90) {
             container.$form().dispatchErrorOccurredEvent(this, "SetCenter", ErrorMessages.ERROR_INVALID_POINT, latitude, longitude);

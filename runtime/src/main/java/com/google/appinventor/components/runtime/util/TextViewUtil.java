@@ -13,6 +13,11 @@ import android.text.Html;
 import android.view.Gravity;
 import android.widget.TextView;
 import com.google.appinventor.components.runtime.Component;
+import com.google.appinventor.components.runtime.Form;
+import com.google.appinventor.components.runtime.ReplForm;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Helper methods for manipulating {@link TextView} objects.
@@ -121,28 +126,19 @@ public class TextViewUtil {
      * @param bold     true for bold, false for not bold
      * @param italic   true for italic, false for not italic
      */
-    public static void setFontTypeface(TextView textview, int typeface,
+    public static void setFontTypeface(Form form, TextView textview, String typeface,
                                        boolean bold, boolean italic) {
         Typeface tf;
-        switch (typeface) {
-            default:
-                throw new IllegalArgumentException();
-
-            case Component.TYPEFACE_DEFAULT:
-                tf = Typeface.DEFAULT;
-                break;
-
-            case Component.TYPEFACE_SERIF:
-                tf = Typeface.SERIF;
-                break;
-
-            case Component.TYPEFACE_SANSSERIF:
-                tf = Typeface.SANS_SERIF;
-                break;
-
-            case Component.TYPEFACE_MONOSPACE:
-                tf = Typeface.MONOSPACE;
-                break;
+        if (typeface.equals(Component.TYPEFACE_DEFAULT)) {
+            tf = Typeface.DEFAULT;
+        } else if (typeface.equals(Component.TYPEFACE_SANSSERIF)) {
+            tf = Typeface.SANS_SERIF;
+        } else if (typeface.equals(Component.TYPEFACE_SERIF)) {
+            tf = Typeface.SERIF;
+        } else if (typeface.equals(Component.TYPEFACE_MONOSPACE)) {
+            tf = Typeface.MONOSPACE;
+        } else {
+            tf = getTypeFace(form, typeface);
         }
 
         int style = 0;
@@ -154,6 +150,36 @@ public class TextViewUtil {
         }
         textview.setTypeface(Typeface.create(tf, style));
         textview.requestLayout();
+    }
+
+    /**
+     * Gets typeface.
+     *
+     * @param form     the form
+     * @param fontFile the font file
+     * @return the typeface
+     */
+    public static Typeface getTypeFace(Form form, String fontFile) {
+        if (fontFile == null || fontFile.isEmpty()) {
+            return null;
+        }
+        Typeface typeface = null;
+        File file;
+        if (!fontFile.contains("/")) {
+            if (form instanceof ReplForm) {
+                try {
+                    file = new File(MediaUtil.fileUrlToFilePath(form.getAssetPath(fontFile)));
+                    typeface = Typeface.createFromFile(file);
+                } catch (IOException ioe) {
+                }
+            } else {
+                typeface = Typeface.createFromAsset(form.$context().getAssets(), fontFile);
+            }
+        } else {
+            file = new File(fontFile);
+            typeface = Typeface.createFromFile(file);
+        }
+        return typeface;
     }
 
     /**

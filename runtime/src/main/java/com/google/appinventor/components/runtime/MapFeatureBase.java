@@ -5,19 +5,24 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.GeometryUtil;
 import com.google.appinventor.components.runtime.util.MapFactory;
-import com.google.appinventor.components.runtime.util.MapFactory.*;
+import com.google.appinventor.components.runtime.util.MapFactory.HasStroke;
+import com.google.appinventor.components.runtime.util.MapFactory.MapCircle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeature;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureContainer;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureVisitor;
+import com.google.appinventor.components.runtime.util.MapFactory.MapLineString;
+import com.google.appinventor.components.runtime.util.MapFactory.MapMarker;
+import com.google.appinventor.components.runtime.util.MapFactory.MapPolygon;
+import com.google.appinventor.components.runtime.util.MapFactory.MapRectangle;
 import com.google.appinventor.components.runtime.util.YailList;
 import org.locationtech.jts.geom.Geometry;
 import org.osmdroid.util.GeoPoint;
 
-public abstract class MapFeatureBase implements MapFeature, HasStroke {
+/* @SimpleObject
+ */public abstract class MapFeatureBase implements MapFeature, HasStroke {
     private final MapFeatureVisitor<Double> distanceComputation;
     protected MapFeatureContainer container = null;
     protected Map map = null;
@@ -105,10 +110,10 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
     }
 
     @SuppressWarnings("squid:S00100")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
-            defaultValue = "True")
-    @SimpleProperty
-    public void Visible(boolean visibility) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */ public void Visible(boolean visibility) {
         if (visible == visibility) {
             return;
         }
@@ -125,18 +130,18 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * Specifies whether the `%type%` should be visible on the screen.  Value is `true`{:.logic.block}
      * if the `%type%` is showing and `false`{:.logic.block} if hidden.
      */
-    @SimpleProperty(
-            description = "Specifies whether the %type% should be visible on the screen. "
-                    + "Value is true if the component is showing and false if hidden.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "Specifies whether the %type% should be visible on the screen. "
+          + "Value is true if the component is showing and false if hidden.") */
     public boolean Visible() {
         return visible;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK)
-    @SimpleProperty
-    public void StrokeColor(int argb) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK) */
+    /* @SimpleProperty
+     */ public void StrokeColor(int argb) {
         strokeColor = argb;
         map.getController().updateFeatureStroke(this);
     }
@@ -145,17 +150,18 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * Sets or gets the color used to outline the `%type%`.
      */
     @Override
-    @SimpleProperty(
-            description = "The paint color used to outline the %type%.")
-    public int StrokeColor() {
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The paint color used to outline the %type%.") */
+    /* @IsColor
+     */ public int StrokeColor() {
         return strokeColor;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "1.0")
-    @SimpleProperty
-    public void StrokeOpacity(float opacity) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "1.0") */
+    /* @SimpleProperty
+     */ public void StrokeOpacity(float opacity) {
         strokeOpacity = opacity;
         strokeColor = (strokeColor & 0x00FFFFFF) | (Math.round(0xFF * opacity) << 24);
         map.getController().updateFeatureStroke(this);
@@ -166,17 +172,17 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * a value of 1.0 will be opaque.
      */
     @Override
-    @SimpleProperty(
-            description = "The opacity of the stroke used to outline the map feature.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+    description = "The opacity of the stroke used to outline the map feature.") */
     public float StrokeOpacity() {
         return strokeOpacity;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER,
-            defaultValue = "1")
-    @SimpleProperty
-    public void StrokeWidth(int width) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER,
+      defaultValue = "1") */
+    /* @SimpleProperty
+     */ public void StrokeWidth(int width) {
         strokeWidth = width;
         map.getController().updateFeatureStroke(this);
     }
@@ -185,16 +191,16 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * Sets or gets the width of the stroke used to outline the `%type%`.
      */
     @Override
-    @SimpleProperty(
-            description = "The width of the stroke used to outline the %type%.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The width of the stroke used to outline the %type%.") */
     public int StrokeWidth() {
         return strokeWidth;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
     public void Draggable(boolean draggable) {
         this.draggable = draggable;
         map.getController().updateFeatureDraggable(this);
@@ -205,16 +211,16 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * long-pressing and then dragging the `%type%` to a new location.
      */
     @Override
-    @SimpleProperty(description = "The Draggable property is used to set whether or not the user " +
-            "can drag the %type% by long-pressing and then dragging the %type% to a new location.")
+  /* @SimpleProperty(description = "The Draggable property is used to set whether or not the user " +
+      "can drag the %type% by long-pressing and then dragging the %type% to a new location.") */
     public boolean Draggable() {
         return this.draggable;
     }
 
     @Override
-    @DesignerProperty
-    @SimpleProperty
-    public void Title(String title) {
+    /* @DesignerProperty
+     *//* @SimpleProperty
+     */ public void Title(String title) {
         this.title = title;
         map.getController().updateFeatureText(this);
     }
@@ -224,17 +230,17 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * map feature.
      */
     @Override
-    @SimpleProperty(
-            description = "The title displayed in the info window that appears when the user clicks " +
-                    "on the %type%.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The title displayed in the info window that appears when the user clicks " +
+      "on the %type%.") */
     public String Title() {
         return title;
     }
 
     @Override
-    @DesignerProperty
-    @SimpleProperty
-    public void Description(String description) {
+    /* @DesignerProperty
+     *//* @SimpleProperty
+     */ public void Description(String description) {
         this.description = description;
         map.getController().updateFeatureText(this);
     }
@@ -244,18 +250,18 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * user taps on the `%type%`.
      */
     @Override
-    @SimpleProperty(
-            description = "The description displayed in the info window that appears when the user " +
-                    "clicks on the %type%.")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The description displayed in the info window that appears when the user " +
+      "clicks on the %type%.") */
     public String Description() {
         return description;
     }
 
     @Override
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
-    public void EnableInfobox(boolean enable) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty
+     */ public void EnableInfobox(boolean enable) {
         this.infobox = enable;
         map.getController().updateFeatureText(this);
     }
@@ -264,8 +270,8 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * Enables or disables the infobox window display when the user taps the `%type%`.
      */
     @Override
-    @SimpleProperty(
-            description = "Enable or disable the infobox window display when the user taps the %type%.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+  description = "Enable or disable the infobox window display when the user taps the %type%.") */
     public boolean EnableInfobox() {
         return infobox;
     }
@@ -275,8 +281,8 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * This method can be used to show the info box even if {@link #EnableInfobox()} is false.
      */
     @Override
-    @SimpleFunction(description = "Show the infobox for the %type%. This will show the infobox " +
-            "even if EnableInfobox is set to false.")
+  /* @SimpleFunction(description = "Show the infobox for the %type%. This will show the infobox " +
+      "even if EnableInfobox is set to false.") */
     public void ShowInfobox() {
         map.getController().showInfobox(this);
     }
@@ -285,8 +291,8 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * Hides the `%type%`'s info box if it is visible. Otherwise, no action is taken.
      */
     @Override
-    @SimpleFunction(description = "Hide the infobox if it is shown. If the infobox is not " +
-            "visible this function has no effect.")
+  /* @SimpleFunction(description = "Hide the infobox if it is shown. If the infobox is not " +
+      "visible this function has no effect.") */
     public void HideInfobox() {
         map.getController().hideInfobox(this);
     }
@@ -311,8 +317,8 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * an error.
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleFunction(description = "Compute the distance, in meters, between a %type% and a " +
-            "latitude, longitude point.")
+  /* @SimpleFunction(description = "Compute the distance, in meters, between a %type% and a " +
+      "latitude, longitude point.") */
     public double DistanceToPoint(double latitude, double longitude, boolean centroid) {
         return accept(distanceToPoint, new GeoPoint(latitude, longitude), centroid);
     }
@@ -330,7 +336,7 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * @return The distance in meters between the two features or -1 if there is an error.
      */
     @SuppressWarnings("squid:S00100")
-    @SimpleFunction(description = "Compute the distance, in meters, between two map features.")
+    /* @SimpleFunction(description = "Compute the distance, in meters, between two map features.") */
     public double DistanceToFeature(MapFeature mapFeature, final boolean centroids) {
         return mapFeature == null ? -1 : mapFeature.accept(distanceComputation, this, centroids);
     }
@@ -341,7 +347,7 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * The `Click` event runs when the user taps on the `%type%`.
      */
     @Override
-    @SimpleEvent(description = "The user clicked on the %type%.")
+    /* @SimpleEvent(description = "The user clicked on the %type%.") */
     public void Click() {
         EventDispatcher.dispatchEvent(this, "Click");
         container.FeatureClick(this);
@@ -353,8 +359,8 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * uses the same gesture as {@link #StartDrag()}.
      */
     @Override
-    @SimpleEvent(description = "The user long-pressed on the %type%. This event will only " +
-            "trigger if Draggable is false.")
+  /* @SimpleEvent(description = "The user long-pressed on the %type%. This event will only " +
+      "trigger if Draggable is false.") */
     public void LongClick() {
         EventDispatcher.dispatchEvent(this, "LongClick");
         container.FeatureLongClick(this);
@@ -366,7 +372,7 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * {@link #StopDrag()} events.
      */
     @Override
-    @SimpleEvent(description = "The user started a drag operation.")
+    /* @SimpleEvent(description = "The user started a drag operation.") */
     public void StartDrag() {
         EventDispatcher.dispatchEvent(this, "StartDrag");
         container.FeatureStartDrag(this);
@@ -376,7 +382,7 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * The `Drag` event runs in response to position updates of the `%type%` as the user drags it.
      */
     @Override
-    @SimpleEvent(description = "The user dragged the %type%.")
+    /* @SimpleEvent(description = "The user dragged the %type%.") */
     public void Drag() {
         EventDispatcher.dispatchEvent(this, "Drag");
         container.FeatureDrag(this);
@@ -386,7 +392,7 @@ public abstract class MapFeatureBase implements MapFeature, HasStroke {
      * The `StopDrag` event runs when the user releases the `%type%` at the end of a drag.
      */
     @Override
-    @SimpleEvent(description = "The user stopped a drag operation.")
+    /* @SimpleEvent(description = "The user stopped a drag operation.") */
     public void StopDrag() {
         EventDispatcher.dispatchEvent(this, "StopDrag");
         container.FeatureStopDrag(this);

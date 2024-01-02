@@ -9,7 +9,18 @@ import android.view.View;
 import com.google.appinventor.components.common.MapType;
 import com.google.appinventor.components.common.ScaleUnits;
 import com.google.appinventor.components.runtime.LocationSensor;
-import com.google.appinventor.components.runtime.util.MapFactory.*;
+import com.google.appinventor.components.runtime.util.MapFactory.HasFill;
+import com.google.appinventor.components.runtime.util.MapFactory.HasStroke;
+import com.google.appinventor.components.runtime.util.MapFactory.MapCircle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapController;
+import com.google.appinventor.components.runtime.util.MapFactory.MapEventListener;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeature;
+import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureCollection;
+import com.google.appinventor.components.runtime.util.MapFactory.MapLineString;
+import com.google.appinventor.components.runtime.util.MapFactory.MapMarker;
+import com.google.appinventor.components.runtime.util.MapFactory.MapPolygon;
+import com.google.appinventor.components.runtime.util.MapFactory.MapRectangle;
+import com.google.appinventor.components.runtime.util.MapFactory.MapScaleUnits;
 import org.osmdroid.util.BoundingBox;
 
 class DummyMapController implements MapController {

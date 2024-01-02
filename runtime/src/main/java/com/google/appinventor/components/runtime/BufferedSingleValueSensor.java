@@ -3,16 +3,18 @@
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
-
 package com.google.appinventor.components.runtime;
 
+import android.content.Context;
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 
 /**
  * A single-value sensor whose most recent values should be buffered
  * and averaged.
  */
-public abstract class BufferedSingleValueSensor extends SingleValueSensor {
+/* @SimpleObject
+ */public abstract class BufferedSingleValueSensor extends SingleValueSensor {
     private AveragingBuffer buffer;
 
     public BufferedSingleValueSensor(ComponentContainer container,

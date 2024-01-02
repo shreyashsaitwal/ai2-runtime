@@ -6,11 +6,17 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.*;
+import com.google.appinventor.components.common.NxtMotorMode;
+import com.google.appinventor.components.common.NxtMotorPort;
+import com.google.appinventor.components.common.NxtRegulationMode;
+import com.google.appinventor.components.common.NxtRunState;
+import com.google.appinventor.components.common.NxtSensorMode;
+import com.google.appinventor.components.common.NxtSensorPort;
+import com.google.appinventor.components.common.NxtSensorType;
+import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+
+import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
@@ -22,7 +28,8 @@ import java.util.Map;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class LegoMindstormsNxtBase extends AndroidNonvisibleComponent
+/* @SimpleObject
+ */public class LegoMindstormsNxtBase extends AndroidNonvisibleComponent
         implements BluetoothConnectionListener, Component, Deleteable {
     private static final int TOY_ROBOT = 0x0804; // from android.bluetooth.BluetoothClass.Device.
 
@@ -73,7 +80,6 @@ public class LegoMindstormsNxtBase extends AndroidNonvisibleComponent
     // TODO(lizlooney) - allow communication via USB if possible.
     protected BluetoothClient bluetooth;
 
-
     /**
      * Creates a new LegoMindstormsNxtBase.
      */
@@ -99,8 +105,9 @@ public class LegoMindstormsNxtBase extends AndroidNonvisibleComponent
     /**
      * Returns the BluetoothClient component that should be used for communication.
      */
-    @SimpleProperty(
-            description = "The BluetoothClient component that should be used for communication.", userVisible = false)
+  /* @SimpleProperty(
+      description = "The BluetoothClient component that should be used for communication.",
+      category = PropertyCategory.BEHAVIOR, userVisible = false) */
     public BluetoothClient BluetoothClient() {
         return bluetooth;
     }
@@ -109,9 +116,9 @@ public class LegoMindstormsNxtBase extends AndroidNonvisibleComponent
      * Specifies the BluetoothClient component that should be used for communication.
      * **Must be set in the Designer.**
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BLUETOOTHCLIENT,
-            defaultValue = "")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BLUETOOTHCLIENT,
+      defaultValue = "") */
+    /* @SimpleProperty(userVisible = false) */
     public void BluetoothClient(BluetoothClient bluetoothClient) {
         if (bluetooth != null) {
             bluetooth.removeBluetoothConnectionListener(this);
@@ -284,7 +291,6 @@ public class LegoMindstormsNxtBase extends AndroidNonvisibleComponent
     protected final byte[] lsRead(String functionName, NxtSensorPort port) {
         return lsRead(functionName, port.toInt());
     }
-
 
     /*
      * Checks whether the bluetooth property has been set or whether this

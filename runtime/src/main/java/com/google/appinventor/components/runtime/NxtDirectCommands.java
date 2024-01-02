@@ -7,9 +7,18 @@
 package com.google.appinventor.components.runtime;
 
 import android.util.Log;
-import com.google.appinventor.components.annotations.Options;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.common.*;
+
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.NxtMailbox;
+import com.google.appinventor.components.common.NxtMotorMode;
+import com.google.appinventor.components.common.NxtMotorPort;
+import com.google.appinventor.components.common.NxtRegulationMode;
+import com.google.appinventor.components.common.NxtRunState;
+import com.google.appinventor.components.common.NxtSensorMode;
+import com.google.appinventor.components.common.NxtSensorPort;
+import com.google.appinventor.components.common.NxtSensorType;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.FileUtil;
 import com.google.appinventor.components.runtime.util.MediaUtil;
@@ -19,6 +28,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +40,14 @@ import java.util.List;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class NxtDirectCommands extends LegoMindstormsNxtBase {
+/* @DesignerComponent(version = YaVersion.NXT_DIRECT_COMMANDS_COMPONENT_VERSION,
+    description = "A component that provides a low-level interface to a LEGO MINDSTORMS NXT " +
+    "robot, with functions to send NXT Direct Commands.",
+    category = ComponentCategory.LEGOMINDSTORMS,
+    nonVisible = true,
+    iconName = "images//legoMindstormsNxt.png") */
+/* @SimpleObject
+ */public class NxtDirectCommands extends LegoMindstormsNxtBase {
 
     /**
      * Creates a new NxtDirectCommands component.
@@ -44,8 +61,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
     // necessary) and starting the helper program. This would minimize the programming blocks for a
     // classroom project.
 
-    @SimpleFunction(description = "Start execution of a previously downloaded program on " +
-            "the robot.")
+    /* @SimpleFunction(description = "Start execution of a previously downloaded program on " +
+        "the robot.") */
     public void StartProgram(String programName) {
         String functionName = "StartProgram";
         if (!checkBluetooth(functionName)) {
@@ -67,8 +84,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Stop execution of the currently running program on " +
-            "the robot.")
+    /* @SimpleFunction(description = "Stop execution of the currently running program on " +
+        "the robot.") */
     public void StopProgram() {
         String functionName = "StopProgram";
         if (!checkBluetooth(functionName)) {
@@ -81,7 +98,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Play a sound file on the robot.")
+    /* @SimpleFunction(description = "Play a sound file on the robot.") */
     public void PlaySoundFile(String fileName) {
         String functionName = "PlaySoundFile";
         if (!checkBluetooth(functionName)) {
@@ -104,7 +121,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Make the robot play a tone.")
+    /* @SimpleFunction(description = "Make the robot play a tone.") */
     public void PlayTone(int frequencyHz, int durationMs) {
         String functionName = "PlayTone";
         if (!checkBluetooth(functionName)) {
@@ -127,15 +144,15 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Sets the output state of a motor on the robot.")
+    /* @SimpleFunction(description = "Sets the output state of a motor on the robot.") */
     public void SetOutputState(
-            @Options(NxtMotorPort.class) String motorPortLetter,
-            int power,
-            @Options(NxtMotorMode.class) int mode,
-            @Options(NxtRegulationMode.class) int regulationMode,
-            int turnRatio,
-            @Options(NxtRunState.class) int runState,
-            long tachoLimit) {
+            /* @Options(NxtMotorPort.class) */ String motorPortLetter,
+                                               int power,
+            /* @Options(NxtMotorMode.class) */ int mode,
+            /* @Options(NxtRegulationMode.class) */ int regulationMode,
+                                               int turnRatio,
+            /* @Options(NxtRunState.class) */ int runState,
+                                               long tachoLimit) {
         String functionName = "SetOutputState";
         if (!checkBluetooth(functionName)) {
             return;
@@ -179,11 +196,11 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
                 tachoLimit);
     }
 
-    @SimpleFunction(description = "Configure an input sensor on the robot.")
+    /* @SimpleFunction(description = "Configure an input sensor on the robot.") */
     public void SetInputMode(
-            @Options(NxtSensorPort.class) String sensorPortLetter,
-            @Options(NxtSensorType.class) int sensorType,
-            @Options(NxtSensorMode.class) int sensorMode) {
+            /* @Options(NxtSensorPort.class) */ String sensorPortLetter,
+            /* @Options(NxtSensorType.class) */ int sensorType,
+            /* @Options(NxtSensorMode.class) */ int sensorMode) {
         String functionName = "SetInputMode";
         if (!checkBluetooth(functionName)) {
             return;
@@ -216,8 +233,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         setInputMode(functionName, port, type, mode);
     }
 
-    @SimpleFunction(description = "Reads the output state of a motor on the robot.")
-    public List<Number> GetOutputState(@Options(NxtMotorPort.class) String motorPortLetter) {
+    /* @SimpleFunction(description = "Reads the output state of a motor on the robot.") */
+    public List<Number> GetOutputState(/* @Options(NxtMotorPort.class) */ String motorPortLetter) {
         String functionName = "GetOutputState";
         if (!checkBluetooth(functionName)) {
             return new ArrayList<Number>();
@@ -267,9 +284,9 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return null;
     }
 
-    @SimpleFunction(description = "Reads the values of an input sensor on the robot. " +
-            "Assumes sensor type has been configured via SetInputMode.")
-    public List<Object> GetInputValues(@Options(NxtSensorPort.class) String sensorPortLetter) {
+    /* @SimpleFunction(description = "Reads the values of an input sensor on the robot. " +
+        "Assumes sensor type has been configured via SetInputMode.") */
+    public List<Object> GetInputValues(/* @Options(NxtSensorPort.class) */ String sensorPortLetter) {
         String functionName = "GetInputValues";
         if (!checkBluetooth(functionName)) {
             return new ArrayList<Object>();
@@ -301,8 +318,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return new ArrayList<Object>();
     }
 
-    @SimpleFunction(description = "Reset the scaled value of an input sensor on the robot.")
-    public void ResetInputScaledValue(@Options(NxtSensorPort.class) String sensorPortLetter) {
+    /* @SimpleFunction(description = "Reset the scaled value of an input sensor on the robot.") */
+    public void ResetInputScaledValue(/* @Options(NxtSensorPort.class) */ String sensorPortLetter) {
         String functionName = "ResetInputScaledValue";
         if (!checkBluetooth(functionName)) {
             return;
@@ -324,10 +341,10 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Reset motor position.")
+    /* @SimpleFunction(description = "Reset motor position.") */
     public void ResetMotorPosition(
-            @Options(NxtMotorPort.class) String motorPortLetter,
-            boolean relative) {
+            /* @Options(NxtMotorPort.class) */ String motorPortLetter,
+                                               boolean relative) {
         String functionName = "ResetMotorPosition";
         if (!checkBluetooth(functionName)) {
             return;
@@ -349,8 +366,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Get the battery level for the robot. " +
-            "Returns the voltage in millivolts.")
+    /* @SimpleFunction(description = "Get the battery level for the robot. " +
+        "Returns the voltage in millivolts.") */
     public int GetBatteryLevel() {
         String functionName = "GetBatteryLevel";
         if (!checkBluetooth(functionName)) {
@@ -372,7 +389,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return 0;
     }
 
-    @SimpleFunction(description = "Stop sound playback.")
+    /* @SimpleFunction(description = "Stop sound playback.") */
     public void StopSoundPlayback() {
         String functionName = "StopSoundPlayback";
         if (!checkBluetooth(functionName)) {
@@ -385,8 +402,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         sendCommand(functionName, command);
     }
 
-    @SimpleFunction(description = "Keep Alive. " +
-            "Returns the current sleep time limit in milliseconds.")
+    /* @SimpleFunction(description = "Keep Alive. " +
+        "Returns the current sleep time limit in milliseconds.") */
     public long KeepAlive() {
         String functionName = "KeepAlive";
         if (!checkBluetooth(functionName)) {
@@ -408,8 +425,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return 0;
     }
 
-    @SimpleFunction(description = "Returns the count of available bytes to read.")
-    public int LsGetStatus(@Options(NxtSensorPort.class) String sensorPortLetter) {
+    /* @SimpleFunction(description = "Returns the count of available bytes to read.") */
+    public int LsGetStatus(/* @Options(NxtSensorPort.class) */ String sensorPortLetter) {
         String functionName = "LsGetStatus";
         if (!checkBluetooth(functionName)) {
             return 0;
@@ -426,12 +443,12 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return lsGetStatus(functionName, port);
     }
 
-    @SimpleFunction(description = "Writes low speed data to an input sensor on the robot. " +
-            "Assumes sensor type has been configured via SetInputMode.")
+    /* @SimpleFunction(description = "Writes low speed data to an input sensor on the robot. " +
+        "Assumes sensor type has been configured via SetInputMode.") */
     public void LsWrite(
-            @Options(NxtSensorPort.class) String sensorPortLetter,
-            YailList list,
-            int rxDataLength) {
+            /* @Options(NxtSensorPort.class) */ String sensorPortLetter,
+                                                YailList list,
+                                                int rxDataLength) {
         String functionName = "LsWrite";
         if (!checkBluetooth(functionName)) {
             return;
@@ -477,10 +494,9 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         lsWrite(functionName, port, bytes, rxDataLength);
     }
 
-
-    @SimpleFunction(description = "Reads unsigned low speed data from an input sensor on the " +
-            "robot. Assumes sensor type has been configured via SetInputMode.")
-    public List<Integer> LsRead(@Options(NxtSensorPort.class) String sensorPortLetter) {
+    /* @SimpleFunction(description = "Reads unsigned low speed data from an input sensor on the " +
+        "robot. Assumes sensor type has been configured via SetInputMode.") */
+    public List<Integer> LsRead(/* @Options(NxtSensorPort.class) */ String sensorPortLetter) {
         String functionName = "LsRead";
         if (!checkBluetooth(functionName)) {
             return new ArrayList<Integer>();
@@ -509,8 +525,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return new ArrayList<Integer>();
     }
 
-    @SimpleFunction(description = "Get the name of currently running program on " +
-            "the robot.")
+    /* @SimpleFunction(description = "Get the name of currently running program on " +
+        "the robot.") */
     public String GetCurrentProgramName() {
         String functionName = "GetCurrentProgramName";
         if (!checkBluetooth(functionName)) {
@@ -535,8 +551,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return "";
     }
 
-    @SimpleFunction(description = "Read a message from a mailbox (1-10) on the robot.")
-    public String MessageRead(@Options(NxtMailbox.class) int mailbox) {
+    /* @SimpleFunction(description = "Read a message from a mailbox (1-10) on the robot.") */
+    public String MessageRead(/* @Options(NxtMailbox.class) */ int mailbox) {
         String functionName = "MessageRead";
         // Make sure mailbox is a valid NxtMailbox.
         NxtMailbox box = NxtMailbox.fromUnderlyingValue(mailbox);
@@ -593,8 +609,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
      * @param mailbox the mailbox number
      * @param message the text of the message
      */
-    @SimpleFunction(description = "Write a message to a mailbox (1-10) on the robot.")
-    public void MessageWrite(@Options(NxtMailbox.class) int mailbox, String message) {
+    /* @SimpleFunction(description = "Write a message to a mailbox (1-10) on the robot.") */
+    public void MessageWrite(/* @Options(NxtMailbox.class) */ int mailbox, String message) {
         String functionName = "MessageWrite";
         // Make sure mailbox is a valid NxtMailbox.
         NxtMailbox box = NxtMailbox.fromUnderlyingValue(mailbox);
@@ -646,7 +662,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
      * @param source      the path of the file to download
      * @param destination the name of the file on the robot
      */
-    @SimpleFunction(description = "Download a file to the robot.")
+    /* @SimpleFunction(description = "Download a file to the robot.") */
     public void DownloadFile(String source, String destination) {
         String functionName = "DownloadFile";
         if (!checkBluetooth(functionName)) {
@@ -757,7 +773,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         evaluateStatus(functionName, returnPackage, command[1]);
     }
 
-    @SimpleFunction(description = "Delete a file on the robot.")
+    /* @SimpleFunction(description = "Delete a file on the robot.") */
     public void DeleteFile(String fileName) {
         String functionName = "DeleteFile";
         if (!checkBluetooth(functionName)) {
@@ -777,8 +793,8 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         evaluateStatus(functionName, returnPackage, command[1]);
     }
 
-    @SimpleFunction(description = "Returns a list containing the names of matching files found on " +
-            "the robot.")
+    /* @SimpleFunction(description = "Returns a list containing the names of matching files found on " +
+        "the robot.") */
     public List<String> ListFiles(String wildcard) {
         String functionName = "ListFiles";
         if (!checkBluetooth(functionName)) {
@@ -811,9 +827,9 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         return fileNames;
     }
 
-    @SimpleFunction(description = "Get the firmware and protocol version numbers for the robot as" +
-            " a list where the first element is the firmware version number and the second element is" +
-            " the protocol version number.")
+    /* @SimpleFunction(description = "Get the firmware and protocol version numbers for the robot as" +
+        " a list where the first element is the firmware version number and the second element is" +
+        " the protocol version number.") */
     public List<String> GetFirmwareVersion() {
         String functionName = "GetFirmwareVersion";
         if (!checkBluetooth(functionName)) {
@@ -855,7 +871,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
     // The new name will appear on the NXT LCD immediately,
     // but the AddressesAndNames property does not update until
     // the app is restarted.
-    @SimpleFunction(description = "Set the brick name of the robot.")
+    /* @SimpleFunction(description = "Set the brick name of the robot.") */
     public void SetBrickName(String name) {
         String functionName = "SetBrickName";
         if (!checkBluetooth(functionName)) {
@@ -870,7 +886,7 @@ public class NxtDirectCommands extends LegoMindstormsNxtBase {
         evaluateStatus(functionName, returnPackage, command[1]);
     }
 
-    @SimpleFunction(description = "Get the brick name of the robot.")
+    /* @SimpleFunction(description = "Get the brick name of the robot.") */
     public String GetBrickName() {
         String functionName = "GetBrickName";
         if (!checkBluetooth(functionName)) {

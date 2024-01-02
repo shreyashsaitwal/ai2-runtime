@@ -6,18 +6,18 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.collect.Lists;
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 import com.google.appinventor.components.runtime.util.AsyncCallbackPair;
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.JsonUtil;
 import com.google.appinventor.components.runtime.util.WebServiceUtil;
+
+import android.os.Handler;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -44,7 +44,6 @@ import org.json.JSONException;
  * @author halabelson@google.com (Hal Abelson)
  */
 
-
 // The annotations here provide information to the compiler about
 // integrating the component into App Inventor system.  The following
 // three annotations stipulate that TinyWeb DB will appear in the
@@ -52,7 +51,14 @@ import org.json.JSONException;
 // and say what Android system permissions it requires.
 //
 
-
+/* @DesignerComponent(version = YaVersion.TINYWEBDB_COMPONENT_VERSION,
+    description = "Non-visible component that communicates with a Web service to store and " +
+    "retrieve information.",
+    category = ComponentCategory.STORAGE,
+    nonVisible = true,
+    iconName = "images//tinyWebDB.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
 public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
 
     private static final String LOG_TAG = "TinyWebDB";
@@ -98,8 +104,9 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
     /**
      * The URL to the database with which the component should communicate.
      */
-    @SimpleProperty(
-            description = "The URL of the web service database.")
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR,
+      description = "The URL of the web service database.") */
     public String ServiceURL() {
         return serviceURL;
     }
@@ -108,9 +115,10 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
      * Specifies the URL of the  Web service.
      * The default value is the demo service running on App Engine.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "http://tinywebdb.appinventor.mit.edu")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "http:////tinywebdb.appinventor.mit.edu") */
+    /* @SimpleProperty
+     */
     public void ServiceURL(String url) {
         serviceURL = url;
     }
@@ -134,7 +142,7 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
      * @param valueToStore The value to store. Can be any type of value (e.g.
      *                     number, text, boolean or list).
      */
-    @SimpleFunction(description = "Asks the Web service to store the given value under the given tag")
+    /* @SimpleFunction(description = "Asks the Web service to store the given value under the given tag") */
     // The @SimpleFunction annotation arranges for this to be a
     // function (StoreValue)  associated with the component.
     public void StoreValue(final String tag, final Object valueToStore) {
@@ -218,7 +226,7 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
     /**
      * Event indicating that a {@link #StoreValue(String, Object)}  server request has succeeded.
      */
-    @SimpleEvent(description = "Event indicating that a StoreValue server request has succeeded.")
+    /* @SimpleEvent(description = "Event indicating that a StoreValue server request has succeeded.") */
     public void ValueStored() {
         // invoke the application's "ValueStored" event handler.
         EventDispatcher.dispatchEvent(this, "ValueStored");
@@ -248,9 +256,9 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
      *
      * @param tag The tag whose value is to be retrieved.
      */
-    @SimpleFunction(description = "Sends a request to the Web service to get the value stored under "
-            + "the given tag. The Web service must decide what to return if there is no value stored "
-            + "under the tag. This component accepts whatever is returned.")
+  /* @SimpleFunction(description = "Sends a request to the Web service to get the value stored under "
+      + "the given tag. The Web service must decide what to return if there is no value stored "
+      + "under the tag. This component accepts whatever is returned.") */
     public void GetValue(final String tag) {
         final Runnable call = new Runnable() {
             public void run() {
@@ -332,7 +340,7 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
      * @param valueFromWebDB the value that was returned. Can be any type of value
      *                       (e.g. number, text, boolean or list).
      */
-    @SimpleEvent(description = "Indicates that a GetValue server request has succeeded.")
+    /* @SimpleEvent(description = "Indicates that a GetValue server request has succeeded.") */
     public void GotValue(String tagFromWebDB, Object valueFromWebDB) {
         // Invoke the application's "GotValue" event handler
         EventDispatcher.dispatchEvent(this, "GotValue", tagFromWebDB, valueFromWebDB);
@@ -343,7 +351,8 @@ public class TinyWebDB extends AndroidNonvisibleComponent implements Component {
      *
      * @param message the error message
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void WebServiceError(String message) {
         // Invoke the application's "WebServiceError" event handler
         // Log.w(LOG_TAG, "calling error event handler: " + message);

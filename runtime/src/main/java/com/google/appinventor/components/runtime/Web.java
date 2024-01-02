@@ -10,12 +10,7 @@ import android.app.Activity;
 import android.text.TextUtils;
 import android.util.Log;
 import androidx.annotation.VisibleForTesting;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.HtmlEntities;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.collect.Lists;
 import com.google.appinventor.components.runtime.collect.Maps;
 import com.google.appinventor.components.runtime.errors.DispatchableError;
@@ -50,6 +45,14 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * @author lizlooney@google.com (Liz Looney)
  * @author josmasflores@gmail.com (Jose Dominguez)
  */
+/* @DesignerComponent(version = YaVersion.WEB_COMPONENT_VERSION,
+    description = "Non-visible component that provides functions for HTTP GET, POST, PUT, and DELETE requests.",
+    category = ComponentCategory.CONNECTIVITY,
+    nonVisible = true,
+    iconName = "images//web.png") */
+/* @SimpleObject
+ *//* @UsesPermissions({INTERNET}) */
+/* @UsesLibraries(libraries = "json.jar") */
 public class Web extends AndroidNonvisibleComponent implements Component,
         ObservableDataSource<YailList, Future<YailList>> {
     private static final String LOG_TAG = "Web";
@@ -96,6 +99,7 @@ public class Web extends AndroidNonvisibleComponent implements Component,
     private YailList columns = new YailList();
     // Set of observers
     private HashSet<DataSourceChangeListener> dataSourceObservers = new HashSet<>();
+    private String responseTextEncoding = "UTF-8";
 
     /**
      * Creates a new Web component.
@@ -220,11 +224,15 @@ public class Web extends AndroidNonvisibleComponent implements Component,
         return (responseType != null) ? responseType : "";
     }
 
-    private static String getResponseContent(HttpURLConnection connection) throws IOException {
+    private static String getResponseContent(HttpURLConnection connection, String encodingProperty) throws IOException {
         // Use the content encoding to convert bytes to characters.
         String encoding = connection.getContentEncoding();
         if (encoding == null) {
-            encoding = "UTF-8";
+            if (encodingProperty == null || encodingProperty.isEmpty()) {
+                encoding = "UTF-8";
+            } else {
+                encoding = encodingProperty;
+            }
         }
         InputStreamReader reader = new InputStreamReader(getConnectionStream(connection), encoding);
         try {
@@ -316,7 +324,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @return the URL
      */
-    @SimpleProperty(description = "The URL for the web request.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "The URL for the web request.") */
     public String Url() {
         return urlString;
     }
@@ -324,11 +333,32 @@ public class Web extends AndroidNonvisibleComponent implements Component,
     /**
      * Specifies the URL.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void Url(String url) {
         urlString = url;
+    }
+
+    /**
+     * Returns the Response Text Encoding.
+     */
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "User-specified character encoding for web response.") */
+    public String ResponseTextEncoding() {
+        return responseTextEncoding;
+    }
+
+    /**
+     * Specifies the Response Text Encoding.
+     */
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "UTF-8") */
+    /* @SimpleProperty
+     */
+    public void ResponseTextEncoding(String encoding) {
+        responseTextEncoding = encoding;
     }
 
     /**
@@ -338,10 +368,11 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @return the request headers.
      */
-    @SimpleProperty(description = "The request headers, as a list of two-element sublists. The first element " +
-            "of each sublist represents the request header field name. The second element of each " +
-            "sublist represents the request header field values, either a single value or a list " +
-            "containing multiple values.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "The request headers, as a list of two-element sublists. The first element " +
+      "of each sublist represents the request header field name. The second element of each " +
+      "sublist represents the request header field values, either a single value or a list " +
+      "containing multiple values.") */
     public YailList RequestHeaders() {
         return requestHeaders;
     }
@@ -351,7 +382,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param list a list of two-element sublists, each representing a header name and values
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void RequestHeaders(YailList list) {
         // Call processRequestHeaders to validate the list parameter before setting the requestHeaders
         // field.
@@ -369,8 +401,9 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @return whether cookies should be allowed
      */
-    @SimpleProperty(description = "Whether the cookies from a response should be saved and used in subsequent " +
-            "requests. Cookies are only supported on Android version 2.3 or greater.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Whether the cookies from a response should be saved and used in subsequent " +
+      "requests. Cookies are only supported on Android version 2.3 or greater.") */
     public boolean AllowCookies() {
         return allowCookies;
     }
@@ -378,9 +411,10 @@ public class Web extends AndroidNonvisibleComponent implements Component,
     /**
      * Specifies whether cookies should be allowed
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "false")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "false") */
+    /* @SimpleProperty
+     */
     public void AllowCookies(boolean allowCookies) {
         this.allowCookies = allowCookies;
         if (allowCookies && cookieHandler == null) {
@@ -392,7 +426,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
     /**
      * Returns whether the response should be saved in a file.
      */
-    @SimpleProperty(description = "Whether the response should be saved in a file.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Whether the response should be saved in a file.") */
     public boolean SaveResponse() {
         return saveResponse;
     }
@@ -400,9 +435,10 @@ public class Web extends AndroidNonvisibleComponent implements Component,
     /**
      * Specifies whether the response should be saved in a file.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "false")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "false") */
+    /* @SimpleProperty
+     */
     public void SaveResponse(boolean saveResponse) {
         this.saveResponse = saveResponse;
     }
@@ -413,8 +449,9 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @return the name of the file where the response should be saved
      */
-    @SimpleProperty(description = "The name of the file where the response should be saved. If SaveResponse " +
-            "is true and ResponseFileName is empty, then a new file name will be generated.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "The name of the file where the response should be saved. If SaveResponse " +
+      "is true and ResponseFileName is empty, then a new file name will be generated.") */
     public String ResponseFileName() {
         return responseFileName;
     }
@@ -424,9 +461,10 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * If SaveResponse is true and ResponseFileName is empty, then a new file
      * name will be generated.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void ResponseFileName(String responseFileName) {
         this.responseFileName = responseFileName;
     }
@@ -435,8 +473,9 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * Returns the number of milliseconds that each request will wait for a response before they time out.
      * If set to 0 (the default), then the request will wait for a response indefinitely.
      */
-    @SimpleProperty(description = "The number of milliseconds that a web request will wait for a response before giving up. " +
-            "If set to 0, then there is no time limit on how long the request will wait.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "The number of milliseconds that a web request will wait for a response before giving up. " +
+          "If set to 0, then there is no time limit on how long the request will wait.") */
     public int Timeout() {
         return timeout;
     }
@@ -445,9 +484,10 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * Returns the number of milliseconds that each request will wait for a response before they time out.
      * If set to 0, then the request will wait for a response indefinitely.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "0")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "0") */
+    /* @SimpleProperty
+     */
     public void Timeout(int timeout) {
         if (timeout < 0) {
             throw new IllegalArgumentError("Web Timeout must be a non-negative integer.");
@@ -455,7 +495,7 @@ public class Web extends AndroidNonvisibleComponent implements Component,
         this.timeout = timeout;
     }
 
-    @SimpleFunction(description = "Clears all cookies for this Web component.")
+    /* @SimpleFunction(description = "Clears all cookies for this Web component.") */
     public void ClearCookies() {
         if (cookieHandler != null) {
             GingerbreadUtil.clearCookies(cookieHandler);
@@ -476,7 +516,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * If the SaveResponse property is false, the GotText event will be
      * triggered.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Get() {
         final String METHOD = "Get";
         // Capture property values in local variables before running asynchronously.
@@ -509,13 +550,13 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param text the text data for the POST request
      */
-    @SimpleFunction(description = "Performs an HTTP POST request using the Url property and " +
-            "the specified text.\n" +
-            "The characters of the text are encoded using UTF-8 encoding.\n" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The responseFileName property can be used to specify " +
-            "the name of the file.\n" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP POST request using the Url property and " +
+      "the specified text.\n" +
+      "The characters of the text are encoded using UTF-8 encoding.\n" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The responseFileName property can be used to specify " +
+      "the name of the file.\n" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PostText(final String text) {
         requestTextImpl(text, "UTF-8", "PostText", "POST");
     }
@@ -535,13 +576,13 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param encoding the character encoding to use when sending the text. If
      *                 encoding is empty or null, UTF-8 encoding will be used.
      */
-    @SimpleFunction(description = "Performs an HTTP POST request using the Url property and " +
-            "the specified text.\n" +
-            "The characters of the text are encoded using the given encoding.\n" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
-            "the name of the file.\n" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP POST request using the Url property and " +
+      "the specified text.\n" +
+      "The characters of the text are encoded using the given encoding.\n" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
+      "the name of the file.\n" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PostTextWithEncoding(final String text, final String encoding) {
         requestTextImpl(text, encoding, "PostTextWithEncoding", "POST");
     }
@@ -557,12 +598,12 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param path the path of the file for the POST request
      */
-    @SimpleFunction(description = "Performs an HTTP POST request using the Url property and " +
-            "data from the specified file.\n" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
-            "the name of the file.\n" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP POST request using the Url property and " +
+      "data from the specified file.\n" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
+      "the name of the file.\n" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PostFile(final String path) {
         final String METHOD = "PostFile";
         // Capture property values before running asynchronously.
@@ -595,13 +636,13 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param text the text data for the PATCH request
      */
-    @SimpleFunction(description = "Performs an HTTP PATCH request using the Url property and " +
-            "the specified text.<br>" +
-            "The characters of the text are encoded using UTF-8 encoding.<br>" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The responseFileName property can be used to specify " +
-            "the name of the file.<br>" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP PATCH request using the Url property and " +
+      "the specified text.<br>" +
+      "The characters of the text are encoded using UTF-8 encoding.<br>" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The responseFileName property can be used to specify " +
+      "the name of the file.<br>" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PatchText(final String text) {
         requestTextImpl(text, "UTF-8", "PatchText", "PATCH");
     }
@@ -621,13 +662,13 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param encoding the character encoding to use when sending the text. If
      *                 encoding is empty or null, UTF-8 encoding will be used.
      */
-    @SimpleFunction(description = "Performs an HTTP PATCH request using the Url property and " +
-            "the specified text.<br>" +
-            "The characters of the text are encoded using the given encoding.<br>" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
-            "the name of the file.<br>" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP PATCH request using the Url property and " +
+      "the specified text.<br>" +
+      "The characters of the text are encoded using the given encoding.<br>" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
+      "the name of the file.<br>" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PatchTextWithEncoding(final String text, final String encoding) {
         requestTextImpl(text, encoding, "PatchTextWithEncoding", "PATCH");
     }
@@ -643,12 +684,12 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param path the path of the file for the PATCH request
      */
-    @SimpleFunction(description = "Performs an HTTP PATCH request using the Url property and " +
-            "data from the specified file.<br>" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
-            "the name of the file.<br>" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP PATCH request using the Url property and " +
+      "data from the specified file.<br>" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
+      "the name of the file.<br>" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PatchFile(final String path) {
         final String METHOD = "PatchFile";
         // Capture property values before running asynchronously.
@@ -679,13 +720,13 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param text the text data for the PUT request
      */
-    @SimpleFunction(description = "Performs an HTTP PUT request using the Url property and " +
-            "the specified text.<br>" +
-            "The characters of the text are encoded using UTF-8 encoding.<br>" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The responseFileName property can be used to specify " +
-            "the name of the file.<br>" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP PUT request using the Url property and " +
+      "the specified text.<br>" +
+      "The characters of the text are encoded using UTF-8 encoding.<br>" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The responseFileName property can be used to specify " +
+      "the name of the file.<br>" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PutText(final String text) {
         requestTextImpl(text, "UTF-8", "PutText", "PUT");
     }
@@ -705,13 +746,13 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param encoding the character encoding to use when sending the text. If
      *                 encoding is empty or null, UTF-8 encoding will be used.
      */
-    @SimpleFunction(description = "Performs an HTTP PUT request using the Url property and " +
-            "the specified text.<br>" +
-            "The characters of the text are encoded using the given encoding.<br>" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
-            "the name of the file.<br>" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP PUT request using the Url property and " +
+      "the specified text.<br>" +
+      "The characters of the text are encoded using the given encoding.<br>" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
+      "the name of the file.<br>" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PutTextWithEncoding(final String text, final String encoding) {
         requestTextImpl(text, encoding, "PutTextWithEncoding", "PUT");
     }
@@ -727,12 +768,12 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param path the path of the file for the PUT request
      */
-    @SimpleFunction(description = "Performs an HTTP PUT request using the Url property and " +
-            "data from the specified file.<br>" +
-            "If the SaveResponse property is true, the response will be saved in a file and the " +
-            "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
-            "the name of the file.<br>" +
-            "If the SaveResponse property is false, the GotText event will be triggered.")
+  /* @SimpleFunction(description = "Performs an HTTP PUT request using the Url property and " +
+      "data from the specified file.<br>" +
+      "If the SaveResponse property is true, the response will be saved in a file and the " +
+      "GotFile event will be triggered. The ResponseFileName property can be used to specify " +
+      "the name of the file.<br>" +
+      "If the SaveResponse property is false, the GotText event will be triggered.") */
     public void PutFile(final String path) {
         final String METHOD = "PutFile";
         // Capture property values before running asynchronously.
@@ -763,7 +804,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * If the SaveResponse property is false, the GotText event will be
      * triggered.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Delete() {
         final String METHOD = "Delete";
         // Capture property values in local variables before running asynchronously.
@@ -840,7 +882,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param responseType    the mime type of the response
      * @param responseContent the response content from the server
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void GotText(String url, int responseCode, String responseType, String responseContent) {
         // invoke the application's "GotText" event handler.
         EventDispatcher.dispatchEvent(this, "GotText", url, responseCode, responseType,
@@ -855,7 +898,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param responseType the mime type of the response
      * @param fileName     the full path name of the saved file
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void GotFile(String url, int responseCode, String responseType, String fileName) {
         // invoke the application's "GotFile" event handler.
         EventDispatcher.dispatchEvent(this, "GotFile", url, responseCode, responseType, fileName);
@@ -866,7 +910,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param url the URL used for the request
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void TimedOut(String url) {
         // invoke the application's "TimedOut" event handler.
         EventDispatcher.dispatchEvent(this, "TimedOut", url);
@@ -879,7 +924,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      *
      * @param list a list of two-element sublists representing name and value pairs
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public String BuildRequestData(YailList list) {
         try {
             return buildRequestData(list);
@@ -930,7 +976,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param text the text to encode
      * @return the encoded text
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public String UriEncode(String text) {
         try {
             return URLEncoder.encode(text, "UTF-8");
@@ -949,7 +996,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param text the text to encode
      * @return the decoded text
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public String UriDecode(String text) {
         try {
             return URLDecoder.decode(text, "UTF-8");
@@ -974,8 +1022,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param jsonText the JSON text to decode
      * @return the decoded text
      */
-    @SimpleFunction
-    // This returns an object, which in general will be a Java ArrayList, String, Boolean, Integer,
+    /* @SimpleFunction
+     */// This returns an object, which in general will be a Java ArrayList, String, Boolean, Integer,
     // or Double.
     // The object will be sanitized to produce the corresponding Yail data by call-component-method.
     // That mechanism would need to be extended if we ever change JSON decoding to produce
@@ -1001,7 +1049,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param jsonText The JSON text to decode.
      * @return The decoded value.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public Object JsonTextDecodeWithDictionaries(String jsonText) {
         try {
             return decodeJsonText(jsonText, true);
@@ -1021,7 +1070,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param jsonObject the object to turn into JSON
      * @return the stringified JSON value
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public String JsonObjectEncode(Object jsonObject) {
         try {
             return JsonUtil.encodeJsonObject(jsonObject);
@@ -1068,8 +1118,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param XmlText the JSON text to decode
      * @return the decoded text
      */
-    @SimpleFunction(description = "Decodes the given XML into a set of nested dictionaries that " +
-            "capture the structure and data contained in the XML. See the help for more details.")
+  /* @SimpleFunction(description = "Decodes the given XML into a set of nested dictionaries that " +
+      "capture the structure and data contained in the XML. See the help for more details.") */
     public Object XMLTextDecodeAsDictionary(String XmlText) {
         try {
             XmlParser p = new XmlParser();
@@ -1110,8 +1160,8 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @return the decoded text
      */
     // This method works by by first converting the XML to JSON and then decoding the JSON.
-    @SimpleFunction(description = "Decodes the given XML string to produce a dictionary structure. " +
-            "See the App Inventor documentation on \"Other topics, notes, and details\" for information.")
+  /* @SimpleFunction(description = "Decodes the given XML string to produce a dictionary structure. " +
+      "See the App Inventor documentation on \"Other topics, notes, and details\" for information.") */
     // The above description string is punted because I can't figure out how to write the
     // documentation string in a way that will look work both as a tooltip and in the autogenerated
     // HTML for the component documentation on the Web.  It's too long for a tooltip, anyway.
@@ -1140,10 +1190,10 @@ public class Web extends AndroidNonvisibleComponent implements Component,
      * @param htmlText the HTML text to decode
      * @return the decoded text
      */
-    @SimpleFunction(description = "Decodes the given HTML text value. HTML character entities " +
-            "such as `&`, `<`, `>`, `'`, and `\"` are changed to " +
-            "&, <, >, ', and \". Entities such as &#xhhhh, and &#nnnn " +
-            "are changed to the appropriate characters.")
+  /* @SimpleFunction(description = "Decodes the given HTML text value. HTML character entities " +
+      "such as `&`, `<`, `>`, `'`, and `\"` are changed to " +
+      "&, <, >, ', and \". Entities such as &#xhhhh, and &#nnnn " +
+      "are changed to the appropriate characters.") */
     public String HtmlTextDecode(String htmlText) {
         try {
             return HtmlEntities.decodeHtmlText(htmlText);
@@ -1182,7 +1232,7 @@ public class Web extends AndroidNonvisibleComponent implements Component,
         final List<String> neededPermissions = new ArrayList<>();
 
         // Check if we need permission to read the postFile, if any
-        if (postFile != null && FileUtil.needsPermission(form, postFile) && !haveReadPermission) {
+        if (postFile != null && FileUtil.needsReadPermission(form, postFile) && !haveReadPermission) {
             neededPermissions.add(READ_EXTERNAL_STORAGE);
         }
 
@@ -1190,7 +1240,7 @@ public class Web extends AndroidNonvisibleComponent implements Component,
         if (saveResponse) {
             String target = FileUtil.resolveFileName(form, webProps.responseFileName,
                     form.DefaultFileScope());
-            if (FileUtil.needsPermission(form, target) && !haveWritePermission) {
+            if (FileUtil.needsWritePermission(form, target) && !haveWritePermission) {
                 neededPermissions.add(WRITE_EXTERNAL_STORAGE);
             }
         }
@@ -1249,7 +1299,7 @@ public class Web extends AndroidNonvisibleComponent implements Component,
                             }
                         });
                     } else {
-                        final String responseContent = getResponseContent(connection);
+                        final String responseContent = getResponseContent(connection, responseTextEncoding);
 
                         // Dispatch the event.
                         activity.runOnUiThread(new Runnable() {

@@ -5,10 +5,10 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
 
 /**
  * The class provides utility functions to encode and decode commands
@@ -493,7 +493,6 @@ public class Ev3BinaryParser {
     public static byte[] encodeDirectCommand(byte opcode, boolean needReply, int globalAllocation, int localAllocation, String paramFormat, Object... parameters) {
         if (globalAllocation < 0 || globalAllocation > 0x3ff || localAllocation < 0 || localAllocation > 0x3f || paramFormat.length() != parameters.length)
             throw new IllegalArgumentException();
-
 
         // encode parameters
         ArrayList<byte[]> payloads = new ArrayList<byte[]>();

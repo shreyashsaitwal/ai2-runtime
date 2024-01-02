@@ -5,10 +5,10 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import android.annotation.SuppressLint;
-
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+import android.annotation.SuppressLint;
 
 @SuppressLint("InlinedApi")
 public enum FileAccessMode {

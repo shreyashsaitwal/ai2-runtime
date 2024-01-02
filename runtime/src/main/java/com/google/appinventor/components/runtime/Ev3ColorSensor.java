@@ -5,11 +5,12 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ColorSensorMode;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+import android.os.Handler;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
@@ -20,7 +21,14 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteable {
+/* @DesignerComponent(version = YaVersion.EV3_COLORSENSOR_COMPONENT_VERSION,
+                   description = "A component that provides a high-level interface to a color sensor on a " +
+                                 "LEGO MINDSTORMS EV3 robot.",
+                   category = ComponentCategory.LEGOMINDSTORMS,
+                   nonVisible = true,
+                   iconName = "images//legoMindstormsEv3.png") */
+/* @SimpleObject
+ */public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteable {
     private static final int SENSOR_TYPE = 29;
     private static final int DEFAULT_BOTTOM_OF_RANGE = 30;
     private static final int DEFAULT_TOP_OF_RANGE = 60;
@@ -104,8 +112,8 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * It returns the light level in percentage.
      */
-    @SimpleFunction(description = "It returns the light level in percentage, or " +
-            "-1 when the light level cannot be read.")
+  /* @SimpleFunction(description = "It returns the light level in percentage, or " +
+                                "-1 when the light level cannot be read.") */
     public int GetLightLevel() {
         if (mode == ColorSensorMode.Color) {
             return -1;
@@ -116,7 +124,7 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * It returns the color code for the detected color.
      */
-    @SimpleFunction(description = "It returns the color code from 0 to 7 corresponding to no color, black, blue, green, yellow, red, white and brown.")
+    /* @SimpleFunction(description = "It returns the color code from 0 to 7 corresponding to no color, black, blue, green, yellow, red, white and brown.") */
     public int GetColorCode() {
         if (mode != ColorSensorMode.Color) {
             return 0;
@@ -127,7 +135,7 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Returns the name of the detected color.
      */
-    @SimpleFunction(description = "Return the color name in one of \"No Color\", \"Black\", \"Blue\", \"Green\", \"Yellow\", \"Red\", \"White\", \"Brown\".")
+    /* @SimpleFunction(description = "Return the color name in one of \"No Color\", \"Black\", \"Blue\", \"Green\", \"Yellow\", \"Red\", \"White\", \"Brown\".") */
     public String GetColorName() {
         if (mode != ColorSensorMode.Color) {
             return "No Color";
@@ -139,8 +147,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns the bottom of the range used for the BelowRange, WithinRange,
      * and AboveRange events.
      */
-    @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange, " +
-            "and AboveRange events.")
+  /* @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange, " +
+                                "and AboveRange events.",
+                  category = PropertyCategory.BEHAVIOR) */
     public int BottomOfRange() {
         return bottomOfRange;
     }
@@ -149,9 +158,10 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies the bottom of the range used for the BelowRange, WithinRange,
      * and AboveRange events.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+                    defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE) */
+    /* @SimpleProperty
+     */
     public void BottomOfRange(int bottomOfRange) {
         this.bottomOfRange = bottomOfRange;
     }
@@ -160,8 +170,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns the top of the range used for the BelowRange, WithinRange, and
      * AboveRange events.
      */
-    @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and " +
-            "AboveRange events.")
+  /* @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and " +
+                                "AboveRange events.",
+                  category = PropertyCategory.BEHAVIOR) */
     public int TopOfRange() {
         return topOfRange;
     }
@@ -170,9 +181,10 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies the top of the range used for the BelowRange, WithinRange, and
      * AboveRange events.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "" + DEFAULT_TOP_OF_RANGE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+                    defaultValue = "" + DEFAULT_TOP_OF_RANGE) */
+    /* @SimpleProperty
+     */
     public void TopOfRange(int topOfRange) {
         this.topOfRange = topOfRange;
     }
@@ -181,8 +193,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns whether the BelowRange event should fire when the light level
      * goes below the BottomOfRange.
      */
-    @SimpleProperty(description = "Whether the BelowRange event should fire when the light level" +
-            " goes below the BottomOfRange.")
+  /* @SimpleProperty(description = "Whether the BelowRange event should fire when the light level" +
+                                " goes below the BottomOfRange.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean BelowRangeEventEnabled() {
         return belowRangeEventEnabled;
     }
@@ -191,14 +204,15 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies whether the BelowRange event should fire when the light level
      * goes below the BottomOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void BelowRangeEventEnabled(boolean enabled) {
         belowRangeEventEnabled = enabled;
     }
 
-    @SimpleEvent(description = "Light level has gone below the range.")
+    /* @SimpleEvent(description = "Light level has gone below the range.") */
     public void BelowRange() {
         EventDispatcher.dispatchEvent(this, "BelowRange");
     }
@@ -207,8 +221,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns whether the WithinRange event should fire when the light level
      * goes between the BottomOfRange and the TopOfRange.
      */
-    @SimpleProperty(description = "Whether the WithinRange event should fire when the light level " +
-            "goes between the BottomOfRange and the TopOfRange.")
+  /* @SimpleProperty(description = "Whether the WithinRange event should fire when the light level " +
+                                "goes between the BottomOfRange and the TopOfRange.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean WithinRangeEventEnabled() {
         return withinRangeEventEnabled;
     }
@@ -217,14 +232,15 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies whether the WithinRange event should fire when the light level
      * goes between the BottomOfRange and the TopOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void WithinRangeEventEnabled(boolean enabled) {
         withinRangeEventEnabled = enabled;
     }
 
-    @SimpleEvent(description = "Light level has gone within the range.")
+    /* @SimpleEvent(description = "Light level has gone within the range.") */
     public void WithinRange() {
         EventDispatcher.dispatchEvent(this, "WithinRange");
     }
@@ -233,8 +249,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns whether the AboveRange event should fire when the light level
      * goes above the TopOfRange.
      */
-    @SimpleProperty(description = "Whether the AboveRange event should fire when the light level " +
-            "goes above the TopOfRange.")
+  /* @SimpleProperty(description = "Whether the AboveRange event should fire when the light level " +
+                                "goes above the TopOfRange.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean AboveRangeEventEnabled() {
         return aboveRangeEventEnabled;
     }
@@ -243,14 +260,15 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies whether the AboveRange event should fire when the light level
      * goes above the TopOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void AboveRangeEventEnabled(boolean enabled) {
         aboveRangeEventEnabled = enabled;
     }
 
-    @SimpleEvent(description = "Light level has gone above the range.")
+    /* @SimpleEvent(description = "Light level has gone above the range.") */
     public void AboveRange() {
         EventDispatcher.dispatchEvent(this, "AboveRange");
     }
@@ -259,8 +277,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Returns whether the ColorChanged event should fire when the DetectColor
      * property is set to True and the detected color changes.
      */
-    @SimpleProperty(description = "Whether the ColorChanged event should fire when the Mode" +
-            " property is set to \"color\" and the detected color changes.")
+  /* @SimpleProperty(description = "Whether the ColorChanged event should fire when the Mode" +
+                                " property is set to \"color\" and the detected color changes.",
+                  category = PropertyCategory.BEHAVIOR) */
     public boolean ColorChangedEventEnabled() {
         return colorChangedEventEnabled;
     }
@@ -269,9 +288,10 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Specifies whether the ColorChanged event should fire when the DetectColor
      * property is set to True and the detected color changes
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+                    defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ColorChangedEventEnabled(boolean enabled) {
         colorChangedEventEnabled = enabled;
     }
@@ -279,9 +299,9 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Called when the detected color has changed.
      */
-    @SimpleEvent(description = "Called when the detected color has changed. The ColorChanged event will occur " +
-            "if the Mode property is set to \"color\" and the ColorChangedEventEnabled property " +
-            "is set to True.")
+  /* @SimpleEvent(description = "Called when the detected color has changed. The ColorChanged event will occur " +
+                             "if the Mode property is set to \"color\" and the ColorChangedEventEnabled property " +
+                             "is set to True.") */
     public void ColorChanged(int colorCode, String colorName) {
         EventDispatcher.dispatchEvent(this, "ColorChanged", colorCode, colorName);
     }
@@ -350,10 +370,11 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Specifies the mode of the sensor.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_COLOR_SENSOR_MODE,
-            defaultValue = "reflected")
-    @SimpleProperty
-    public void Mode(@Options(ColorSensorMode.class) String modeName) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_EV3_COLOR_SENSOR_MODE,
+                    defaultValue = "reflected") */
+    /* @SimpleProperty
+     */
+    public void Mode(/* @Options(ColorSensorMode.class) */ String modeName) {
         // Make sure modeName is a valid ColorSensorMode.
         ColorSensorMode mode = ColorSensorMode.fromUnderlyingValue(modeName);
         if (mode == null) {
@@ -388,15 +409,16 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
      * Ambient: Senses the current light level *not* including light reflected by the sensor.
      * Color: Senses the color the sensor is pointing at.
      */
-    @SimpleProperty(description = "Get the current sensor mode.")
-    public @Options(ColorSensorMode.class) String Mode() {
+  /* @SimpleProperty(description = "Get the current sensor mode.",
+                  category = PropertyCategory.BEHAVIOR) */
+    public /* @Options(ColorSensorMode.class) */ String Mode() {
         return mode.toUnderlyingValue();
     }
 
     /**
      * Enter the color detection mode.
      */
-    @SimpleFunction(description = "Enter the color detection mode.")
+    /* @SimpleFunction(description = "Enter the color detection mode.") */
     @Deprecated
     public void SetColorMode() {
         setMode(ColorSensorMode.Color);
@@ -405,7 +427,7 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Make the sensor read the light level with reflected light.
      */
-    @SimpleFunction(description = "Make the sensor read the light level with reflected light.")
+    /* @SimpleFunction(description = "Make the sensor read the light level with reflected light.") */
     @Deprecated
     public void SetReflectedMode() {
         setMode(ColorSensorMode.Reflected);
@@ -414,7 +436,7 @@ public class Ev3ColorSensor extends LegoMindstormsEv3Sensor implements Deleteabl
     /**
      * Make the sensor read the light level without reflected light.
      */
-    @SimpleFunction(description = "Make the sensor read the light level without reflected light.")
+    /* @SimpleFunction(description = "Make the sensor read the light level without reflected light.") */
     @Deprecated
     public void SetAmbientMode() {
         setMode(ColorSensorMode.Ambient);

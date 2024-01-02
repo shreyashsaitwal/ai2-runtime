@@ -3,12 +3,16 @@
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
-
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+
+import android.content.Context;
 import android.hardware.Sensor;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
 /**
  * Physical world component that can measure the light level.
@@ -17,7 +21,13 @@ import com.google.appinventor.components.annotations.SimpleProperty;
  * android.hardware.SensorListener
  * (http://developer.android.com/reference/android/hardware/SensorListener.html).
  */
-public class LightSensor extends BufferedSingleValueSensor {
+/* @DesignerComponent(version = YaVersion.LIGHTSENSOR_COMPONENT_VERSION,
+    description = "A sensor component that can measure the light level.",
+    category = ComponentCategory.SENSORS,
+    nonVisible = true,
+    iconName = "images//lightsensor.png") */
+/* @SimpleObject
+ */public class LightSensor extends BufferedSingleValueSensor {
     private static final int BUFFER_SIZE = 10;
 
     /**
@@ -39,7 +49,7 @@ public class LightSensor extends BufferedSingleValueSensor {
      *
      * @param lux the new light level in lux
      */
-    @SimpleEvent(description = "Called when a change is detected in the light level.")
+    /* @SimpleEvent(description = "Called when a change is detected in the light level.") */
     public void LightChanged(float lux) {
         EventDispatcher.dispatchEvent(this, "LightChanged", lux);
     }
@@ -50,8 +60,8 @@ public class LightSensor extends BufferedSingleValueSensor {
      *
      * @return lux
      */
-    @SimpleProperty(description = "The most recent light level, in lux, if the sensor is available " +
-            "and enabled.")
+  /* @SimpleProperty(description = "The most recent light level, in lux, if the sensor is available " +
+       "and enabled.") */
     public float Lux() {
         return getValue();
     }
@@ -62,7 +72,7 @@ public class LightSensor extends BufferedSingleValueSensor {
      *
      * @return lux
      */
-    @SimpleProperty(description = "The average of the 10 most recent light levels measured, in lux.")
+    /* @SimpleProperty(description = "The average of the 10 most recent light levels measured, in lux.") */
     public float AverageLux() {
         return getAverageValue();
     }

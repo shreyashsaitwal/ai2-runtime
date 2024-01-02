@@ -6,22 +6,23 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.Manifest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.Contacts;
 import android.util.Log;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.runtime.util.ErrorMessages;
-import com.google.appinventor.components.runtime.util.HoneycombMR1Util;
-import com.google.appinventor.components.runtime.util.SdkLevel;
+import android.Manifest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.HoneycombMR1Util;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.SdkLevel;
 
 /**
  * A button that, when clicked on, displays a list of the contacts to choose among. After the user
@@ -47,6 +48,30 @@ import java.util.List;
  * @author markf@google.com (Mark Friedman)
  * @author Yifan(Evan) Li (for contact Uri)
  */
+/* @DesignerComponent(version = YaVersion.CONTACTPICKER_COMPONENT_VERSION,
+    description = "A button that, when clicked on, displays a list of " +
+    "the contacts to choose among. After the user has made a " +
+    "selection, the following properties will be set to information about " +
+    "the chosen contact: <ul>\n" +
+    "<li> <code>ContactName<//code>: the contact's name <//li>\n "  +
+    "<li> <code>EmailAddress<//code>: the contact's primary email address <//li>\n " +
+    "<li> <code>ContactUri<//code>: the contact's URI on the device <//li>\n"+
+    "<li> <code>EmailAddressList<//code>: a list of the contact's email addresses <//li>\n " +
+    "<li> <code>PhoneNumber<//code>: the contact's primary phone number (on Later Android Verisons)<//li>\n " +
+    "<li> <code>PhoneNumberList<//code>: a list of the contact's phone numbers (on Later Android Versions)<//li>\n " +
+    "<li> <code>Picture<//code>: the name of the file containing the contact's " +
+    "image, which can be used as a <code>Picture<//code> property value for " +
+    "the <code>Image<//code> or <code>ImageSprite<//code> component.<//li><//ul>\n" +
+    "<//p><p>Other properties affect the appearance of the button " +
+    "(<code>TextAlignment<//code>, <code>BackgroundColor<//code>, etc.) and " +
+    "whether it can be clicked on (<code>Enabled<//code>).\n<//p>" +
+    "<p>The ContactPicker component might not work on all phones. For " +
+    "example, on Android systems before system 3.0, it cannot pick phone " +
+    "numbers, and the list of email addresses will contain only one email.",
+    category = ComponentCategory.SOCIAL,
+    iconName = "images//contactPicker.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.READ_CONTACTS") */
 public class ContactPicker extends Picker implements ActivityResultListener {
 
     private static final String[] PROJECTION = {
@@ -120,8 +145,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
      * Returns a picture URI for the selected contact, which can be
      * used to retrieve the contact's photo and other fields.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+    category = PropertyCategory.BEHAVIOR) */
     public String Picture() {
         return ensureNotNull(contactPictureUri);
     }
@@ -129,8 +154,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
     /**
      * Returns the full name of the selected contact, or the empty string if a name is unavailable.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+    category = PropertyCategory.BEHAVIOR) */
     public String ContactName() {
         return ensureNotNull(contactName);
     }
@@ -139,8 +164,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
      * Returns the primary email address of the selected contact, or the empty string if an email
      * address is unavailable.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String EmailAddress() {
         // Note(halabelson):  I am commenting out this test.  Android provider.Contacts was
         // deprecated in Donut, but email picking still seems to work on newer versions of the SDK.
@@ -156,7 +181,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
     /**
      * Returns a URI that specifies the location of the contact on the device.
      */
-    @SimpleProperty(description = "URI that specifies the location of the contact on the device.")
+  /* @SimpleProperty(description = "URI that specifies the location of the contact on the device.",
+      category = PropertyCategory.BEHAVIOR) */
     public String ContactUri() {
         return ensureNotNull(contactUri);
     }
@@ -164,8 +190,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
     /**
      * Returns a list of email addresses associated with the selected contact.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public List EmailAddressList() {
         return ensureNotNull(emailAddressList);
     }
@@ -174,8 +200,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
      * Returns the primary phone number associated with the selected contact, or the empty string if
      * no phone number is associated with the contact.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public String PhoneNumber() {
         return ensureNotNull(phoneNumber);
     }
@@ -183,8 +209,8 @@ public class ContactPicker extends Picker implements ActivityResultListener {
     /**
      * Returns a list of phone numbers associated with the selected contact.
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public List PhoneNumberList() {
         return ensureNotNull(phoneNumberList);
     }
@@ -192,7 +218,7 @@ public class ContactPicker extends Picker implements ActivityResultListener {
     /**
      * Opens the selected contact's entry in the device's default Contacts app.
      */
-    @SimpleFunction(description = "view a contact via its URI")
+    /* @SimpleFunction(description = "view a contact via its URI") */
     public void ViewContact(String uri) {
         if (contactUri != null) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
@@ -423,7 +449,6 @@ public class ContactPicker extends Picker implements ActivityResultListener {
         // on some phones, we'll leave it in just to be extra careful
         return ensureNotNull(data);
     }
-
 
     // If the selection returns null, this should be passed back as a
     // an empty string to prevent errors if the app tries to convert this

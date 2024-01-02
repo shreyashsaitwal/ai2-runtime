@@ -6,15 +6,14 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.os.Handler;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.NxtSensorMode;
 import com.google.appinventor.components.common.NxtSensorType;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+
+import android.os.Handler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,14 @@ import java.util.Map;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteable {
+/* @DesignerComponent(version = YaVersion.NXT_COLORSENSOR_COMPONENT_VERSION,
+    description = "A component that provides a high-level interface to a color sensor on a " +
+    "LEGO MINDSTORMS NXT robot.",
+    category = ComponentCategory.LEGOMINDSTORMS,
+    nonVisible = true,
+    iconName = "images//legoMindstormsNxt.png") */
+/* @SimpleObject
+ */public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteable {
 
     private static final String DEFAULT_SENSOR_PORT = "3";
     private static final int DEFAULT_BOTTOM_OF_RANGE = 256;
@@ -152,9 +158,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Specifies the sensor port that the sensor is connected to.
      * **Must be set in the Designer.**
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_SENSOR_PORT,
-            defaultValue = DEFAULT_SENSOR_PORT)
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_SENSOR_PORT,
+      defaultValue = DEFAULT_SENSOR_PORT) */
+    /* @SimpleProperty(userVisible = false) */
     public void SensorPort(String sensorPortLetter) {
         setSensorPort(sensorPortLetter);
     }
@@ -171,12 +177,13 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * The sensor will not generate color when the DetectColor property is set to
      * True.
      */
-    @SimpleProperty(description = "Whether the sensor should detect color or light. " +
-            "True indicates that the sensor should detect color; False indicates that the sensor " +
-            "should detect light. " +
-            "If the DetectColor property is set to True, the BelowRange, WithinRange, and AboveRange " +
-            "events will not occur and the sensor will not generate color. " +
-            "If the DetectColor property is set to False, the ColorChanged event will not occur.")
+  /* @SimpleProperty(description = "Whether the sensor should detect color or light. " +
+      "True indicates that the sensor should detect color; False indicates that the sensor " +
+      "should detect light. " +
+      "If the DetectColor property is set to True, the BelowRange, WithinRange, and AboveRange " +
+      "events will not occur and the sensor will not generate color. " +
+      "If the DetectColor property is set to False, the ColorChanged event will not occur.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean DetectColor() {
         return detectColor;
     }
@@ -186,9 +193,10 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * that the sensor should detect color; False indicates that the sensor
      * should detect light.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void DetectColor(boolean detectColor) {
         boolean handlerWasNeeded = isHandlerNeeded();
 
@@ -208,8 +216,8 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
         }
     }
 
-    @SimpleFunction(description = "Returns the current detected color, or the color None if the " +
-            "color can not be read or if the DetectColor property is set to False.")
+    /* @SimpleFunction(description = "Returns the current detected color, or the color None if the " +
+        "color can not be read or if the DetectColor property is set to False.") */
     public int GetColor() {
         String functionName = "GetColor";
         if (!checkBluetooth(functionName)) {
@@ -253,8 +261,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Returns whether the ColorChanged event should fire when the DetectColor
      * property is set to True and the detected color changes.
      */
-    @SimpleProperty(description = "Whether the ColorChanged event should fire when the DetectColor" +
-            " property is set to True and the detected color changes.")
+  /* @SimpleProperty(description = "Whether the ColorChanged event should fire when the DetectColor" +
+      " property is set to True and the detected color changes.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean ColorChangedEventEnabled() {
         return colorChangedEventEnabled;
     }
@@ -263,8 +272,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Specifies whether the ColorChanged event should fire when the DetectColor
      * property is set to True and the detected color changes
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void ColorChangedEventEnabled(boolean enabled) {
         boolean handlerWasNeeded = isHandlerNeeded();
 
@@ -280,15 +290,15 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
         }
     }
 
-    @SimpleEvent(description = "Detected color has changed. " +
-            "The ColorChanged event will not occur if the DetectColor property is set to False or if " +
-            "the ColorChangedEventEnabled property is set to False.")
+    /* @SimpleEvent(description = "Detected color has changed. " +
+        "The ColorChanged event will not occur if the DetectColor property is set to False or if " +
+        "the ColorChangedEventEnabled property is set to False.") */
     public void ColorChanged(int color) {
         EventDispatcher.dispatchEvent(this, "ColorChanged", color);
     }
 
-    @SimpleFunction(description = "Returns the current light level as a value between 0 and 1023, " +
-            "or -1 if the light level can not be read or if the DetectColor property is set to True.")
+    /* @SimpleFunction(description = "Returns the current light level as a value between 0 and 1023, " +
+        "or -1 if the light level can not be read or if the DetectColor property is set to True.") */
     public int GetLightLevel() {
         String functionName = "GetLightLevel";
         if (!checkBluetooth(functionName)) {
@@ -329,8 +339,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Returns the bottom of the range used for the BelowRange, WithinRange,
      * and AboveRange events.
      */
-    @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange," +
-            " and AboveRange events.")
+  /* @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange," +
+      " and AboveRange events.",
+      category = PropertyCategory.BEHAVIOR) */
     public int BottomOfRange() {
         return bottomOfRange;
     }
@@ -339,9 +350,10 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Specifies the bottom of the range used for the BelowRange, WithinRange,
      * and AboveRange events.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE) */
+    /* @SimpleProperty
+     */
     public void BottomOfRange(int bottomOfRange) {
         this.bottomOfRange = bottomOfRange;
         previousState = State.UNKNOWN;
@@ -351,8 +363,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Returns the top of the range used for the BelowRange, WithinRange, and
      * AboveRange events.
      */
-    @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and" +
-            " AboveRange events.")
+  /* @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and" +
+      " AboveRange events.",
+      category = PropertyCategory.BEHAVIOR) */
     public int TopOfRange() {
         return topOfRange;
     }
@@ -361,9 +374,10 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Specifies the top of the range used for the BelowRange, WithinRange, and
      * AboveRange events.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "" + DEFAULT_TOP_OF_RANGE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "" + DEFAULT_TOP_OF_RANGE) */
+    /* @SimpleProperty
+     */
     public void TopOfRange(int topOfRange) {
         this.topOfRange = topOfRange;
         previousState = State.UNKNOWN;
@@ -373,8 +387,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Returns whether the BelowRange event should fire when the DetectColor
      * property is set to False and the light level goes below the BottomOfRange.
      */
-    @SimpleProperty(description = "Whether the BelowRange event should fire when the DetectColor" +
-            " property is set to False and the light level goes below the BottomOfRange.")
+  /* @SimpleProperty(description = "Whether the BelowRange event should fire when the DetectColor" +
+      " property is set to False and the light level goes below the BottomOfRange.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean BelowRangeEventEnabled() {
         return belowRangeEventEnabled;
     }
@@ -383,8 +398,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Specifies whether the BelowRange event should fire when the DetectColor
      * property is set to False and the light level goes below the BottomOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void BelowRangeEventEnabled(boolean enabled) {
         boolean handlerWasNeeded = isHandlerNeeded();
 
@@ -400,9 +416,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
         }
     }
 
-    @SimpleEvent(description = "Light level has gone below the range. " +
-            "The BelowRange event will not occur if the DetectColor property is set to True or if " +
-            "the BelowRangeEventEnabled property is set to False.")
+    /* @SimpleEvent(description = "Light level has gone below the range. " +
+        "The BelowRange event will not occur if the DetectColor property is set to True or if " +
+        "the BelowRangeEventEnabled property is set to False.") */
     public void BelowRange() {
         EventDispatcher.dispatchEvent(this, "BelowRange");
     }
@@ -412,9 +428,10 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * property is set to False and the light level goes between the
      * BottomOfRange and the TopOfRange.
      */
-    @SimpleProperty(description = "Whether the WithinRange event should fire when the DetectColor" +
-            " property is set to False and the light level goes between the BottomOfRange and the " +
-            "TopOfRange.")
+  /* @SimpleProperty(description = "Whether the WithinRange event should fire when the DetectColor" +
+      " property is set to False and the light level goes between the BottomOfRange and the " +
+      "TopOfRange.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean WithinRangeEventEnabled() {
         return withinRangeEventEnabled;
     }
@@ -424,8 +441,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * property is set to False and the light level goes between the
      * BottomOfRange and the TopOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void WithinRangeEventEnabled(boolean enabled) {
         boolean handlerWasNeeded = isHandlerNeeded();
 
@@ -441,9 +459,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
         }
     }
 
-    @SimpleEvent(description = "Light level has gone within the range. " +
-            "The WithinRange event will not occur if the DetectColor property is set to True or if " +
-            "the WithinRangeEventEnabled property is set to False.")
+    /* @SimpleEvent(description = "Light level has gone within the range. " +
+        "The WithinRange event will not occur if the DetectColor property is set to True or if " +
+        "the WithinRangeEventEnabled property is set to False.") */
     public void WithinRange() {
         EventDispatcher.dispatchEvent(this, "WithinRange");
     }
@@ -452,8 +470,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Returns whether the AboveRange event should fire when the DetectColor
      * property is set to False and the light level goes above the TopOfRange.
      */
-    @SimpleProperty(description = "Whether the AboveRange event should fire when the DetectColor" +
-            " property is set to False and the light level goes above the TopOfRange.")
+  /* @SimpleProperty(description = "Whether the AboveRange event should fire when the DetectColor" +
+      " property is set to False and the light level goes above the TopOfRange.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean AboveRangeEventEnabled() {
         return aboveRangeEventEnabled;
     }
@@ -462,8 +481,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * Specifies whether the AboveRange event should fire when the DetectColor
      * property is set to False and the light level goes above the TopOfRange.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void AboveRangeEventEnabled(boolean enabled) {
         boolean handlerWasNeeded = isHandlerNeeded();
 
@@ -479,9 +499,9 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
         }
     }
 
-    @SimpleEvent(description = "Light level has gone above the range. " +
-            "The AboveRange event will not occur if the DetectColor property is set to True or if " +
-            "the AboveRangeEventEnabled property is set to False.")
+    /* @SimpleEvent(description = "Light level has gone above the range. " +
+        "The AboveRange event will not occur if the DetectColor property is set to True or if " +
+        "the AboveRangeEventEnabled property is set to False.") */
     public void AboveRange() {
         EventDispatcher.dispatchEvent(this, "AboveRange");
     }
@@ -492,9 +512,10 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * The sensor will not generate color when the DetectColor property is set to
      * True.
      */
-    @SimpleProperty(description = "The color that should generated by the sensor. " +
-            "Only None, Red, Green, or Blue are valid values. " +
-            "The sensor will not generate color when the DetectColor property is set to True.")
+  /* @SimpleProperty(description = "The color that should generated by the sensor. " +
+      "Only None, Red, Green, or Blue are valid values. " +
+      "The sensor will not generate color when the DetectColor property is set to True.",
+      category = PropertyCategory.BEHAVIOR) */
     public int GenerateColor() {
         return generateColor;
     }
@@ -505,9 +526,10 @@ public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteabl
      * The sensor will not generate color when the DetectColor property is set to
      * True.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_GENERATED_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_NONE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_GENERATED_COLOR,
+  defaultValue = Component.DEFAULT_VALUE_COLOR_NONE) */
+    /* @SimpleProperty
+     */
     public void GenerateColor(int generateColor) {
         String functionName = "GenerateColor";
         if (mapColorToSensorType.containsKey(generateColor)) {

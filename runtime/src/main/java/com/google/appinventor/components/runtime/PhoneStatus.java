@@ -5,21 +5,28 @@
 
 package com.google.appinventor.components.runtime;
 
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
+import static android.Manifest.permission.ACCESS_WIFI_STATE;
+
 import android.app.Activity;
+
 import android.content.Context;
 import android.content.Intent;
+
 import android.content.pm.PackageManager.NameNotFoundException;
+
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.AppInvHTTPD;
 import com.google.appinventor.components.runtime.util.EclairUtil;
 import com.google.appinventor.components.runtime.util.SdkLevel;
@@ -27,8 +34,8 @@ import com.google.appinventor.components.runtime.util.WebRTCNativeMgr;
 
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
-import java.util.Formatter;
 
+import java.util.Formatter;
 
 /**
  * Component for obtaining Phone Information. Currently supports
@@ -37,6 +44,20 @@ import java.util.Formatter;
  *
  * @author lmercer@mit.edu (Logan Mercer)
  */
+/* @DesignerComponent(version = YaVersion.PHONESTATUS_COMPONENT_VERSION,
+                   description = "Component that returns information about the phone.",
+                   category = ComponentCategory.INTERNAL,
+                   nonVisible = true,
+                   iconName = "images//phoneip.png") */
+/* @SimpleObject
+ *//* @UsesLibraries(libraries = "webrtc.jar," +
+    "google-http-client.jar," +
+    "google-http-client-android2-beta.jar," +
+    "google-http-client-android3-beta.jar") */
+/* @UsesNativeLibraries(v7aLibraries = "libjingle_peerconnection_so.so",
+  v8aLibraries = "libjingle_peerconnection_so.so",
+  x86_64Libraries = "libjingle_peerconnection_so.so") */
+/* @UsesPermissions({ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE}) */
 public class PhoneStatus extends AndroidNonvisibleComponent implements Component {
 
     private static final String LOG_TAG = "PhoneStatus";
@@ -57,7 +78,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         }
     }
 
-    @SimpleFunction(description = "Returns the IP address of the phone in the form of a String")
+    /* @SimpleFunction(description = "Returns the IP address of the phone in the form of a String") */
     public static String GetWifiIpAddress() {
         DhcpInfo ip;
         Object wifiManager = activity.getSystemService("wifi");
@@ -71,7 +92,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         return ipAddress;
     }
 
-    @SimpleFunction(description = "Returns TRUE if the phone is on Wifi, FALSE otherwise")
+    /* @SimpleFunction(description = "Returns TRUE if the phone is on Wifi, FALSE otherwise") */
     public static boolean isConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService("connectivity");
         NetworkInfo networkInfo = null;
@@ -82,7 +103,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         return networkInfo == null ? false : networkInfo.isConnected();
     }
 
-    @SimpleFunction(description = "Causes an Exception, used to debug exception processing.")
+    /* @SimpleFunction(description = "Causes an Exception, used to debug exception processing.") */
     public static void doFault() throws Exception {
         throw new Exception("doFault called!");
         // Thread t = new Thread(new Runnable() { // Cause an exception in a background thread to test bugsense
@@ -122,10 +143,10 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         return (i & 0xFF) + "." + ((i >> 8) & 0xFF) + "." + ((i >> 16) & 0xFF) + "." + ((i >> 24) & 0xFF);
     }
 
-    @SimpleFunction(description = "Establish the secret seed for HOTP generation. " +
-            "Return the SHA1 of the provided seed, this will be used to contact the " +
-            "rendezvous server. Note: This code also starts the connection negotiation " +
-            "process if we are using WebRTC. This is a bit of a kludge...")
+    /* @SimpleFunction(description = "Establish the secret seed for HOTP generation. " +
+      "Return the SHA1 of the provided seed, this will be used to contact the " +
+      "rendezvous server. Note: This code also starts the connection negotiation " +
+      "process if we are using WebRTC. This is a bit of a kludge...") */
     public String setHmacSeedReturnCode(String seed, String rendezvousServer) {
 
         /* If we get an empty seed, just ignore it. */
@@ -203,7 +224,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         return firstHmacSeed;
     }
 
-    @SimpleFunction(description = "Returns true if we are running in the emulator or USB Connection")
+    /* @SimpleFunction(description = "Returns true if we are running in the emulator or USB Connection") */
     public boolean isDirect() {
         Log.d(LOG_TAG, "android.os.Build.VERSION.RELEASE = " + android.os.Build.VERSION.RELEASE);
         Log.d(LOG_TAG, "android.os.Build.PRODUCT = " + android.os.Build.PRODUCT);
@@ -217,7 +238,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         }
     }
 
-    @SimpleFunction(description = "Start the WebRTC engine")
+    /* @SimpleFunction(description = "Start the WebRTC engine") */
     public void startWebRTC(String rendezvousServer, String iceServers) {
         if (!useWebRTC) {
             return;
@@ -227,21 +248,21 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         ((ReplForm) form).setWebRTCMgr(webRTCNativeMgr);
     }
 
-    @SimpleFunction(description = "Start the internal AppInvHTTPD to listen for incoming forms. FOR REPL USE ONLY!")
+    /* @SimpleFunction(description = "Start the internal AppInvHTTPD to listen for incoming forms. FOR REPL USE ONLY!") */
     public void startHTTPD(boolean secure) {
         if (form.isRepl()) {
             ((ReplForm) form).startHTTPD(secure);
         }
     }
 
-    @SimpleFunction(description = "Declare that we have loaded our initial assets and other assets should come from the sdcard")
+    /* @SimpleFunction(description = "Declare that we have loaded our initial assets and other assets should come from the sdcard") */
     public void setAssetsLoaded() {
         if (form instanceof ReplForm) {
             ((ReplForm) form).setAssetsLoaded();
         }
     }
 
-    @SimpleFunction(description = "Downloads the URL and installs it as an Android Package via the installed browser")
+    /* @SimpleFunction(description = "Downloads the URL and installs it as an Android Package via the installed browser") */
     public void installURL(String url) {
         try {
             Class<?> clazz = Class.forName("edu.mit.appinventor.companionextras.CompanionExtras");
@@ -256,7 +277,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         }
     }
 
-    @SimpleFunction(description = "Really Exit the Application")
+    /* @SimpleFunction(description = "Really Exit the Application") */
     public void shutdown() {
         form.finish();
         System.exit(0);             // We cannot be restarted, so we better kill the process
@@ -266,7 +287,8 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
      * This event is fired when the "settings" menu item is selected (only available in the
      * Companion App, defined in ReplForm.java).
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void OnSettings() {
         EventDispatcher.dispatchEvent(this, "OnSettings");
     }
@@ -276,13 +298,13 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
      *
      * @param useWebRTC Set True to use WebRTC
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False")
-    @SimpleProperty()
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty() */
     public void WebRTC(boolean useWebRTC) {
         this.useWebRTC = useWebRTC;
     }
 
-    @SimpleProperty(description = "If True we are using WebRTC to talk to the server.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "If True we are using WebRTC to talk to the server.") */
     public boolean WebRTC() {
         return useWebRTC;
     }
@@ -297,7 +319,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
      * @return SdkLevel
      */
 
-    @SimpleFunction(description = "Get the current Android SDK Level")
+    /* @SimpleFunction(description = "Get the current Android SDK Level") */
     public int SdkLevel() {
         return SdkLevel.getLevel();
     }
@@ -317,7 +339,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
      * @return The VersionName as a string
      */
 
-    @SimpleFunction(description = "Return the our VersionName property")
+    /* @SimpleFunction(description = "Return the our VersionName property") */
     public String GetVersionName() {
         try {
             String packageName = form.getPackageName();
@@ -328,7 +350,7 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         }
     }
 
-    @SimpleFunction(description = "Return the app that installed us")
+    /* @SimpleFunction(description = "Return the app that installed us") */
     public String GetInstaller() {
         if (SdkLevel.getLevel() >= SdkLevel.LEVEL_ECLAIR) {
             String installer = EclairUtil.getInstallerPackageName("edu.mit.appinventor.aicompanion3", form);
@@ -342,12 +364,13 @@ public class PhoneStatus extends AndroidNonvisibleComponent implements Component
         }
     }
 
-    @SimpleFunction(description = "Return the ACRA Installation ID")
+    /* @SimpleFunction(description = "Return the ACRA Installation ID") */
     public String InstallationId() {
-        return ""; /*org.acra.util.Installation.id(form)*/
+//    return org.acra.util.Installation.id(form);
+        return "<stub>";
     }
 
-    @SimpleFunction(description = "Set the content of the Pop-Up page used for the new legacy connection")
+    /* @SimpleFunction(description = "Set the content of the Pop-Up page used for the new legacy connection") */
     public void SetPopup(String page) {
         popup = page;
     }

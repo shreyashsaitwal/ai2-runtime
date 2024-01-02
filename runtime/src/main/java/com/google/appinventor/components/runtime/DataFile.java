@@ -6,20 +6,40 @@
 package com.google.appinventor.components.runtime;
 
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ChartDataSourceUtil;
 import com.google.appinventor.components.runtime.util.CsvUtil;
 import com.google.appinventor.components.runtime.util.JsonUtil;
 import com.google.appinventor.components.runtime.util.YailList;
-import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.concurrent.*;
 
-public class DataFile extends FileBase implements DataSource<YailList, Future<YailList>> {
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.json.JSONException;
+
+/* @DesignerComponent(version = YaVersion.DATA_FILE_COMPONENT_VERSION,
+    description = "Component that allows reading CSV and JSON data. "
+        + "The DataFile contains functionality relevant to accessing "
+        + "CSV or JSON parsed data in the form of rows or columns. "
+        + "Can be used together with the ChartData2D component to import "
+        + "data directly from a file to the Chart. The component may also be "
+        + "dragged and dropped on a Chart after a file has been selected and "
+        + "parsed successfully to create ChartData components automatically from "
+        + "the file onto the Chart.",
+    category = ComponentCategory.STORAGE,
+    nonVisible = true,
+    iconName = "images//dataFile.png") */
+/* @SimpleObject
+ */public class DataFile extends FileBase implements DataSource<YailList, Future<YailList>> {
 
     private final ExecutorService threadRunner; // Used to queue & execute asynchronous tasks
     private YailList rows;
@@ -46,8 +66,8 @@ public class DataFile extends FileBase implements DataSource<YailList, Future<Ya
      *
      * @return a YailList representing the parsed rows of the Data file.
      */
-    @SimpleProperty(
-            description = "Returns a list of rows corresponding to the Data File's content.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Returns a list of rows corresponding to the Data File's content.") */
     public YailList Rows() {
         return getYailListPropertyHelper(new Callable<YailList>() {
             @Override
@@ -57,14 +77,13 @@ public class DataFile extends FileBase implements DataSource<YailList, Future<Ya
         });
     }
 
-
     /**
      * Retrieve a List of columns of the currently loaded Source file.
      *
      * @return a YailList representing the parsed columns of the Data file.
      */
-    @SimpleProperty(
-            description = "Returns a list of columns corresponding to the Data File's content.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Returns a list of columns corresponding to the Data File's content.") */
     public YailList Columns() {
         return getYailListPropertyHelper(new Callable<YailList>() {
             @Override
@@ -81,8 +100,8 @@ public class DataFile extends FileBase implements DataSource<YailList, Future<Ya
      *
      * @return a YailList containing the elements of the first row.
      */
-    @SimpleProperty(
-            description = "Returns the elements of the first row of the Data File's contents.")
+  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description = "Returns the elements of the first row of the Data File's contents.") */
     public YailList ColumnNames() {
         return getYailListPropertyHelper(new Callable<YailList>() {
             @Override
@@ -130,8 +149,8 @@ public class DataFile extends FileBase implements DataSource<YailList, Future<Ya
      *
      * @param source Source file name
      */
-    @SimpleProperty(userVisible = false)
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET)
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, userVisible = false) */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET) */
     public void SourceFile(String source) {
         // The SourceFile property is only set from the Designer, so the
         // only possibility is a media file. Since media file paths are
@@ -151,16 +170,16 @@ public class DataFile extends FileBase implements DataSource<YailList, Future<Ya
      *
      * @param fileName the file from which the data are read
      */
-    @SimpleFunction(description = "Indicates source file to load data from. "
-            + "The expected format of the contents of the file are either CSV or JSON."
-            + "Prefix the filename with / to read from a specific file on the SD card. "
-            + "for instance /myFile.txt will read the file /sdcard/myFile.txt. To read "
-            + "assets packaged with an application (also works for the Companion) start "
-            + "the filename with // (two slashes). If a filename does not start with a "
-            + "slash, it will be read from the applications private storage (for packaged "
-            + "apps) and from /sdcard/AppInventor/data for the Companion."
-            + "The results of the reading are stored in the Rows, Columns "
-            + "and ColumnNames properties of the component.")
+  /* @SimpleFunction(description = "Indicates source file to load data from. "
+      + "The expected format of the contents of the file are either CSV or JSON."
+      + "Prefix the filename with // to read from a specific file on the SD card. "
+      + "for instance //myFile.txt will read the file //sdcard//myFile.txt. To read "
+      + "assets packaged with an application (also works for the Companion) start "
+      + "the filename with //// (two slashes). If a filename does not start with a "
+      + "slash, it will be read from the applications private storage (for packaged "
+      + "apps) and from //sdcard//AppInventor//data for the Companion."
+      + "The results of the reading are stored in the Rows, Columns "
+      + "and ColumnNames properties of the component.") */
     public void ReadFile(String fileName) {
 
         readFromFile(fileName);

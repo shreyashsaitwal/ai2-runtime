@@ -7,14 +7,15 @@
 package com.google.appinventor.components.runtime.util;
 
 import android.util.Log;
+
 import com.google.appinventor.components.runtime.PhoneStatus;
 import com.google.appinventor.components.runtime.ReplForm;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /*
  * A Class for managing return values from evaluating Repl Forms and

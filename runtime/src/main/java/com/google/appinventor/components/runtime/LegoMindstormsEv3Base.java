@@ -5,8 +5,6 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
@@ -19,7 +17,8 @@ import java.util.Collections;
  * @author jerry73204@gmail.com (jerry73204)
  * @author spaded06543@gmail.com (Alvin Chang)
  */
-public class LegoMindstormsEv3Base extends AndroidNonvisibleComponent
+/* @SimpleObject
+ */public class LegoMindstormsEv3Base extends AndroidNonvisibleComponent
         implements BluetoothConnectionListener, Component, Deleteable {
 
     private static final int TOY_ROBOT = 0x0804;
@@ -37,7 +36,8 @@ public class LegoMindstormsEv3Base extends AndroidNonvisibleComponent
         logTag = null;
     }
 
-    @SimpleProperty(description = "The BluetoothClient component that should be used for communication.")
+    /* @SimpleProperty(description = "The BluetoothClient component that should be used for communication.",
+                    category = PropertyCategory.BEHAVIOR) */
     public BluetoothClient BluetoothClient() {
         return bluetooth;
     }
@@ -46,9 +46,10 @@ public class LegoMindstormsEv3Base extends AndroidNonvisibleComponent
      * Specifies the BluetoothClient component that should be used for communication.
      * **Must be set in the Designer**.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BLUETOOTHCLIENT,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BLUETOOTHCLIENT,
+                    defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void BluetoothClient(BluetoothClient bluetoothClient) {
         if (bluetooth != null) {
             bluetooth.removeBluetoothConnectionListener(this);

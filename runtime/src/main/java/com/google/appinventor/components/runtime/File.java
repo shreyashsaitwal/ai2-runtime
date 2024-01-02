@@ -8,13 +8,11 @@ package com.google.appinventor.components.runtime;
 
 import android.annotation.SuppressLint;
 import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import androidx.documentfile.provider.DocumentFile;
 import com.google.appinventor.components.common.FileScope;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.errors.StopBlocksExecution;
 import com.google.appinventor.components.runtime.util.*;
 
@@ -22,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -67,6 +66,17 @@ import java.util.List;
  * Note 2: In all scopes, a file name beginning with two slashes (`//`) will be interpreted as an
  * asset name.
  */
+/* @DesignerComponent(version = YaVersion.FILE_COMPONENT_VERSION,
+    description = "Non-visible component for storing and retrieving files. Use this component to "
+    + "write or read files on your device. The default behaviour is to write files to the "
+    + "private data directory associated with your App. The Companion is special cased to write "
+    + "files to a public directory for debugging. Use the More information link to read more about "
+    + "how the File component uses paths and scopes to manage access to files.",
+    category = ComponentCategory.STORAGE,
+    nonVisible = true,
+    iconName = "images//file.png") */
+/* @SimpleObject
+ */
 @SuppressLint({"InlinedApi", "SdCardPath"})
 public class File extends FileBase implements Component {
     private static final String LOG_TAG = "FileComponent";
@@ -86,9 +96,10 @@ public class File extends FileBase implements Component {
      *
      * @param required true if the permission is required
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.BEHAVIOR) */
+    /* @UsesPermissions(READ_EXTERNAL_STORAGE) */
     public void ReadPermission(boolean required) {
         // not used programmatically
     }
@@ -98,12 +109,14 @@ public class File extends FileBase implements Component {
      *
      * @param scope the target scope
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void Scope(FileScope scope) {
         this.scope = scope;
     }
 
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public FileScope Scope() {
         return scope;
     }
@@ -114,9 +127,10 @@ public class File extends FileBase implements Component {
      *
      * @param required true if the permission is required
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.BEHAVIOR) */
+    /* @UsesPermissions(WRITE_EXTERNAL_STORAGE) */
     public void WritePermission(boolean required) {
         // not used programmatically
     }
@@ -130,7 +144,8 @@ public class File extends FileBase implements Component {
      * @param directoryName the name of the directory to create
      * @param continuation  the code to run after making the directory
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void MakeDirectory(FileScope scope, String directoryName,
                               final Continuation<Boolean> continuation) {
         if (scope == FileScope.Asset) {
@@ -180,7 +195,8 @@ public class File extends FileBase implements Component {
      * @param recursive     true if the directory should be removed recursively
      * @param continuation  the continuation to run after the operation completes
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void RemoveDirectory(FileScope scope, String directoryName, final boolean recursive,
                                 final Continuation<Boolean> continuation) {
         if (scope == FileScope.Asset) {
@@ -213,7 +229,8 @@ public class File extends FileBase implements Component {
      * @param directoryName the name of the directory to list
      * @param continuation  the continuation to run after the operation completes
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void ListDirectory(FileScope scope, String directoryName,
                               final Continuation<List<String>> continuation) {
         if (scope == FileScope.Asset && !form.isRepl()) {
@@ -224,6 +241,16 @@ public class File extends FileBase implements Component {
                 form.dispatchErrorOccurredEvent(this, "ListDirectory",
                         ErrorMessages.ERROR_CANNOT_LIST_DIRECTORY, directoryName);
             }
+            return;
+        } else if (scope == FileScope.Shared && directoryName.startsWith("content:")
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            DocumentFile dir = DocumentFile.fromTreeUri(form, Uri.parse(directoryName));
+            DocumentFile[] files = dir.listFiles();
+            List<String> result = new ArrayList<>();
+            for (DocumentFile file : files) {
+                result.add(file.getName());
+            }
+            continuation.call(result);
             return;
         }
         if (!directoryName.contains("/")) {
@@ -255,7 +282,8 @@ public class File extends FileBase implements Component {
      * @param path         the path to test to see if it is a directory
      * @param continuation the continuation to run after the operation completes
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void IsDirectory(FileScope scope, String path, final Continuation<Boolean> continuation) {
         if (scope == FileScope.Asset && !form.isRepl()) {
             AssetManager manager = form.getAssets();
@@ -292,7 +320,8 @@ public class File extends FileBase implements Component {
      * @param toFileName   the name of the target file
      * @param continuation the continuation to run after the operation completes
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void CopyFile(FileScope fromScope, String fromFileName, final FileScope toScope,
                          final String toFileName, final Continuation<Boolean> continuation) {
         final String method = "CopyFile";
@@ -314,12 +343,15 @@ public class File extends FileBase implements Component {
                     public void call(ScopedFile[] files) {
                         InputStream in = null;
                         OutputStream out = null;
-                        java.io.File parent = files[1].resolve(form).getParentFile();
-                        if (!parent.exists() && !parent.mkdirs()) {
-                            form.dispatchErrorOccurredEvent(File.this, method,
-                                    ErrorMessages.ERROR_CANNOT_MAKE_DIRECTORY, parent.getAbsolutePath());
-                            result.caught(new IOException());
-                            return;
+                        if (!files[1].getFileName().startsWith("content:")) {
+                            // If we aren't using a content provider, try to ensure the parent dirs exist
+                            java.io.File parent = files[1].resolve(form).getParentFile();
+                            if (!parent.exists() && !parent.mkdirs()) {
+                                form.dispatchErrorOccurredEvent(File.this, method,
+                                        ErrorMessages.ERROR_CANNOT_MAKE_DIRECTORY, parent.getAbsolutePath());
+                                result.caught(new IOException());
+                                return;
+                            }
                         }
                         try {
                             in = FileUtil.openForReading(form, files[0]);
@@ -353,7 +385,8 @@ public class File extends FileBase implements Component {
      * Android O and higher. On earlier versions, the file will be copied and then the old file
      * removed.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void MoveFile(final FileScope fromScope, final String fromFileName,
                          final FileScope toScope, final String toFileName, final Continuation<Boolean> continuation) {
         final String method = "MoveFile";
@@ -396,7 +429,8 @@ public class File extends FileBase implements Component {
      * @param path         the path (such as a file or directory) to look for
      * @param continuation the continuation to pass the result
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void Exists(FileScope scope, String path, final Continuation<Boolean> continuation) {
         // TODO(ewpatton): Restructure this when we have full continuation passing style.
         final Synchronizer<Boolean> result = new Synchronizer<>();
@@ -405,7 +439,25 @@ public class File extends FileBase implements Component {
                 .addCommand(new FileOperation.FileInvocation() {
                     @Override
                     public void call(ScopedFile[] files) {
-                        result.wakeup(files[0].resolve(form).exists());
+                        if (files[0].getScope() == FileScope.Asset && !form.isRepl()) {
+                            boolean success = false;
+                            try {
+                                String[] items = form.getAssets().list("");
+                                if (items != null) {
+                                    for (String item : items) {
+                                        if (item.equals(files[0].getFileName())) {
+                                            success = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch (IOException e) {
+                                // This can happen if the file doesn't exist
+                            }
+                            result.wakeup(success);
+                        } else {
+                            result.wakeup(files[0].resolve(form).exists());
+                        }
                     }
                 }).build().run();
         AsynchUtil.finish(result, continuation);
@@ -418,7 +470,8 @@ public class File extends FileBase implements Component {
      * @param path  the path (such as a file or directory) to look for
      * @return a path that uniquely identifies a file in the file system
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public String MakeFullPath(FileScope scope, String path) {
         return FileUtil.resolveFileName(form, path, scope);
     }
@@ -439,14 +492,14 @@ public class File extends FileBase implements Component {
      * @internaldoc Calls the Write function to write to the file asynchronously to prevent
      * the UI from hanging when there is a large write.
      */
-    @SimpleFunction(description = "Saves text to a file. If the filename "
-            + "begins with a slash (/) the file is written to the sdcard. For example writing to "
-            + "/myFile.txt will write the file to /sdcard/myFile.txt. If the filename does not start "
-            + "with a slash, it will be written in the programs private data directory where it will "
-            + "not be accessible to other programs on the phone. There is a special exception for the "
-            + "AI Companion where these files are written to /sdcard/AppInventor/data to facilitate "
-            + "debugging. Note that this block will overwrite a file if it already exists."
-            + "\n\nIf you want to add content to a file use the append block.")
+  /* @SimpleFunction(description = "Saves text to a file. If the filename "
+      + "begins with a slash (//) the file is written to the sdcard. For example writing to "
+      + "//myFile.txt will write the file to //sdcard//myFile.txt. If the filename does not start "
+      + "with a slash, it will be written in the programs private data directory where it will "
+      + "not be accessible to other programs on the phone. There is a special exception for the "
+      + "AI Companion where these files are written to //sdcard//AppInventor//data to facilitate "
+      + "debugging. Note that this block will overwrite a file if it already exists."
+      + "\n\nIf you want to add content to a file use the append block.") */
     public void SaveFile(String text, String fileName) {
         write(fileName, "SaveFile", text, false);
     }
@@ -461,8 +514,8 @@ public class File extends FileBase implements Component {
      * @internaldoc Calls the Write function to write to the file asynchronously to prevent
      * the UI from hanging when there is a large write.
      */
-    @SimpleFunction(description = "Appends text to the end of a file storage, creating the file if it does not exist. "
-            + "See the help text under SaveFile for information about where files are written.")
+  /* @SimpleFunction(description = "Appends text to the end of a file storage, creating the file if it does not exist. "
+      + "See the help text under SaveFile for information about where files are written.") */
     public void AppendToFile(String text, String fileName) {
         write(fileName, "AppendToFile", text, true);
     }
@@ -477,17 +530,16 @@ public class File extends FileBase implements Component {
      *
      * @param fileName the file from which the text is read
      */
-    @SimpleFunction(description = "Reads text from a file in storage. "
-            + "Prefix the filename with / to read from a specific file on the SD card. "
-            + "for instance /myFile.txt will read the file /sdcard/myFile.txt. To read "
-            + "assets packaged with an application (also works for the Companion) start "
-            + "the filename with // (two slashes). If a filename does not start with a "
-            + "slash, it will be read from the applications private storage (for packaged "
-            + "apps) and from /sdcard/AppInventor/data for the Companion.")
+  /* @SimpleFunction(description = "Reads text from a file in storage. "
+      + "Prefix the filename with // to read from a specific file on the SD card. "
+      + "for instance //myFile.txt will read the file //sdcard//myFile.txt. To read "
+      + "assets packaged with an application (also works for the Companion) start "
+      + "the filename with //// (two slashes). If a filename does not start with a "
+      + "slash, it will be read from the applications private storage (for packaged "
+      + "apps) and from //sdcard//AppInventor//data for the Companion.") */
     public void ReadFrom(final String fileName) {
         readFromFile(fileName);
     }
-
 
     /**
      * Deletes a file from storage. Prefix the `fileName`{:.text.block} with `/` to delete a specific
@@ -498,11 +550,11 @@ public class File extends FileBase implements Component {
      *
      * @param fileName the file to be deleted
      */
-    @SimpleFunction(description = "Deletes a file from storage. Prefix the filename with / to "
-            + "delete a specific file in the SD card, for instance /myFile.txt. will delete the file "
-            + "/sdcard/myFile.txt. If the file does not begin with a /, then the file located in the "
-            + "programs private storage will be deleted. Starting the file with // is an error "
-            + "because assets files cannot be deleted.")
+  /* @SimpleFunction(description = "Deletes a file from storage. Prefix the filename with // to "
+      + "delete a specific file in the SD card, for instance //myFile.txt. will delete the file "
+      + "//sdcard//myFile.txt. If the file does not begin with a //, then the file located in the "
+      + "programs private storage will be deleted. Starting the file with //// is an error "
+      + "because assets files cannot be deleted.") */
     public void Delete(final String fileName) {
         if (fileName.startsWith("//")) {
             form.dispatchErrorOccurredEvent(this, "Delete",
@@ -583,8 +635,14 @@ public class File extends FileBase implements Component {
                 @Override
                 public void onError(IOException e) {
                     super.onError(e);
+                    String fileName;
+                    if (getFile() == null) {
+                        fileName = getScopedFile().getFileName();
+                    } else {
+                        fileName = getFile().getAbsolutePath();
+                    }
                     form.dispatchErrorOccurredEvent(File.this, method, ErrorMessages.ERROR_CANNOT_WRITE_TO_FILE,
-                            getFile().getAbsolutePath());
+                            fileName);
                 }
             }.run();
         } catch (StopBlocksExecution e) {
@@ -597,7 +655,7 @@ public class File extends FileBase implements Component {
      *
      * @param text read from the file
      */
-    @SimpleEvent(description = "Event indicating that the contents from the file have been read.")
+    /* @SimpleEvent (description = "Event indicating that the contents from the file have been read.") */
     public void GotText(String text) {
         // invoke the application's "GotText" event handler.
         EventDispatcher.dispatchEvent(this, "GotText", text);
@@ -608,7 +666,7 @@ public class File extends FileBase implements Component {
      *
      * @param fileName the name of the written file
      */
-    @SimpleEvent(description = "Event indicating that the contents of the file have been written.")
+    /* @SimpleEvent (description = "Event indicating that the contents of the file have been written.") */
     public void AfterFileSaved(String fileName) {
         // invoke the application's "AfterFileSaved" event handler.
         EventDispatcher.dispatchEvent(this, "AfterFileSaved", fileName);

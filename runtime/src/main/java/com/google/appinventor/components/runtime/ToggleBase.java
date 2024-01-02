@@ -6,21 +6,20 @@
 
 package com.google.appinventor.components.runtime;
 
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.runtime.util.TextViewUtil;
+
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
-import com.google.appinventor.components.runtime.util.TextViewUtil;
 
 /**
  * Abstract base class for toggleable items with the ability to detect initialization, focus
  * change (mousing on or off of it), and user clicks.
  */
-public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewComponent
+/* @SimpleObject
+ */public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewComponent
         implements OnCheckedChangeListener, OnFocusChangeListener, AccessibleComponent {
 
     protected T view;
@@ -29,7 +28,7 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
     private int backgroundColor;
 
     // Backing for font typeface
-    private int fontTypeface;
+    private String fontTypeface;
 
     // Backing for font bold
     private boolean bold;
@@ -64,7 +63,7 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
         BackgroundColor(Component.COLOR_NONE);
         Enabled(true);
         fontTypeface = Component.TYPEFACE_DEFAULT;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
         FontSize(Component.FONT_DEFAULT_SIZE);
         Text("");
         TextColor(Component.COLOR_DEFAULT);
@@ -105,7 +104,7 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
     /**
      * User tapped and released the `%type%`.
      */
-    @SimpleEvent(description = "User tapped and released the %type%.")
+    /* @SimpleEvent(description = "User tapped and released the %type%.") */
     public void Changed() {
         EventDispatcher.dispatchEvent(this, "Changed");
     }
@@ -113,7 +112,7 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
     /**
      * `%type%` became the focused component.
      */
-    @SimpleEvent(description = "%type% became the focused component.")
+    /* @SimpleEvent(description = "%type% became the focused component.") */
     public void GotFocus() {
         EventDispatcher.dispatchEvent(this, "GotFocus");
     }
@@ -121,7 +120,7 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
     /**
      * `%type%` stopped being the focused component.
      */
-    @SimpleEvent(description = "%type% stopped being the focused component.")
+    /* @SimpleEvent(description = "%type% stopped being the focused component.") */
     public void LostFocus() {
         EventDispatcher.dispatchEvent(this, "LostFocus");
     }
@@ -132,9 +131,9 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param argb background RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_NONE)
-    @SimpleProperty(description = "The background color of the %type% as an alpha-red-green-blue integer.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+          defaultValue = Component.DEFAULT_VALUE_COLOR_NONE) */
+    /* @SimpleProperty(description = "The background color of the %type% as an alpha-red-green-blue integer.") */
     public void BackgroundColor(int argb) {
         backgroundColor = argb;
         if (argb != Component.COLOR_DEFAULT) {
@@ -151,8 +150,10 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return background RGB color with alpha
      * @suppressdoc
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+    /* @IsColor
+     */
     public int BackgroundColor() {
         return backgroundColor;
     }
@@ -162,9 +163,9 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param enabled {@code true} for enabled, {@code false} disabled
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty(description = "True if the %type% is active and clickable.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+          defaultValue = "True") */
+    /* @SimpleProperty(description = "True if the %type% is active and clickable.") */
     public void Enabled(boolean enabled) {
         TextViewUtil.setEnabled(view, enabled);
     }
@@ -175,8 +176,8 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return {@code true} indicates enabled, {@code false} disabled
      * @suppressdoc
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR) */
     public boolean Enabled() {
         return view.isEnabled();
     }
@@ -187,14 +188,14 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param bold {@code true} indicates bold, {@code false} normal
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(
-            userVisible = false,
-            description = "Set to true if the text of the %type% should be bold.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(
+      userVisible = false,
+      description = "Set to true if the text of the %type% should be bold.") */
     public void FontBold(boolean bold) {
         this.bold = bold;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
     }
 
     /**
@@ -205,8 +206,9 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return {@code true} indicates bold, {@code false} normal
      * @suppressdoc
      */
-    @SimpleProperty(
-            userVisible = false)
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
     public boolean FontBold() {
         return bold;
     }
@@ -217,14 +219,14 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param italic {@code true} indicates italic, {@code false} normal
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(
-            userVisible = false,
-            description = "Set to true if the text of the %type% should be italic.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(
+      userVisible = false,
+      description = "Set to true if the text of the %type% should be italic.") */
     public void FontItalic(boolean italic) {
         this.italic = italic;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
     }
 
     /**
@@ -235,8 +237,9 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return {@code true} indicates italic, {@code false} normal
      * @suppressdoc
      */
-    @SimpleProperty(
-            userVisible = false)
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
     public boolean FontItalic() {
         return italic;
     }
@@ -246,10 +249,10 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param size font size in sp(scale-independent pixels)
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-            defaultValue = Component.FONT_DEFAULT_SIZE + "")
-    @SimpleProperty(description = "Specifies the text font size of the %type% in scale-independent "
-            + "pixels.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = Component.FONT_DEFAULT_SIZE + "") */
+  /* @SimpleProperty(description = "Specifies the text font size of the %type% in scale-independent "
+      + "pixels.") */
     public void FontSize(float size) {
         if (Math.abs(size - Component.FONT_DEFAULT_SIZE) < .01 || Math.abs(size - 24) < .01) {
             if (isBigText || container.$form().BigDefaultText()) {
@@ -268,8 +271,8 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return font size in sp (scale-independent pixels)
      * @suppressdoc
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public float FontSize() {
         return TextViewUtil.getFontSize(view, container.$context());
     }
@@ -283,14 +286,14 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *                 {@link Component#TYPEFACE_SANSSERIF} or
      *                 {@link Component#TYPEFACE_MONOSPACE}
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TYPEFACE,
-            defaultValue = Component.TYPEFACE_DEFAULT + "")
-    @SimpleProperty(
-            description = "Specifies the text font face of the %type%.",
-            userVisible = false)
-    public void FontTypeface(int typeface) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TYPEFACE,
+      defaultValue = Component.TYPEFACE_DEFAULT + "") */
+  /* @SimpleProperty(
+      description = "Specifies the text font face of the %type%.",
+      userVisible = false) */
+    public void FontTypeface(String typeface) {
         fontTypeface = typeface;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
     }
 
     /**
@@ -303,9 +306,10 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * {@link Component#TYPEFACE_MONOSPACE}
      * @suppressdoc
      */
-    @SimpleProperty(
-            userVisible = false)
-    public int FontTypeface() {
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
+    public String FontTypeface() {
         return fontTypeface;
     }
 
@@ -314,8 +318,8 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param text new caption for toggleable button
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING)
-    @SimpleProperty(description = "Specifies the text displayed by the %type%.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING) */
+    /* @SimpleProperty(description = "Specifies the text displayed by the %type%.") */
     public void Text(String text) {
         TextViewUtil.setText(view, text);
     }
@@ -326,8 +330,8 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return toggle's caption
      * @suppressdoc
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public String Text() {
         return TextViewUtil.getText(view);
     }
@@ -338,10 +342,10 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      *
      * @param argb text RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK)
-    @SimpleProperty(description = "Specifies the text color of the %type% as an "
-            + "alpha-red-green-blue integer.")
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK) */
+  /* @SimpleProperty(description = "Specifies the text color of the %type% as an "
+      + "alpha-red-green-blue integer.") */
     public void TextColor(int argb) {
         textColor = argb;
         if (argb != Component.COLOR_DEFAULT) {
@@ -358,8 +362,10 @@ public abstract class ToggleBase<T extends CompoundButton> extends AndroidViewCo
      * @return text RGB color with alpha
      * @suppressdoc
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+    /* @IsColor
+     */
     public int TextColor() {
         return textColor;
     }

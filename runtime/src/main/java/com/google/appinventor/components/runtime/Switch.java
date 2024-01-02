@@ -11,10 +11,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 
 /**
@@ -24,7 +24,14 @@ import com.google.appinventor.components.runtime.util.SdkLevel;
  * Switches have an on (true) state and an off (false) state. A `Switch` component raises an event
  * when the user taps it to toggle between states.
  */
-public final class Switch extends ToggleBase<CompoundButton> {
+/* @DesignerComponent(version = YaVersion.SWITCH_COMPONENT_VERSION,
+    description = "Toggle switch that raises an event when the user clicks on it. " +
+    "There are many properties affecting its appearance that can be set in " +
+    "the Designer or Blocks Editor.",
+    category = ComponentCategory.USERINTERFACE,
+    iconName = "images//switch.png") */
+/* @SimpleObject
+ */public final class Switch extends ToggleBase<CompoundButton> {
 
     private final Activity activity;
     private final SwitchCompat switchView;
@@ -81,7 +88,7 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @return thumb RGB color with alpha
      */
-    @SimpleProperty()
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE) */
     public int ThumbColorActive() {
         return thumbColorActive;
     }
@@ -91,9 +98,10 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @param argb thumb RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_WHITE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+          defaultValue = Component.DEFAULT_VALUE_COLOR_WHITE) */
+    /* @SimpleProperty
+     */
     public void ThumbColorActive(int argb) {
         thumbColorActive = argb;
         if (switchView != null) {
@@ -108,7 +116,7 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @return thumb RGB color with alpha
      */
-    @SimpleProperty(userVisible = true)
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE, userVisible = true) */
     public int ThumbColorInactive() {
         return thumbColorInactive;
     }
@@ -118,9 +126,10 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @param argb thumb RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_LTGRAY)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+          defaultValue = Component.DEFAULT_VALUE_COLOR_LTGRAY) */
+    /* @SimpleProperty
+     */
     public void ThumbColorInactive(int argb) {
         thumbColorInactive = argb;
         if (switchView != null) {
@@ -134,12 +143,12 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @return track RGB color with alpha
      */
-    @SimpleProperty(userVisible = true)
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE, userVisible = true) */
     public int TrackColorActive() {
         return trackColorActive;
     }
 
-    @SimpleProperty(userVisible = true)
+    /* @SimpleProperty(category = PropertyCategory.APPEARANCE, userVisible = true) */
     public int TrackColorInactive() {
         return trackColorInactive;
     }
@@ -149,9 +158,9 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @param argb track RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_GREEN)
-    @SimpleProperty(description = "Color of the toggle track when switched on", userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+          defaultValue = Component.DEFAULT_VALUE_COLOR_GREEN) */
+    /* @SimpleProperty(description = "Color of the toggle track when switched on", userVisible = true) */
     public void TrackColorActive(int argb) {
         trackColorActive = argb;
         if (switchView != null) {
@@ -165,9 +174,9 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @param argb
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_DKGRAY)
-    @SimpleProperty(description = "Color of the toggle track when switched off", userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+          defaultValue = Component.DEFAULT_VALUE_COLOR_DKGRAY) */
+    /* @SimpleProperty(description = "Color of the toggle track when switched off", userVisible = true) */
     public void TrackColorInactive(int argb) {
         trackColorInactive = argb;
         if (switchView != null) {
@@ -181,8 +190,8 @@ public final class Switch extends ToggleBase<CompoundButton> {
      *
      * @return {@code true} indicates checked, {@code false} unchecked
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+          category = PropertyCategory.BEHAVIOR) */
     public boolean On() {
         return view.isChecked();
     }
@@ -193,16 +202,17 @@ public final class Switch extends ToggleBase<CompoundButton> {
      * @param value {@code true} indicates checked, {@code false} unchecked
      * @internaldoc Checked property setter method.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+          defaultValue = "False") */
+    /* @SimpleProperty
+     */
     public void On(boolean value) {
         view.setChecked(value);
         view.invalidate();
     }
 
     @Override
-    @SimpleEvent(description = "User change the state of the `Switch` from On to Off or back.")
+    /* @SimpleEvent(description = "User change the state of the `Switch` from On to Off or back.") */
     public void Changed() {
         super.Changed();
     }

@@ -6,20 +6,26 @@
 
 package com.google.appinventor.components.runtime;
 
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import android.app.Activity;
+
 import android.content.Intent;
+
 import android.net.Uri;
+
 import android.os.Environment;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
+
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.FileUtil;
 
 import java.io.File;
-
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 /**
  * ![Camcorder icon](images/camcorder.png)
@@ -30,6 +36,17 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
  * property of a {@link VideoPlayer} component.
  */
 
+/* @DesignerComponent(version = YaVersion.CAMCORDER_COMPONENT_VERSION,
+  description = "A component to record a video using the device's camcorder." +
+  "After the video is recorded, the name of the file on the phone " +
+  "containing the clip is available as an argument to the " +
+  "AfterRecording event. The file name can be used, for example, to set " +
+  "the source property of a VideoPlayer component.",
+  category = ComponentCategory.MEDIA,
+  nonVisible = true,
+  iconName = "images//camcorder.png") */
+/* @SimpleObject
+ *//* @UsesPermissions({CAMERA}) */
 public class Camcorder extends AndroidNonvisibleComponent
         implements ActivityResultListener, Component {
 
@@ -66,7 +83,8 @@ public class Camcorder extends AndroidNonvisibleComponent
     /**
      * Records a video, then raises the {@link #AfterRecording(String)} event.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public void RecordVideo() {
         String state = Environment.getExternalStorageState();
         if (!havePermission) {
@@ -150,7 +168,8 @@ public class Camcorder extends AndroidNonvisibleComponent
      * Indicates that a video was recorded with the camera and provides the path to
      * the stored video.
      */
-    @SimpleEvent
+    /* @SimpleEvent
+     */
     public void AfterRecording(String clip) {
         EventDispatcher.dispatchEvent(this, "AfterRecording", clip);
     }

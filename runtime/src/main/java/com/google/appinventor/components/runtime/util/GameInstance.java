@@ -25,7 +25,6 @@ public class GameInstance {
     // Use this to store the most recent time stamp of each message type received.
     private Map<String, String> messageTimes;
 
-
     /**
      * A GameInstance contains the most recent values
      * for the leader and players of a particular game instance.

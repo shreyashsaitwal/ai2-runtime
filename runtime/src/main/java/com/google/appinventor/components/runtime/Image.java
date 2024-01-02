@@ -6,15 +6,10 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.Manifest;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.errors.IllegalArgumentError;
 import com.google.appinventor.components.runtime.util.*;
 
@@ -26,6 +21,15 @@ import java.io.IOException;
  * The picture to display, and other aspects of the Image's appearance, can be specified in the
  * Designer or in the Blocks Editor.
  */
+/* @DesignerComponent(version = YaVersion.IMAGE_COMPONENT_VERSION,
+    category = ComponentCategory.USERINTERFACE,
+    description = "Component for displaying images.  The picture to display, " +
+    "and other aspects of the Image's appearance, can be specified in the " +
+    "Designer or in the Blocks Editor.",
+    iconName = "images//image.png") */
+/* @SimpleObject
+ *//* @UsesPermissions(permissionNames = "android.permission.INTERNET," +
+    "android.permission.READ_EXTERNAL_STORAGE") */
 public final class Image extends AndroidViewComponent {
 
     private final ImageView view;
@@ -65,20 +69,21 @@ public final class Image extends AndroidViewComponent {
         return view;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(description = "A written description of what the image looks like.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+  /* @SimpleProperty(description = "A written description of what the image looks like.",
+      category = PropertyCategory.APPEARANCE) */
     public void AlternateText(String description) {
         view.setContentDescription(description);
     }
 
-    @SimpleEvent(description = "An event that occurs when an image is clicked.")
+    /* @SimpleEvent(description = "An event that occurs when an image is clicked.") */
     public void Click() {
         EventDispatcher.dispatchEvent(this, "Click");
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(description = "Specifies whether the image should be clickable or not.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty(description = "Specifies whether the image should be clickable or not.") */
     public void Clickable(boolean clickable) {
         this.clickable = clickable;
         view.setClickable(this.clickable);
@@ -94,7 +99,7 @@ public final class Image extends AndroidViewComponent {
         }
     }
 
-    @SimpleProperty(description = "Specifies whether the image should be clickable or not.")
+    /* @SimpleProperty(description = "Specifies whether the image should be clickable or not.", category = PropertyCategory.APPEARANCE) */
     public boolean Clickable() {
         return this.clickable;
     }
@@ -104,8 +109,8 @@ public final class Image extends AndroidViewComponent {
      *
      * @return the path of the image's picture
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public String Picture() {
         return picturePath;
     }
@@ -117,26 +122,26 @@ public final class Image extends AndroidViewComponent {
      * @internaldoc <p/>See {@link MediaUtil#determineMediaSource} for information about what
      * a path can be.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
-            defaultValue = "")
-    @SimpleProperty
-    public void Picture(final String path) {
-        if (MediaUtil.isExternalFile(container.$context(), path)
-                && container.$form().isDeniedPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            container.$form().askPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
-                    new PermissionResultHandler() {
-                        @Override
-                        public void HandlePermissionResponse(String permission, boolean granted) {
-                            if (granted) {
-                                Picture(path);
-                            } else {
-                                container.$form().dispatchPermissionDeniedEvent(Image.this, "Picture", permission);
-                            }
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
+    public void Picture(/* @Asset  */String path) {
+        final String tempPath = path == null ? "" : path;
+        if (TiramisuUtil.requestImagePermissions(container.$form(), path,
+                new PermissionResultHandler() {
+                    @Override
+                    public void HandlePermissionResponse(String permission, boolean granted) {
+                        if (granted) {
+                            Picture(tempPath);
+                        } else {
+                            container.$form().dispatchPermissionDeniedEvent(Image.this, "Picture", permission);
                         }
-                    });
+                    }
+                })) {
             return;
         }
-        picturePath = (path == null) ? "" : path;
+        picturePath = tempPath;
 
         Drawable drawable;
         try {
@@ -154,9 +159,10 @@ public final class Image extends AndroidViewComponent {
      *
      * @param rotated the rotation angle
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "0.0")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "0.0") */
+    /* @SimpleProperty
+     */
     public void RotationAngle(double rotationAngle) {
         if (this.rotationAngle == rotationAngle) {
             return;                   // Nothing to do...
@@ -172,16 +178,18 @@ public final class Image extends AndroidViewComponent {
         this.rotationAngle = rotationAngle;
     }
 
-    @SimpleProperty(description = "The angle at which the image picture appears rotated. " +
-            "This rotation does not appear on the designer screen, only on the device.")
+    /* @SimpleProperty(description = "The angle at which the image picture appears rotated. " +
+        "This rotation does not appear on the designer screen, only on the device.",
+        category = PropertyCategory.APPEARANCE) */
     public double RotationAngle() {
         return rotationAngle;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
     // @Deprecated -- We will deprecate this in a future release (jis: 2/12/2016)
-    @SimpleProperty(description = "Specifies whether the image should be resized to match the size of the ImageView.")
+  /* @SimpleProperty(description = "Specifies whether the image should be resized to match the size of the ImageView.",
+      category = PropertyCategory.APPEARANCE) */
     public void ScalePictureToFit(boolean scale) {
         if (scale)
             view.setScaleType(ImageView.ScaleType.FIT_XY);
@@ -197,10 +205,11 @@ public final class Image extends AndroidViewComponent {
      * @param animation animation kind
      * @see AnimationUtil
      */
-    @SimpleProperty(description = "This is a limited form of animation that can attach " +
-            "a small number of motion types to images.  The allowable motions are " +
-            "ScrollRightSlow, ScrollRight, ScrollRightFast, ScrollLeftSlow, ScrollLeft, " +
-            "ScrollLeftFast, and Stop")
+  /* @SimpleProperty(description = "This is a limited form of animation that can attach " +
+      "a small number of motion types to images.  The allowable motions are " +
+      "ScrollRightSlow, ScrollRight, ScrollRightFast, ScrollLeftSlow, ScrollLeft, " +
+      "ScrollLeftFast, and Stop",
+      category = PropertyCategory.APPEARANCE) */
     // TODO(user): This should be changed from a property to an "animate" method, and have the choices
     // placed in a dropdown.  Aternatively the whole thing should be removed and we should do
     // something that is more consistent with sprites.
@@ -211,10 +220,10 @@ public final class Image extends AndroidViewComponent {
     @Deprecated
 //  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_SCALING,
 //      defaultValue = Component.SCALING_SCALE_PROPORTIONALLY + "")
-    @SimpleProperty(description = "This property determines how the picture " +
-            "scales according to the Height or Width of the Image. Scale " +
-            "proportionally (0) preserves the picture aspect ratio. Scale to fit " +
-            "(1) matches the Image area, even if the aspect ratio changes.")
+  /* @SimpleProperty(description = "This property determines how the picture " +
+      "scales according to the Height or Width of the Image. Scale " +
+      "proportionally (0) preserves the picture aspect ratio. Scale to fit " +
+      "(1) matches the Image area, even if the aspect ratio changes.") */
     public void Scaling(int mode) {
         switch (mode) {
             case 0:
@@ -232,7 +241,8 @@ public final class Image extends AndroidViewComponent {
     /**
      * @suppressdoc
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public int Scaling() {
         return scalingMode;
     }

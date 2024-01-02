@@ -6,19 +6,19 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.view.View;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
+
+import android.view.View;
 
 /**
  * Underlying base class for all components with views; not accessible to Simple programmers.
  * <p>
  * Provides implementations for standard properties and events.
  */
-public abstract class AndroidViewComponent extends VisibleComponent {
+/* @SimpleObject
+ */public abstract class AndroidViewComponent extends VisibleComponent {
 
     protected final ComponentContainer container;
 
@@ -49,9 +49,10 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @return true iff the component is visible
      */
-    @SimpleProperty(
-            description = "Specifies whether the %type% should be visible on the screen. "
-                    + "Value is true if the %type% is showing and false if hidden.")
+  /* @SimpleProperty(
+      description = "Specifies whether the %type% should be visible on the screen. "
+          + "Value is true if the %type% is showing and false if hidden.",
+      category = PropertyCategory.APPEARANCE) */
     public boolean Visible() {
         return getView().getVisibility() == View.VISIBLE;
     }
@@ -62,9 +63,10 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @param visibility desired state
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void Visible(boolean visibility) {
         // The principle of least astonishment suggests we not offer the
         // Android option INVISIBLE.
@@ -77,8 +79,8 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      * @return width in pixels
      */
     @Override
-    @SimpleProperty
-    public int Width() {
+    /* @SimpleProperty
+     */ public int Width() {
         int zWidth = (int) (getView().getWidth() / container.$form().deviceDensity());
 //    System.err.println("AndroidViewComponent: Width() Called, returning " + zWidth);
         return zWidth;
@@ -90,7 +92,7 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      * @param width in pixels
      */
     @Override
-    @SimpleProperty(description = "Specifies the horizontal width of the %type%, measured in pixels.")
+    /* @SimpleProperty(description = "Specifies the horizontal width of the %type%, measured in pixels.") */
     public void Width(int width) {
         container.setChildWidth(this, width);
         lastSetWidth = width;
@@ -109,8 +111,8 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      */
 
     @Override
-    @SimpleProperty(description = "Specifies the horizontal width of the %type% as a percentage of "
-            + "the width of the Screen.")
+  /* @SimpleProperty(description = "Specifies the horizontal width of the %type% as a percentage of "
+      + "the width of the Screen.") */
     public void WidthPercent(int pCent) {
         if (pCent < 0 || pCent > 100) {
             container.$form().dispatchErrorOccurredEvent(this, "WidthPercent",
@@ -158,6 +160,8 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @param sourceComponent the component to copy from
      */
+    /* @SimplePropertyCopier
+     */
     public void CopyWidth(AndroidViewComponent sourceComponent) {
         Width(sourceComponent.lastSetWidth);
     }
@@ -168,8 +172,8 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      * @return height in pixels
      */
     @Override
-    @SimpleProperty
-    public int Height() {
+    /* @SimpleProperty
+     */ public int Height() {
         return (int) (getView().getHeight() / container.$form().deviceDensity());
     }
 
@@ -179,7 +183,7 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      * @param height in pixels
      */
     @Override
-    @SimpleProperty(description = "Specifies the vertical height of the %type%, measured in pixels.")
+    /* @SimpleProperty(description = "Specifies the vertical height of the %type%, measured in pixels.") */
     public void Height(int height) {
         container.setChildHeight(this, height);
         lastSetHeight = height;
@@ -198,8 +202,8 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      */
 
     @Override
-    @SimpleProperty(description = "Specifies the vertical height of the %type% as a percentage of "
-            + "the height of the Screen.")
+  /* @SimpleProperty(description = "Specifies the vertical height of the %type% as a percentage of "
+      + "the height of the Screen.") */
     public void HeightPercent(int pCent) {
         if (pCent < 0 || pCent > 100) {
             container.$form().dispatchErrorOccurredEvent(this, "HeightPercent",
@@ -219,6 +223,8 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @param sourceComponent the component to copy from
      */
+    /* @SimplePropertyCopier
+     */
     public void CopyHeight(AndroidViewComponent sourceComponent) {
         Height(sourceComponent.lastSetHeight);
     }
@@ -228,7 +234,7 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @return column property used by the table arrangement
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public int Column() {
         return column;
     }
@@ -238,7 +244,7 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @param column column property used by the table arrangement
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public void Column(int column) {
         this.column = column;
     }
@@ -248,7 +254,7 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @return row property used by the table arrangement
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public int Row() {
         return row;
     }
@@ -258,7 +264,7 @@ public abstract class AndroidViewComponent extends VisibleComponent {
      *
      * @param row row property used by the table arrangement
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public void Row(int row) {
         this.row = row;
     }

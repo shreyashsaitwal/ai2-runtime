@@ -6,10 +6,13 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.*;
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.NxtMotorMode;
+import com.google.appinventor.components.common.NxtMotorPort;
+import com.google.appinventor.components.common.NxtRegulationMode;
+import com.google.appinventor.components.common.NxtRunState;
+import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 
 import java.util.ArrayList;
@@ -26,7 +29,14 @@ import java.util.List;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class NxtDrive extends LegoMindstormsNxtBase {
+/* @DesignerComponent(version = YaVersion.NXT_DRIVE_COMPONENT_VERSION,
+    description = "A component that provides a high-level interface to a LEGO MINDSTORMS NXT " +
+    "robot, with functions that can move and turn the robot.",
+    category = ComponentCategory.LEGOMINDSTORMS,
+    nonVisible = true,
+    iconName = "images//legoMindstormsNxt.png") */
+/* @SimpleObject
+ */public class NxtDrive extends LegoMindstormsNxtBase {
 
     private String driveMotors;
     private List<NxtMotorPort> driveMotorPorts;
@@ -57,8 +67,9 @@ public class NxtDrive extends LegoMindstormsNxtBase {
     /**
      * Returns the motor ports that are used for driving.
      */
-    @SimpleProperty(description = "The motor ports that are used for driving: the left wheel's " +
-            "motor port followed by the right wheel's motor port.", userVisible = false)
+  /* @SimpleProperty(description = "The motor ports that are used for driving: the left wheel's " +
+      "motor port followed by the right wheel's motor port.",
+      category = PropertyCategory.BEHAVIOR, userVisible = false) */
     public String DriveMotors() {
         return driveMotors;
     }
@@ -66,9 +77,10 @@ public class NxtDrive extends LegoMindstormsNxtBase {
     /**
      * Specifies the motor ports that are used for driving.
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
-            defaultValue = "CB")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
+      defaultValue = "CB") */
+    /* @SimpleProperty
+     */
     public void DriveMotors(String motorPortLetters) {
         driveMotors = motorPortLetters;
         driveMotorPorts = new ArrayList<NxtMotorPort>();
@@ -88,7 +100,8 @@ public class NxtDrive extends LegoMindstormsNxtBase {
     /**
      * Returns the diameter of the wheels used for driving.
      */
-    @SimpleProperty(description = "The diameter of the wheels used for driving.", userVisible = false)
+  /* @SimpleProperty(description = "The diameter of the wheels used for driving.",
+      category = PropertyCategory.BEHAVIOR, userVisible = false) */
     public float WheelDiameter() {
         return (float) wheelDiameter;
     }
@@ -98,9 +111,10 @@ public class NxtDrive extends LegoMindstormsNxtBase {
      *
      * @param wheelDiameter the diameter of the wheel
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
-            defaultValue = "4.32")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FLOAT,
+      defaultValue = "4.32") */
+    /* @SimpleProperty
+     */
     public void WheelDiameter(float wheelDiameter) {
         this.wheelDiameter = wheelDiameter;
     }
@@ -108,7 +122,8 @@ public class NxtDrive extends LegoMindstormsNxtBase {
     /**
      * Returns whether to stop the drive motors before disconnecting.
      */
-    @SimpleProperty(description = "Whether to stop the drive motors before disconnecting.")
+  /* @SimpleProperty(description = "Whether to stop the drive motors before disconnecting.",
+      category = PropertyCategory.BEHAVIOR) */
     public boolean StopBeforeDisconnect() {
         return stopBeforeDisconnect;
     }
@@ -118,35 +133,36 @@ public class NxtDrive extends LegoMindstormsNxtBase {
      *
      * @param stopBeforeDisconnect whether to stop the drive motors before disconnecting
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+    /* @SimpleProperty
+     */
     public void StopBeforeDisconnect(boolean stopBeforeDisconnect) {
         this.stopBeforeDisconnect = stopBeforeDisconnect;
     }
 
-    @SimpleFunction(description = "Move the robot forward indefinitely, with the " +
-            "specified percentage of maximum power, by powering both drive motors forward.")
+    /* @SimpleFunction(description = "Move the robot forward indefinitely, with the " +
+        "specified percentage of maximum power, by powering both drive motors forward.") */
     public void MoveForwardIndefinitely(int power) {
         move("MoveForwardIndefinitely", power, 0L);
     }
 
-    @SimpleFunction(description = "Move the robot backward indefinitely, with the " +
-            "specified percentage of maximum power, by powering both drive motors backward.")
+    /* @SimpleFunction(description = "Move the robot backward indefinitely, with the " +
+        "specified percentage of maximum power, by powering both drive motors backward.") */
     public void MoveBackwardIndefinitely(int power) {
         move("MoveBackwardIndefinitely", -power, 0L);
     }
 
-    @SimpleFunction(description = "Move the robot forward the given distance, with the " +
-            "specified percentage of maximum power, by powering both drive motors forward.")
+    /* @SimpleFunction(description = "Move the robot forward the given distance, with the " +
+        "specified percentage of maximum power, by powering both drive motors forward.") */
     public void MoveForward(int power, double distance) {
         long tachoLimit = (long) (360.0 * distance / (wheelDiameter * Math.PI));
         // This doesn't work accurately, but it is the best we can do with bluetooth direct commands.
         move("MoveForward", power, tachoLimit);
     }
 
-    @SimpleFunction(description = "Move the robot backward the given distance, with the " +
-            "specified percentage of maximum power, by powering both drive motors backward.")
+    /* @SimpleFunction(description = "Move the robot backward the given distance, with the " +
+        "specified percentage of maximum power, by powering both drive motors backward.") */
     public void MoveBackward(int power, double distance) {
         long tachoLimit = (long) (360.0 * distance / (wheelDiameter * Math.PI));
         // This doesn't work accurately, but it is the best we can do with bluetooth direct commands.
@@ -164,9 +180,9 @@ public class NxtDrive extends LegoMindstormsNxtBase {
         }
     }
 
-    @SimpleFunction(description = "Turn the robot clockwise indefinitely, with the specified " +
-            "percentage of maximum power, by powering the left drive motor forward and the right " +
-            "drive motor backward.")
+    /* @SimpleFunction(description = "Turn the robot clockwise indefinitely, with the specified " +
+        "percentage of maximum power, by powering the left drive motor forward and the right " +
+        "drive motor backward.") */
     public void TurnClockwiseIndefinitely(int power) {
         int numDriveMotors = driveMotorPorts.size();
         if (numDriveMotors >= 2) {
@@ -176,9 +192,9 @@ public class NxtDrive extends LegoMindstormsNxtBase {
         }
     }
 
-    @SimpleFunction(description = "Turn the robot counterclockwise indefinitely, with the " +
-            "specified percentage of maximum power, by powering the right drive motor forward and " +
-            "the left drive motor backward.")
+    /* @SimpleFunction(description = "Turn the robot counterclockwise indefinitely, with the " +
+        "specified percentage of maximum power, by powering the right drive motor forward and " +
+        "the left drive motor backward.") */
     public void TurnCounterClockwiseIndefinitely(int power) {
         int numDriveMotors = driveMotorPorts.size();
         if (numDriveMotors >= 2) {
@@ -206,7 +222,7 @@ public class NxtDrive extends LegoMindstormsNxtBase {
     // the distance between the drive wheels, so that could be a property (similar to
     // the WheelDiameter property).
 
-    @SimpleFunction(description = "Stop the drive motors of the robot.")
+    /* @SimpleFunction(description = "Stop the drive motors of the robot.") */
     public void Stop() {
         String functionName = "Stop";
         if (!checkBluetooth(functionName)) {

@@ -6,14 +6,16 @@
 
 package com.google.appinventor.components.runtime;
 
-import android.app.Activity;
-import android.view.View;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.ViewUtil;
 
+import android.app.Activity;
+import android.view.View;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -40,7 +42,13 @@ import java.util.List;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public class TableArrangement extends AndroidViewComponent
+/* @DesignerComponent(version = YaVersion.TABLEARRANGEMENT_COMPONENT_VERSION,
+    description = "<p>A formatting element in which to place components " +
+    "that should be displayed in tabular form.<//p>",
+    category = ComponentCategory.LAYOUT,
+    iconName = "images//table.png") */
+/* @SimpleObject
+ */public class TableArrangement extends AndroidViewComponent
         implements Component, ComponentContainer {
     private final Activity context;
 
@@ -68,7 +76,7 @@ public class TableArrangement extends AndroidViewComponent
      *
      * @return number of columns in this layout
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public int Columns() {
         return viewLayout.getNumColumns();
     }
@@ -78,9 +86,9 @@ public class TableArrangement extends AndroidViewComponent
      *
      * @param numColumns number of columns in this layout
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "2")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "2") */
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.APPEARANCE) */
     public void Columns(int numColumns) {
         viewLayout.setNumColumns(numColumns);
     }
@@ -90,7 +98,7 @@ public class TableArrangement extends AndroidViewComponent
      *
      * @return number of rows in this layout
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public int Rows() {
         return viewLayout.getNumRows();
     }
@@ -100,9 +108,9 @@ public class TableArrangement extends AndroidViewComponent
      *
      * @param numRows number of rows in this layout
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-            defaultValue = "2")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
+      defaultValue = "2") */
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.APPEARANCE) */
     public void Rows(int numRows) {
         viewLayout.setNumRows(numRows);
     }

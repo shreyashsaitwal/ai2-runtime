@@ -7,15 +7,15 @@ package com.google.appinventor.components.runtime;
 
 import android.app.Activity;
 import android.util.Log;
-import com.google.appinventor.components.annotations.SimpleEvent;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.MapFactory;
 import com.google.appinventor.components.runtime.util.MapFactory.MapFeature;
 import com.google.appinventor.components.runtime.util.YailList;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,14 +24,18 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.google.appinventor.components.runtime.util.GeoJSONUtil.*;
+import static com.google.appinventor.components.runtime.util.GeoJSONUtil.getGeoJSONFeatures;
+import static com.google.appinventor.components.runtime.util.GeoJSONUtil.getGeoJSONType;
+import static com.google.appinventor.components.runtime.util.GeoJSONUtil.processGeoJSONFeature;
 
-public abstract class MapFeatureContainerBase extends AndroidViewComponent implements MapFactory.MapFeatureContainer {
+/* @SimpleObject
+ */public abstract class MapFeatureContainerBase extends AndroidViewComponent implements MapFactory.MapFeatureContainer {
     private static final String TAG = MapFeatureContainerBase.class.getSimpleName();
 
     private static final int ERROR_CODE_MALFORMED_URL = -1;
@@ -93,7 +97,8 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
     /**
      * @param features A YailList of {#Marker Markers}
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public void Features(YailList features) {
         for (MapFactory.MapFeature feature : this.features) {
             feature.removeFromMap();
@@ -116,9 +121,9 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @return A YailList of map features, e.g., Marker, LineString
      */
-    @SimpleProperty(
-            description = "The list of features placed on this %type%. This list also includes any " +
-                    "features created by calls to FeatureFromDescription")
+  /* @SimpleProperty(category = PropertyCategory.APPEARANCE,
+      description = "The list of features placed on this %type%. This list also includes any " +
+          "features created by calls to FeatureFromDescription") */
     public YailList Features() {
         return YailList.makeList(features);
     }
@@ -131,7 +136,7 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @param feature the clicked feature
      */
-    @SimpleEvent(description = "The user clicked on a map feature.")
+    /* @SimpleEvent(description = "The user clicked on a map feature.") */
     public void FeatureClick(MapFactory.MapFeature feature) {
         EventDispatcher.dispatchEvent(this, "FeatureClick", feature);
         if (getMap() != this) {
@@ -147,7 +152,7 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @param feature the long-clicked feature
      */
-    @SimpleEvent(description = "The user long-pressed on a map feature.")
+    /* @SimpleEvent(description = "The user long-pressed on a map feature.") */
     public void FeatureLongClick(MapFactory.MapFeature feature) {
         EventDispatcher.dispatchEvent(this, "FeatureLongClick", feature);
         if (getMap() != this) {
@@ -163,7 +168,7 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @param feature the dragged feature
      */
-    @SimpleEvent(description = "The user started dragging a map feature.")
+    /* @SimpleEvent(description = "The user started dragging a map feature.") */
     public void FeatureStartDrag(MapFactory.MapFeature feature) {
         EventDispatcher.dispatchEvent(this, "FeatureStartDrag", feature);
         if (getMap() != this) {
@@ -179,7 +184,7 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @param feature the dragged feature
      */
-    @SimpleEvent(description = "The user dragged a map feature.")
+    /* @SimpleEvent(description = "The user dragged a map feature.") */
     public void FeatureDrag(MapFactory.MapFeature feature) {
         EventDispatcher.dispatchEvent(this, "FeatureDrag", feature);
         if (getMap() != this) {
@@ -195,7 +200,7 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @param feature the dragged feature
      */
-    @SimpleEvent(description = "The user stopped dragging a map feature.")
+    /* @SimpleEvent(description = "The user stopped dragging a map feature.") */
     public void FeatureStopDrag(MapFactory.MapFeature feature) {
         EventDispatcher.dispatchEvent(this, "FeatureStopDrag", feature);
         if (getMap() != this) {
@@ -212,12 +217,12 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      *
      * @param url The URL from which to read a GeoJSON-encoded feature collection
      */
-    @SimpleFunction(description = "<p>Load a feature collection in " +
-            "<a href=\"https://en.wikipedia.org/wiki/GeoJSON\">GeoJSON</a> format from the given " +
-            "url. On success, the event GotFeatures will be raised with the given url and a list of " +
-            "the features parsed from the GeoJSON as a list of (key, value) pairs. On failure, the " +
-            "LoadError event will be raised with any applicable HTTP response code and error " +
-            "message.</p>")
+  /* @SimpleFunction(description = "<p>Load a feature collection in " +
+      "<a href=\"https:////en.wikipedia.org//wiki//GeoJSON\">GeoJSON<//a> format from the given " +
+      "url. On success, the event GotFeatures will be raised with the given url and a list of " +
+      "the features parsed from the GeoJSON as a list of (key, value) pairs. On failure, the " +
+      "LoadError event will be raised with any applicable HTTP response code and error " +
+      "message.<//p>") */
     public void LoadFromURL(final String url) {
         AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
@@ -247,19 +252,25 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      * @param description The description of a map feature, as a list of key-value pairs.
      * @return A new component representing the feature, or a string indicating an error.
      */
-    @SimpleFunction
+    /* @SimpleFunction
+     */
     public Object FeatureFromDescription(YailList description) {
         try {
-            return processGeoJSONFeature(TAG, this, description);
+            Object feature = processGeoJSONFeature(TAG, this, description);
+            if (feature == null) {
+                return "No valid feature provided";
+            }
+            return feature;
         } catch (IllegalArgumentException e) {
+            Log.e(this.getClass().getSimpleName(), "Unable to create feature", e);
             $form().dispatchErrorOccurredEvent(this, "FeatureFromDescription",
-                    ERROR_CODE_MALFORMED_GEOJSON, e.getMessage());
+                    ErrorMessages.ERROR_INVALID_GEOJSON, e.getMessage());
             return e.getMessage();
         }
     }
 
     /**
-     * The `GotFeatures` event is run when when a feature collection is successfully read from the
+     * The `GotFeatures` event is run when a feature collection is successfully read from the
      * given `url`{:.variable.block}. The `features`{:.variable.block} parameter will be a list of
      * feature descriptions that can be converted into components using the
      * {@link #FeatureFromDescription(YailList)} method.
@@ -267,8 +278,8 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      * @param url      the url corresponding to the requested url in {@link #LoadFromURL(String)}
      * @param features the list of feature descriptions read from the resource at {@code url}
      */
-    @SimpleEvent(description = "A GeoJSON document was successfully read from url. The features " +
-            "specified in the document are provided as a list in features.")
+  /* @SimpleEvent(description = "A GeoJSON document was successfully read from url. The features " +
+      "specified in the document are provided as a list in features.") */
     public void GotFeatures(String url, YailList features) {
         if (!EventDispatcher.dispatchEvent(this, "GotFeatures", url, features)) {
             // If the app inventor hasn't defined GotFeatures, we by default create the features for them
@@ -286,9 +297,9 @@ public abstract class MapFeatureContainerBase extends AndroidViewComponent imple
      * will contain an HTTP status code and the `errorMessage`{:.variable.block} parameter will
      * contain a detailed error message.
      */
-    @SimpleEvent(description = "An error was encountered while processing a GeoJSON document at " +
-            "the given url. The responseCode parameter will contain an HTTP status code and the " +
-            "errorMessage parameter will contain a detailed error message.")
+  /* @SimpleEvent(description = "An error was encountered while processing a GeoJSON document at " +
+      "the given url. The responseCode parameter will contain an HTTP status code and the " +
+      "errorMessage parameter will contain a detailed error message.") */
     public void LoadError(String url, int responseCode, String errorMessage) {
         if (!EventDispatcher.dispatchEvent(this, "LoadError", url, responseCode, errorMessage)) {
             // If the app inventor hasn't defined LoadError, we by default report it via the Form's error

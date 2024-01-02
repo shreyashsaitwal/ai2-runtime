@@ -6,8 +6,9 @@
 
 package com.google.appinventor.components.runtime.util;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import android.util.Log;
+
+import java.text.*;
 import java.util.Locale;
 
 /**
@@ -24,7 +25,6 @@ public final class YailNumberToString {
     private static final double BIGBOUND = 1.e6;
     // format magnitudes smaller than SMALLBOUND in scientific notation
     private static final double SMALLBOUND = 1.e-6;
-
 
     // TODO(halabelson): The Java documentation warns that formatters are
     // not thread-safe.  Is there any way that this can bite us?
@@ -43,7 +43,6 @@ public final class YailNumberToString {
 
     static DecimalFormat decimalFormat = new DecimalFormat(decPattern, symbols);
     static DecimalFormat sciFormat = new DecimalFormat(sciPattern, symbols);
-
 
     // TODO(halabelson): DecimalFormat scientific notation apparently does not provide a
     // way to specify the maximum number of digits in the mantissa. One consequence is that this

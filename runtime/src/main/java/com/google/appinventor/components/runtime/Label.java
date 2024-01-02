@@ -10,9 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleProperty;
-import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
 
 /**
@@ -23,7 +20,15 @@ import com.google.appinventor.components.runtime.util.TextViewUtil;
  * A label displays text which is specified by the `Text` property. Other properties, all of which
  * can be set in the Designer or Blocks Editor, control the appearance and placement of the text.
  */
-public final class Label extends AndroidViewComponent implements AccessibleComponent {
+/* @DesignerComponent(version = YaVersion.LABEL_COMPONENT_VERSION,
+    description = "A Label displays a piece of text, which is " +
+    "specified through the <code>Text<//code> property.  Other properties, " +
+    "all of which can be set in the Designer or Blocks Editor, control " +
+    "the appearance and placement of the text.",
+    category = ComponentCategory.USERINTERFACE,
+    iconName = "images//label.png") */
+/* @SimpleObject
+ */public final class Label extends AndroidViewComponent implements AccessibleComponent {
 
     // default margin around a label in DPs
     // note that the spacing between adjacent labels will be twice this value
@@ -41,7 +46,7 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
     private int backgroundColor;
 
     // Backing for font typeface
-    private int fontTypeface;
+    private String fontTypeface;
 
     // Backing for font bold
     private boolean bold;
@@ -97,7 +102,7 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
         TextAlignment(Component.ALIGNMENT_NORMAL);
         BackgroundColor(Component.COLOR_NONE);
         fontTypeface = Component.TYPEFACE_DEFAULT;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
         FontSize(Component.FONT_DEFAULT_SIZE);
         Text("");
         TextColor(Component.COLOR_DEFAULT);
@@ -125,8 +130,9 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      * {@link Component#ALIGNMENT_CENTER} or
      * {@link Component#ALIGNMENT_OPPOSITE}
      */
-    @SimpleProperty(
-            userVisible = false)
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
     public int TextAlignment() {
         return textAlignment;
     }
@@ -140,10 +146,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *                  {@link Component#ALIGNMENT_CENTER} or
      *                  {@link Component#ALIGNMENT_OPPOSITE}
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTALIGNMENT,
-            defaultValue = Component.ALIGNMENT_NORMAL + "")
-    @SimpleProperty(
-            userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTALIGNMENT,
+      defaultValue = Component.ALIGNMENT_NORMAL + "") */
+  /* @SimpleProperty(
+      userVisible = false) */
     public void TextAlignment(int alignment) {
         this.textAlignment = alignment;
         TextViewUtil.setAlignment(view, alignment, false);
@@ -155,8 +161,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return background RGB color with alpha
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+    /* @IsColor
+     */
     public int BackgroundColor() {
         return backgroundColor;
     }
@@ -167,9 +175,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param argb background RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_NONE)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = Component.DEFAULT_VALUE_COLOR_NONE) */
+    /* @SimpleProperty
+     */
     public void BackgroundColor(int argb) {
         backgroundColor = argb;
         if (argb != Component.COLOR_DEFAULT) {
@@ -186,8 +195,9 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return {@code true} indicates bold, {@code false} normal
      */
-    @SimpleProperty(
-            userVisible = false)
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
     public boolean FontBold() {
         return bold;
     }
@@ -198,13 +208,13 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param bold {@code true} indicates bold, {@code false} normal
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(
-            userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(
+      userVisible = false) */
     public void FontBold(boolean bold) {
         this.bold = bold;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
     }
 
     /**
@@ -214,8 +224,9 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return {@code true} indicates italic, {@code false} normal
      */
-    @SimpleProperty(
-            userVisible = false)
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
     public boolean FontItalic() {
         return italic;
     }
@@ -226,13 +237,13 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param italic {@code true} indicates italic, {@code false} normal
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(
-            userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+  /* @SimpleProperty(
+      userVisible = false) */
     public void FontItalic(boolean italic) {
         this.italic = italic;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
     }
 
     /**
@@ -240,11 +251,12 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return {@code true} indicates margins, {@code false} no margins
      */
-    @SimpleProperty(
-            description = "Reports whether or not the label appears with margins.  All four "
-                    + "margins (left, right, top, bottom) are the same.  This property has no effect "
-                    + "in the designer, where labels are always shown with margins.",
-            userVisible = true)
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      description = "Reports whether or not the label appears with margins.  All four "
+      + "margins (left, right, top, bottom) are the same.  This property has no effect "
+      + "in the designer, where labels are always shown with margins.",
+      userVisible = true) */
     public boolean HasMargins() {
         return hasMargins;
     }
@@ -257,10 +269,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param hasMargins {@code true} indicates that there are margins, {@code false} no margins
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "True")
-    @SimpleProperty(
-            userVisible = true)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "True") */
+  /* @SimpleProperty(
+      userVisible = true) */
     public void HasMargins(boolean hasMargins) {
         this.hasMargins = hasMargins;
         setLabelMargins(hasMargins);
@@ -277,8 +289,8 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return font size in sp(scale-independent pixels).
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public float FontSize() {
         return TextViewUtil.getFontSize(view, container.$context());
     }
@@ -288,9 +300,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param size font size in sp (scale-independent pixels)
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
-            defaultValue = Component.FONT_DEFAULT_SIZE + "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_FLOAT,
+      defaultValue = Component.FONT_DEFAULT_SIZE + "") */
+    /* @SimpleProperty
+     */
     public void FontSize(float size) {
 
         if (size == FONT_DEFAULT_SIZE && (isBigText || container.$form().BigDefaultText())) {
@@ -309,9 +322,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      * {@link Component#TYPEFACE_SANSSERIF} or
      * {@link Component#TYPEFACE_MONOSPACE}
      */
-    @SimpleProperty(
-            userVisible = false)
-    public int FontTypeface() {
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      userVisible = false) */
+    public String FontTypeface() {
         return fontTypeface;
     }
 
@@ -324,13 +338,13 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *                 {@link Component#TYPEFACE_SANSSERIF} or
      *                 {@link Component#TYPEFACE_MONOSPACE}
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TYPEFACE,
-            defaultValue = Component.TYPEFACE_DEFAULT + "")
-    @SimpleProperty(
-            userVisible = false)
-    public void FontTypeface(int typeface) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TYPEFACE,
+      defaultValue = Component.TYPEFACE_DEFAULT + "") */
+  /* @SimpleProperty(
+      userVisible = false) */
+    public void FontTypeface(String typeface) {
         fontTypeface = typeface;
-        TextViewUtil.setFontTypeface(view, fontTypeface, bold, italic);
+        TextViewUtil.setFontTypeface(container.$form(), view, fontTypeface, bold, italic);
     }
 
     /**
@@ -338,8 +352,8 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return label caption
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
     public String Text() {
         return TextViewUtil.getText(view);
     }
@@ -349,9 +363,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param text new caption for label
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA,
-            defaultValue = "")
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA,
+      defaultValue = "") */
+    /* @SimpleProperty
+     */
     public void Text(String text) {
         if (htmlFormat) {
             TextViewUtil.setTextHTML(view, text);
@@ -367,7 +382,8 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return the HTML content of the label
      */
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public String HTMLContent() {
         if (htmlFormat) {
             return htmlContent;
@@ -376,16 +392,16 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
         }
     }
 
-
     /**
      * Returns the label's text's format
      *
      * @return {@code true} indicates that the label format is html text
      * {@code false} lines that the label format is plain text
      */
-    @SimpleProperty(
-            description = "If true, then this label will show html text else it " +
-                    "will show plain text. Note: Not all HTML is supported.")
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE,
+      description = "If true, then this label will show html text else it " +
+      "will show plain text. Note: Not all HTML is supported.") */
     public boolean HTMLFormat() {
         return htmlFormat;
     }
@@ -396,9 +412,9 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      * @return {@code true} indicates that the label format is html text
      * {@code false} lines that the label format is plain text
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = "False")
-    @SimpleProperty(userVisible = false)
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
+      defaultValue = "False") */
+    /* @SimpleProperty(userVisible = false) */
     public void HTMLFormat(boolean fmt) {
         htmlFormat = fmt;
         if (htmlFormat) {
@@ -416,8 +432,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @return text RGB color with alpha
      */
-    @SimpleProperty(
-    )
+  /* @SimpleProperty(
+      category = PropertyCategory.APPEARANCE) */
+    /* @IsColor
+     */
     public int TextColor() {
         return textColor;
     }
@@ -428,9 +446,10 @@ public final class Label extends AndroidViewComponent implements AccessibleCompo
      *
      * @param argb text RGB color with alpha
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK)
-    @SimpleProperty
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+      defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK) */
+    /* @SimpleProperty
+     */
     public void TextColor(int argb) {
         textColor = argb;
         if (argb != Component.COLOR_DEFAULT) {

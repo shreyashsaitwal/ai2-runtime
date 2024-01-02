@@ -8,20 +8,25 @@ package com.google.appinventor.components.runtime;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.DesignerProperty;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.annotations.SimpleProperty;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
+import com.google.appinventor.components.common.YaVersion;
+
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
+
 import com.google.appinventor.components.runtime.util.JsonUtil;
+import com.google.appinventor.components.runtime.util.YailDictionary;
 import com.google.appinventor.components.runtime.util.YailList;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONException;
 
 /**
  * `TinyDB` is a non-visible component that stores data for an app.
@@ -46,8 +51,34 @@ import java.util.Map;
  *
  * @author markf@google.com (Mark Friedman)
  */
+/* @DesignerComponent(version = YaVersion.TINYDB_COMPONENT_VERSION,
+    description = "TinyDB is a non-visible component that stores data for an app. "
+        + "<p> Apps created with App Inventor are initialized each time they run: "
+        + "If an app sets the value of a variable and the user then quits the app, "
+        + "the value of that variable will not be remembered the next time the app is run. "
+        + "In contrast, TinyDB is a <em> persistent <//em> data store for the app, "
+        + "that is, the data stored there will be available each time the app is "
+        + "run. An example might be a game that saves the high score and "
+        + "retrieves it each time the game is played. <//<p> "
+        + "<p> Data items are strings stored under <em>tags<//em> . To store a data "
+        + "item, you specify the tag it should be stored under.  Subsequently, you "
+        + "can retrieve the data that was stored under a given tag. <//p>"
+        + "<p> There is only one data store per app. Even if you have multiple TinyDB "
+        + "components, they will use the same data store. To get the effect of "
+        + "separate stores, use different keys. Also each app has its own data "
+        + "store. You cannot use TinyDB to pass data between two different apps on "
+        + "the phone, although you <em>can<//em> use TinyDb to shares data between the "
+        + "different screens of a multi-screen app. <//p> "
+        + "<p>When you are developing apps using the AI Companion, all the apps "
+        + "using that companion will share the same TinyDb.  That sharing will disappear "
+        + "once the apps are packaged.  But, during development, you should be careful to clear "
+        + "the TinyDb each time you start working on a new app.<//p>",
+    category = ComponentCategory.STORAGE,
+    nonVisible = true,
+    iconName = "images//tinyDB.png") */
 
-public class TinyDB extends AndroidNonvisibleComponent implements Component, Deleteable,
+/* @SimpleObject
+ */public class TinyDB extends AndroidNonvisibleComponent implements Component, Deleteable,
         ObservableDataSource<String, YailList> {
 
     public static final String DEFAULT_NAMESPACE = "TinyDB1";
@@ -58,7 +89,6 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
     private Context context;  // this was a local in constructor and final not private
     // Set of observers
     private HashSet<DataSourceChangeListener> dataSourceObservers = new HashSet<>();
-
 
     /**
      * Creates a new TinyDB component.
@@ -91,8 +121,8 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
      *
      * @param namespace the alternate namespace to use for the TinyDB
      */
-    @SimpleProperty(description = "Namespace for storing data.")
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = DEFAULT_NAMESPACE)
+    /* @SimpleProperty(description = "Namespace for storing data.", category = PropertyCategory.BEHAVIOR) */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = DEFAULT_NAMESPACE) */
     public void Namespace(String namespace) {
         this.namespace = namespace;
 
@@ -107,7 +137,7 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
     }
 
-    @SimpleProperty(description = "Namespace for storing data.")
+    /* @SimpleProperty(description = "Namespace for storing data.") */
     public String Namespace() {
         return namespace;
     }
@@ -120,8 +150,8 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
      * @param valueToStore The value to store. Can be any type of value (e.g.
      *                     number, text, boolean or list).
      */
-    @SimpleFunction(description = "Store the given value under the given tag.  The storage persists "
-            + "on the phone when the app is restarted.")
+  /* @SimpleFunction(description = "Store the given value under the given tag.  The storage persists "
+      + "on the phone when the app is restarted.") */
     public void StoreValue(final String tag, final Object valueToStore) {
         final SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
         try {
@@ -141,8 +171,8 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
      * @return The value stored under the tag. Can be any type of value (e.g.
      * number, text, boolean or list).
      */
-    @SimpleFunction(description = "Retrieve the value stored under the given tag. If there's no "
-            + "such tag, then return valueIfTagNotThere.")
+  /* @SimpleFunction(description = "Retrieve the value stored under the given tag. If there's no "
+      + "such tag, then return valueIfTagNotThere.") */
     public Object GetValue(final String tag, final Object valueIfTagNotThere) {
         try {
             String value = sharedPreferences.getString(tag, "");
@@ -159,7 +189,7 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
      *
      * @return a list of all keys.
      */
-    @SimpleFunction(description = "Return a list of all the tags in the data store.")
+    /* @SimpleFunction(description = "Return a list of all the tags in the data store.") */
     public Object GetTags() {
         List<String> keyList = new ArrayList<String>();
         Map<String, ?> keyValues = sharedPreferences.getAll();
@@ -172,7 +202,7 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
     /**
      * Clear the entire data store.
      */
-    @SimpleFunction(description = "Clear the entire data store.")
+    /* @SimpleFunction(description = "Clear the entire data store.") */
     public void ClearAll() {
         final SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
         sharedPrefsEditor.clear();
@@ -185,7 +215,7 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
      *
      * @param tag The tag to remove.
      */
-    @SimpleFunction(description = "Clear the entry with the given tag.")
+    /* @SimpleFunction(description = "Clear the entry with the given tag.") */
     public void ClearTag(final String tag) {
         final SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
         sharedPrefsEditor.remove(tag);
@@ -241,4 +271,26 @@ public class TinyDB extends AndroidNonvisibleComponent implements Component, Del
             dataComponent.onDataSourceValueChange(this, key, newValue);
         }
     }
+
+    /**
+     * Method to get all data in form of Dictionary
+     *
+     * @return Dictionary of tags and their associated values
+     */
+    /* @SimpleFunction(description = "Retrieves all data entries of TinyDB in form of Dictionaries") */
+    public YailDictionary GetEntries() {
+        Map<String, ?> keyValues = sharedPreferences.getAll();
+        List<String> keyList = new ArrayList<>(keyValues.keySet());
+
+        java.util.Collections.sort(keyList);
+
+        YailDictionary dictionary = new YailDictionary();
+
+        for (String aKey : keyList) {
+            dictionary.put(aKey, GetValue(aKey, ""));
+        }
+
+        return dictionary;
+    }
+
 }

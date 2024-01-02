@@ -6,8 +6,10 @@
 package com.google.appinventor.components.runtime;
 
 import com.github.mikephil.charting.charts.LineChart;
+
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 /**

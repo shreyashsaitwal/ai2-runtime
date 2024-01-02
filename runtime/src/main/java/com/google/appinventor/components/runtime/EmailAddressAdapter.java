@@ -14,10 +14,11 @@ import android.provider.Contacts.ContactMethods;
 import android.provider.Contacts.People;
 import android.text.TextUtils;
 import android.text.util.Rfc822Token;
-import android.util.Log;
 import android.view.View;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
+import android.util.Log;
+
 import com.google.appinventor.components.runtime.util.HoneycombMR1Util;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 

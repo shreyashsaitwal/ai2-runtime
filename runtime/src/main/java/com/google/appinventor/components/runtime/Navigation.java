@@ -5,14 +5,24 @@
 
 package com.google.appinventor.components.runtime;
 
+import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLatitude;
+import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLongitude;
+import static com.google.appinventor.components.runtime.util.YailDictionary.ALL;
+import static java.util.Arrays.asList;
+
 import android.util.Log;
-import com.google.appinventor.components.annotations.*;
+
+import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.TransportMethod;
-import com.google.appinventor.components.runtime.util.*;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.AsynchUtil;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
+import com.google.appinventor.components.runtime.util.GeoJSONUtil;
+import com.google.appinventor.components.runtime.util.JsonUtil;
 import com.google.appinventor.components.runtime.util.MapFactory.MapFeature;
-import org.json.JSONException;
-import org.osmdroid.util.GeoPoint;
+import com.google.appinventor.components.runtime.util.YailDictionary;
+import com.google.appinventor.components.runtime.util.YailList;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -21,10 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLatitude;
-import static com.google.appinventor.components.runtime.util.GeometryUtil.isValidLongitude;
-import static com.google.appinventor.components.runtime.util.YailDictionary.ALL;
-import static java.util.Arrays.asList;
+import org.json.JSONException;
+import org.osmdroid.util.GeoPoint;
 
 /**
  * The Navigation component generates directions between two locations using a service called
@@ -32,7 +40,15 @@ import static java.util.Arrays.asList;
  * service in order for this component to work.
  */
 @SuppressWarnings("TryFinallyCanBeTryWithResources")
-public class Navigation extends AndroidNonvisibleComponent implements Component {
+/* @DesignerComponent(version = YaVersion.NAVIGATION_COMPONENT_VERSION,
+    category = ComponentCategory.MAPS,
+    description = "Navigation",
+    nonVisible = true,
+    iconName = "images//navigation.png") */
+/* @UsesPermissions(permissionNames = "android.permission.INTERNET") */
+/* @UsesLibraries({"osmdroid.jar"}) */
+/* @SimpleObject
+ */ public class Navigation extends AndroidNonvisibleComponent implements Component {
 
     public static final String OPEN_ROUTE_SERVICE_URL =
             "https://api.openrouteservice.org/v2/directions/";
@@ -88,7 +104,7 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
      * error occurs, the error will be reported via the
      * [`Screen's ErrorOccurred`](userinterface.html#Screen.ErrorOccurred) event.
      */
-    @SimpleFunction(description = "Request directions from the routing service.")
+    /* @SimpleFunction(description = "Request directions from the routing service.") */
     public void RequestDirections() {
         if (apiKey.equals("")) {
             form.dispatchErrorOccurredEvent(this, "Authorization", ErrorMessages.ERROR_INVALID_API_KEY);
@@ -117,7 +133,7 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
     /**
      * Reserved for future use in case we decide to run our own service some day.
      */
-    @SimpleProperty(userVisible = false)
+    /* @SimpleProperty(userVisible = false) */
     public void ServiceURL(String url) {
         this.serviceUrl = url;
     }
@@ -128,15 +144,17 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
      *
      * @param key the API key to use for authentication requests
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING)
-    @SimpleProperty(description = "API Key for Open Route Service.")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING) */
+  /* @SimpleProperty(description = "API Key for Open Route Service.",
+      category = PropertyCategory.BEHAVIOR) */
     public void ApiKey(String key) {
         apiKey = key;
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
-            defaultValue = "0.0")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
+        defaultValue = "0.0") */
+    /* @SimpleProperty
+     */
     public void StartLatitude(double latitude) {
         if (isValidLatitude(latitude)) {
             startLocation.setLatitude(latitude);
@@ -146,15 +164,16 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
         }
     }
 
-    @SimpleProperty(
-            description = "The latitude of the start location.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "The latitude of the start location.") */
     public double StartLatitude() {
         return startLocation.getLatitude();
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
-            defaultValue = "0.0")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
+        defaultValue = "0.0") */
+    /* @SimpleProperty
+     */
     public void StartLongitude(double longitude) {
         if (isValidLongitude(longitude)) {
             startLocation.setLongitude(longitude);
@@ -164,13 +183,13 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
         }
     }
 
-    @SimpleProperty(
-            description = "The longitude of the start location.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "The longitude of the start location.") */
     public double StartLongitude() {
         return startLocation.getLongitude();
     }
 
-    @SimpleProperty(description = "Set the start location.")
+    /* @SimpleProperty(description = "Set the start location.") */
     public void StartLocation(MapFeature feature) {
         GeoPoint point = feature.getCentroid();
         double latitude = point.getLatitude();
@@ -186,9 +205,10 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
         }
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
-            defaultValue = "0.0")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LATITUDE,
+        defaultValue = "0.0") */
+    /* @SimpleProperty
+     */
     public void EndLatitude(double latitude) {
         if (isValidLatitude(latitude)) {
             endLocation.setLatitude(latitude);
@@ -198,15 +218,16 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
         }
     }
 
-    @SimpleProperty(
-            description = "The latitude of the end location.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "The latitude of the end location.") */
     public double EndLatitude() {
         return endLocation.getLatitude();
     }
 
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
-            defaultValue = "0.0")
-    @SimpleProperty
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LONGITUDE,
+        defaultValue = "0.0") */
+    /* @SimpleProperty
+     */
     public void EndLongitude(double longitude) {
         if (isValidLongitude(longitude)) {
             endLocation.setLongitude(longitude);
@@ -216,14 +237,14 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
         }
     }
 
-    @SimpleProperty(
-            description = "The longitude of the end location.")
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+        description = "The longitude of the end location.") */
     public double EndLongitude() {
         return endLocation.getLongitude();
     }
 
-    @SimpleProperty()
-    public @Options(TransportMethod.class) String TransportationMethod() {
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+    public /* @Options(TransportMethod.class) */ String TransportationMethod() {
         return TransportationMethodAbstract().toUnderlyingValue();
     }
 
@@ -253,17 +274,17 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
      *
      * @param method the method to use
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NAVIGATION_METHOD,
-            defaultValue = "foot-walking")
-    @SimpleProperty(description = "The transportation method used for determining the route.")
-    public void TransportationMethod(@Options(TransportMethod.class) String method) {
+  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NAVIGATION_METHOD,
+      defaultValue = "foot-walking") */
+    /* @SimpleProperty(description = "The transportation method used for determining the route.") */
+    public void TransportationMethod(/* @Options(TransportMethod.class) */ String method) {
         TransportMethod t = TransportMethod.fromUnderlyingValue(method);
         if (t != null) {
             TransportationMethodAbstract(t);
         }
     }
 
-    @SimpleProperty(description = "Set the end location.")
+    /* @SimpleProperty(description = "Set the end location.") */
     public void EndLocation(MapFeature feature) {
         GeoPoint point = feature.getCentroid();
         double latitude = point.getLatitude();
@@ -284,13 +305,15 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
      *
      * @param language the language to use for generating directions
      */
-    @SimpleProperty(description = "The language to use for textual directions.")
-    @DesignerProperty(defaultValue = "en")
+  /* @SimpleProperty(description = "The language to use for textual directions.",
+      category = PropertyCategory.BEHAVIOR) */
+    /* @DesignerProperty(defaultValue = "en") */
     public void Language(String language) {
         this.language = language;
     }
 
-    @SimpleProperty
+    /* @SimpleProperty
+     */
     public String Language() {
         return language;
     }
@@ -301,7 +324,7 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
      *
      * @return the content of the response
      */
-    @SimpleProperty(description = "Content of the last response as a dictionary.")
+    /* @SimpleProperty(description = "Content of the last response as a dictionary.") */
     public YailDictionary ResponseContent() {
         return lastResponse;
     }
@@ -323,7 +346,7 @@ public class Navigation extends AndroidNonvisibleComponent implements Component 
      * @param distance   the distance of the route, in meters
      * @param duration   the estimated duration to travel the route, in seconds
      */
-    @SimpleEvent(description = "Event triggered when the Openrouteservice returns the directions.")
+    /* @SimpleEvent(description = "Event triggered when the Openrouteservice returns the directions.") */
     public void GotDirections(YailList directions, YailList points, double distance,
                               double duration) {
         Log.d(TAG, "GotDirections");

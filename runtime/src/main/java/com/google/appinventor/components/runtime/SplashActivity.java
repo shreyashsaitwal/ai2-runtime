@@ -6,15 +6,30 @@
 package com.google.appinventor.components.runtime;
 
 import android.app.Activity;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+
+import android.net.Uri;
+
 import android.os.Bundle;
 import android.os.Handler;
-import android.webkit.*;
+
+import android.util.Log;
+
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebStorage;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.google.appinventor.components.runtime.util.SdkLevel;
 
 /**

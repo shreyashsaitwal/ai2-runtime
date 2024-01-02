@@ -6,7 +6,6 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.annotations.SimpleProperty;
 import com.google.appinventor.components.common.NxtSensorPort;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 
@@ -16,7 +15,8 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  *
  * @author lizlooney@google.com (Liz Looney)
  */
-public abstract class LegoMindstormsNxtSensor extends LegoMindstormsNxtBase {
+/* @SimpleObject
+ */public abstract class LegoMindstormsNxtSensor extends LegoMindstormsNxtBase {
     protected NxtSensorPort port;
 
     /**
@@ -29,7 +29,8 @@ public abstract class LegoMindstormsNxtSensor extends LegoMindstormsNxtBase {
     /**
      * Returns the sensor port that the sensor is connected to.
      */
-    @SimpleProperty(description = "The sensor port that the sensor is connected to.", userVisible = false)
+  /* @SimpleProperty(description = "The sensor port that the sensor is connected to.",
+      category = PropertyCategory.BEHAVIOR, userVisible = false) */
     public String SensorPort() {
         return port.toUnderlyingValue();
     }

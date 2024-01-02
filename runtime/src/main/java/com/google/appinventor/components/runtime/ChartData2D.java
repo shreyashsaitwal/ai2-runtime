@@ -6,10 +6,17 @@
 package com.google.appinventor.components.runtime;
 
 import android.util.Log;
-import com.google.appinventor.components.annotations.SimpleFunction;
-import com.google.appinventor.components.runtime.util.YailList;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineDataSet;
 
+import com.google.appinventor.components.common.ComponentCategory;
+import com.google.appinventor.components.common.YaVersion;
+import com.google.appinventor.components.runtime.util.YailList;
+import gnu.lists.LList;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -20,6 +27,12 @@ import java.util.concurrent.ExecutionException;
  * of the Data component correspond of an x and a y value.
  * The component is attached directly to a Chart component by dragging it onto the Chart.
  */
+/* @DesignerComponent(version = YaVersion.CHART_DATA_2D_COMPONENT_VERSION,
+    description = "A component that holds (x, y)-coordinate based data",
+    category = ComponentCategory.CHARTS,
+    iconName = "images//web.png") */
+/* @SimpleObject
+ */
 @SuppressWarnings("checkstyle:JavadocParagraph")
 public final class ChartData2D extends ChartDataBase {
     /**
@@ -27,10 +40,6 @@ public final class ChartData2D extends ChartDataBase {
      */
     public ChartData2D(Chart chartContainer) {
         super(chartContainer);
-        // Construct default dataFileColumns list with 2 entries
-        dataFileColumns = Arrays.asList("", "");
-        sheetsColumns = Arrays.asList("", "");
-        webColumns = Arrays.asList("", ""); // Construct default webColumns list with 2 entries
     }
 
     /**
@@ -42,7 +51,7 @@ public final class ChartData2D extends ChartDataBase {
      * @param x - x value of entry
      * @param y - y value of entry
      */
-    @SimpleFunction()
+    /* @SimpleFunction() */
     public void AddEntry(final String x, final String y) {
         // Entry should be added via the Thread Runner asynchronously
         // to guarantee the order of data adding (e.g. CSV data
@@ -53,10 +62,10 @@ public final class ChartData2D extends ChartDataBase {
             public void run() {
                 // Create a 2-tuple, and add the tuple to the Data Series
                 YailList pair = YailList.makeList(Arrays.asList(x, y));
-                chartDataModel.addEntryFromTuple(pair);
+                dataModel.addEntryFromTuple(pair);
 
                 // Refresh Chart with new data
-                refreshChart();
+                onDataChange();
             }
         });
     }
@@ -68,7 +77,7 @@ public final class ChartData2D extends ChartDataBase {
      * @param x - x value of entry
      * @param y - y value of entry
      */
-    @SimpleFunction()
+    /* @SimpleFunction() */
     public void RemoveEntry(final String x, final String y) {
         // Entry should be deleted via the Thread Runner asynchronously
         // to guarantee the order of data adding (e.g. CSV data
@@ -79,10 +88,18 @@ public final class ChartData2D extends ChartDataBase {
             public void run() {
                 // Create a 2-tuple, and remove the tuple from the Data Series
                 YailList pair = YailList.makeList(Arrays.asList(x, y));
-                chartDataModel.removeEntryFromTuple(pair);
 
+                //get index of x and remove the color highlight at that index
+                float xValue = Float.parseFloat(x);
+                float yValue = Float.parseFloat(y);
+
+                Entry currEntry = new Entry(xValue, yValue);
+                int index = dataModel.findEntryIndex(currEntry);
+
+                dataModel.removeEntryFromTuple(pair);
                 // Refresh Chart with new data
-                refreshChart();
+                resetHighlightAtIndex(index);
+                onDataChange();
             }
         });
     }
@@ -98,8 +115,8 @@ public final class ChartData2D extends ChartDataBase {
      * @return true if entry exists
      */
     @SuppressWarnings("TryWithIdenticalCatches")
-    @SimpleFunction(description = "Checks whether an (x, y) entry exists in the Coordinate Data."
-            + "Returns true if the Entry exists, and false otherwise.")
+  /* @SimpleFunction(description = "Checks whether an (x, y) entry exists in the Coordinate Data."
+      + "Returns true if the Entry exists, and false otherwise.") */
     public boolean DoesEntryExist(final String x, final String y) {
         try {
             return threadRunner.submit(new Callable<Boolean>() {
@@ -107,7 +124,7 @@ public final class ChartData2D extends ChartDataBase {
                 public Boolean call() {
                     // Create a 2-tuple, and check whether the entry exists
                     YailList pair = YailList.makeList(Arrays.asList(x, y));
-                    return chartDataModel.doesEntryExist(pair);
+                    return dataModel.doesEntryExist(pair);
                 }
             }).get();
         } catch (InterruptedException e) {
@@ -121,73 +138,62 @@ public final class ChartData2D extends ChartDataBase {
     }
 
     /**
-     * Imports data from the specified DataFile component by taking the specified x column
-     * for the x values, and the specified y column for the y values. The DataFile's source file
-     * is expected to be either a CSV or a JSON file.
-     * <p>
-     * Passing in empty test for any of the column parameters will result in the usage of
-     * default values which are the indices of the entries. For the first entry, the default
-     * value would be the 1, for the second it would be 2, and so on.
+     * Draws the line of best fit.
      *
-     * @param dataFile     Data File component to import from
-     * @param xValueColumn x-value column name
-     * @param yValueColumn y-value column name
+     * @param xList - the list of x values
+     * @param yList - the list of y values
      */
-    @SuppressWarnings("checkstyle:ParameterName")
-    @SimpleFunction()
-    public void ImportFromDataFile(final DataFile dataFile, String xValueColumn,
-                                   String yValueColumn) {
-        // Construct a YailList of columns from the specified parameters
-        YailList columns = YailList.makeList(Arrays.asList(xValueColumn, yValueColumn));
-
-        importFromDataFileAsync(dataFile, columns);
+    /* @SimpleFunction(description = "Draws the corresponding line of best fit on the graph") */
+    public void DrawLineOfBestFit(final YailList xList, final YailList yList) {
+        List<?> predictions = (List<?>) Regression.computeLineOfBestFit(xList, yList)
+                .get("predictions");
+        final List<List<?>> predictionPairs = new ArrayList<>();
+        List<?> xValues = (List<?>) xList.getCdr();
+        for (int i = 0; i < xValues.size(); i++) {
+            predictionPairs.add(Arrays.asList(xValues.get(i), predictions.get(i)));
+        }
+        YailList predictionPairsList = YailList.makeList(predictionPairs);
+        dataModel.importFromList(predictionPairsList);
+        if (dataModel.getDataset() instanceof LineDataSet) {
+            ((LineDataSet) dataModel.getDataset()).setDrawCircles(false);
+            ((LineDataSet) dataModel.getDataset()).setDrawValues(false);
+        }
+        onDataChange();
     }
 
     /**
-     * Imports data from the specified Spreadsheet component by taking the specified x column
-     * for the x values, and the specified y column for the y values. Prior to calling this function,
-     * the Spreadsheet component's ReadSheet method has to be called to load the data. The usage of
-     * the GotSheet event in the Spreadsheet component is unnecessary.
-     * <p>
-     * Empty columns are filled with default values (1, 2, 3, ... for Entry 1, 2, 3, ...).
+     * Highlights all given data points on the Chart in the color of choice.
      *
-     * @param sheet      Spreadsheet component to import from
-     * @param xColumn    x-value column name
-     * @param yColumn    y-value column name
-     * @param useHeaders use the first row of values to interpret the column names
+     * @param dataPoints - the list of data points. A data point inside this list is a pair of point
+     *                   index and point value: [[point index, point value],...,[,]]
+     * @param color      - the highlight color chosen by the user
      */
-    @SimpleFunction
-    public void ImportFromSpreadsheet(final Spreadsheet sheet, String xColumn, String yColumn,
-                                      boolean useHeaders) {
-        YailList columns = YailList.makeList(Arrays.asList(xColumn, yColumn));
+  /* @SimpleFunction(description = "Highlights data points of choice on the Chart in the color of "
+      + "choice. This block expects a list of data points, each data point is an index, value pair") */
+    public void HighlightDataPoints(final YailList dataPoints, int color) {
+        List<?> dataPointsList = (LList) dataPoints.getCdr();
+        if (!dataPoints.isEmpty()) {
+            List<?> entries = dataModel.getEntries();
+            int[] highlights = new int[entries.size()];
+            Arrays.fill(highlights, dataModel.getDataset().getColor());
 
-        importFromSpreadsheetAsync(sheet, columns, useHeaders);
+            for (Object dataPoint : dataPointsList) {
+                if (!(dataPoint instanceof YailList)) {
+                    continue;
+                }
+                int dataPointIndex = (int) AnomalyDetection.getAnomalyIndex((YailList) dataPoint);
+                highlights[dataPointIndex - 1] = color;
+            }
+            ((LineDataSet) dataModel.getDataset()).setCircleColors(highlights);
+            onDataChange();
+        } else {
+            throw new IllegalStateException("Anomalies list is Empty. Nothing to highlight!");
+        }
     }
 
-    /**
-     * Imports data from the specified Web component by taking the specified x column
-     * for the x values, and the specified y column for the y values. Prior to calling this function,
-     * the Web component's Get method has to be called to load the data. The usage of the gotValue
-     * event in the Web component is unnecessary.
-     * <p>
-     * The expected response of the Web component is a JSON or CSV formatted
-     * file for this function to work.
-     * <p>
-     * Empty columns are filled with default values (1, 2, 3, ... for Entry 1, 2, 3, ...).
-     *
-     * @param web          Web component to import from
-     * @param xValueColumn x-value column name
-     * @param yValueColumn y-value column name
-     */
-    @SimpleFunction(description = "Imports data from the specified Web component, given the names "
-            + "of the X and Y value columns. Empty columns are filled with default values "
-            + "(1, 2, 3, ... for Entry 1, 2, ...). In order for the data importing to be successful, "
-            + "to load the data, and then this block should be used on that Web component. The usage "
-            + "of the gotValue event in the Web component is unnecessary.")
-    public void ImportFromWeb(final Web web, String xValueColumn, String yValueColumn) {
-        // Construct a YailList of columns from the specified parameters
-        YailList columns = YailList.makeList(Arrays.asList(xValueColumn, yValueColumn));
-
-        importFromWebAsync(web, columns);
+    private void resetHighlightAtIndex(int index) {
+        List<Integer> defaultColors = ((LineDataSet) dataModel.getDataset()).getCircleColors();
+        defaultColors.remove(index);
     }
 }
+

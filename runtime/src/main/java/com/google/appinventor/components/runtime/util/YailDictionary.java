@@ -12,9 +12,16 @@ import com.google.appinventor.components.runtime.errors.DispatchableError;
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
 import gnu.lists.FString;
 import gnu.lists.LList;
-import org.json.JSONException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
 
 /**
  * The YailList is a wrapper around the gnu.list.Pair class used
@@ -41,8 +48,12 @@ public class YailDictionary extends LinkedHashMap<Object, Object>
         super();
     }
 
+    @SuppressWarnings("UseBulkOperation")  // Use of put handles type casting
     public YailDictionary(Map<Object, Object> prevMap) {
-        super(prevMap);
+        super();
+        for (Map.Entry<Object, Object> entry : prevMap.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
     }
 
     /**
@@ -142,7 +153,7 @@ public class YailDictionary extends LinkedHashMap<Object, Object>
 
     @SuppressWarnings("WeakerAccess")  // Called from runtime.scm
     public static YailDictionary alistToDict(YailList alist) {
-        LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
+        YailDictionary map = new YailDictionary();
 
         for (Object o : ((LList) alist.getCdr())) {
             YailList currentPair = (YailList) o;
@@ -161,7 +172,7 @@ public class YailDictionary extends LinkedHashMap<Object, Object>
             }
         }
 
-        return new YailDictionary(map);
+        return map;
     }
 
     private static YailList checkList(YailList list) {
