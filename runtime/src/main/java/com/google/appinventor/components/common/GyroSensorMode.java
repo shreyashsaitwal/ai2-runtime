@@ -12,35 +12,35 @@ import java.util.Map;
  * Defines a GyroSensorMode type used by the Lego Ev3 gyro sensor.
  */
 public enum GyroSensorMode implements OptionList<String> {
-  Angle("angle", 0),
-  Rate("rate", 1);
+    Angle("angle", 0),
+    Rate("rate", 1);
 
-  private final String value;
-  private final int intValue;
+    private static final Map<String, GyroSensorMode> lookup = new HashMap<>();
 
-  GyroSensorMode(String mode, int intMode) {
-    this.value = mode;
-    this.intValue = intMode;
-  }
-
-  public String toUnderlyingValue() {
-    return value;
-  }
-
-  public Integer toInt() {
-    return this.intValue;
-  }
-
-  private static final Map<String, GyroSensorMode> lookup = new HashMap<>();
-
-  static {
-    for (GyroSensorMode mode : GyroSensorMode.values()) {
-      lookup.put(mode.toUnderlyingValue(), mode);
+    static {
+        for (GyroSensorMode mode : GyroSensorMode.values()) {
+            lookup.put(mode.toUnderlyingValue(), mode);
+        }
     }
-  }
 
-  public static GyroSensorMode fromUnderlyingValue(String mode) {
-    return lookup.get(mode);
-  }
+    private final String value;
+    private final int intValue;
+
+    GyroSensorMode(String mode, int intMode) {
+        this.value = mode;
+        this.intValue = intMode;
+    }
+
+    public static GyroSensorMode fromUnderlyingValue(String mode) {
+        return lookup.get(mode);
+    }
+
+    public String toUnderlyingValue() {
+        return value;
+    }
+
+    public Integer toInt() {
+        return this.intValue;
+    }
 }
 

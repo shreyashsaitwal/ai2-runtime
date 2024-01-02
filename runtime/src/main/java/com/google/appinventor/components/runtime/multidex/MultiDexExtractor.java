@@ -21,15 +21,9 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.util.Log;
+import com.google.appinventor.components.runtime.util.IOUtils;
 
-import java.io.BufferedOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,8 +32,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import com.google.appinventor.components.runtime.util.IOUtils;
 
 /**
  * Exposes application secondary dex files as files in the application data
@@ -78,19 +70,31 @@ final class MultiDexExtractor {
      * so put up the installation progress dialog.
      *
      */
+    // The following is taken from SharedPreferencesCompat to avoid having a dependency of the
+    // multidex support library on another support library.
+    private static Method sApplyMethod;  // final
+
+    static {
+        try {
+            Class<?> cls = SharedPreferences.Editor.class;
+            sApplyMethod = cls.getMethod("apply");
+        } catch (NoSuchMethodException unused) {
+            sApplyMethod = null;
+        }
+    }
 
     public static boolean mustLoad(Context context, ApplicationInfo applicationInfo) {
-      File sourceApk = new File(applicationInfo.sourceDir);
-      long currentCrc;
-      try {
-          currentCrc = getZipCrc(sourceApk);
-          if (isModified(context, sourceApk, currentCrc)) {
-              return true;
-          }
-      } catch (IOException e) {
-          // XXX
-      }
-      return false;
+        File sourceApk = new File(applicationInfo.sourceDir);
+        long currentCrc;
+        try {
+            currentCrc = getZipCrc(sourceApk);
+            if (isModified(context, sourceApk, currentCrc)) {
+                return true;
+            }
+        } catch (IOException e) {
+            // XXX
+        }
+        return false;
     }
 
     /**
@@ -98,12 +102,12 @@ final class MultiDexExtractor {
      * directory.
      *
      * @return a list of files that were created. The list may be empty if there
-     *         are no secondary dex files.
+     * are no secondary dex files.
      * @throws IOException if encounters a problem while reading or writing
-     *         secondary dex files
+     *                     secondary dex files
      */
     static List<File> load(Context context, ApplicationInfo applicationInfo, File dexDir,
-            boolean forceReload) throws IOException {
+                           boolean forceReload) throws IOException {
         Log.i(TAG, "MultiDexExtractor.load(" + applicationInfo.sourceDir + ", " + forceReload + ")");
         final File sourceApk = new File(applicationInfo.sourceDir);
 
@@ -250,7 +254,7 @@ final class MultiDexExtractor {
     }
 
     private static void putStoredApkInfo(Context context, long timeStamp, long crc,
-            int totalDexNumber) {
+                                         int totalDexNumber) {
         SharedPreferences prefs = getMultiDexPreferences(context);
         SharedPreferences.Editor edit = prefs.edit();
         edit.putLong(KEY_TIME_STAMP, timeStamp);
@@ -305,7 +309,7 @@ final class MultiDexExtractor {
     }
 
     private static void extract(ZipFile apk, ZipEntry dexFile, File extractTo,
-            String extractedFilePrefix) throws IOException, FileNotFoundException {
+                                String extractedFilePrefix) throws IOException, FileNotFoundException {
 
         InputStream in = apk.getInputStream(dexFile);
         ZipOutputStream out = null;
@@ -359,18 +363,6 @@ final class MultiDexExtractor {
             Log.w(TAG, "Got an IOException trying to open zip file: " + file.getAbsolutePath(), ex);
         }
         return false;
-    }
-
-    // The following is taken from SharedPreferencesCompat to avoid having a dependency of the
-    // multidex support library on another support library.
-    private static Method sApplyMethod;  // final
-    static {
-        try {
-            Class<?> cls = SharedPreferences.Editor.class;
-            sApplyMethod = cls.getMethod("apply");
-        } catch (NoSuchMethodException unused) {
-            sApplyMethod = null;
-        }
     }
 
     private static void apply(SharedPreferences.Editor editor) {

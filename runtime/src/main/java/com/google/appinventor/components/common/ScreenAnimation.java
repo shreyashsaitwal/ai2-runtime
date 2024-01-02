@@ -13,32 +13,32 @@ import java.util.Map;
  * animations.
  */
 public enum ScreenAnimation implements OptionList<String> {
-  Default("default"),
-  Fade("fade"),
-  Zoom("zoom"),
-  SlideHorizontal("slidehorizontal"),
-  SlideVertical("slidevertical"),
-  None("none");
+    Default("default"),
+    Fade("fade"),
+    Zoom("zoom"),
+    SlideHorizontal("slidehorizontal"),
+    SlideVertical("slidevertical"),
+    None("none");
 
-  private final String value;
+    private static final Map<String, ScreenAnimation> lookup = new HashMap<>();
 
-  ScreenAnimation(String anim) {
-    this.value = anim;
-  }
-
-  public String toUnderlyingValue() {
-    return value;
-  }
-
-  private static final Map<String, ScreenAnimation> lookup = new HashMap<>();
-
-  static {
-    for (ScreenAnimation anim : ScreenAnimation.values()) {
-      lookup.put(anim.toUnderlyingValue(), anim);
+    static {
+        for (ScreenAnimation anim : ScreenAnimation.values()) {
+            lookup.put(anim.toUnderlyingValue(), anim);
+        }
     }
-  }
 
-  public static ScreenAnimation fromUnderlyingValue(String anim) {
-    return lookup.get(anim);
-  }
+    private final String value;
+
+    ScreenAnimation(String anim) {
+        this.value = anim;
+    }
+
+    public static ScreenAnimation fromUnderlyingValue(String anim) {
+        return lookup.get(anim);
+    }
+
+    public String toUnderlyingValue() {
+        return value;
+    }
 }

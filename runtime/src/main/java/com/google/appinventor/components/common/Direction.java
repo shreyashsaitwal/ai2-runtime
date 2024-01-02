@@ -12,34 +12,34 @@ import java.util.Map;
  * Defines a Direction type used by the Sprite component (and subclasses).
  */
 public enum Direction implements OptionList<Integer> {
-  North(1),
-  Northeast(2),
-  East(3),
-  Southeast(4),
-  South(-1),
-  Southwest(-2),
-  West(-3),
-  Northwest(-4);
+    North(1),
+    Northeast(2),
+    East(3),
+    Southeast(4),
+    South(-1),
+    Southwest(-2),
+    West(-3),
+    Northwest(-4);
 
-  private final int value;
+    private static final Map<Integer, Direction> lookup = new HashMap<>();
 
-  Direction(int dir) {
-    this.value = dir;
-  }
-
-  public Integer toUnderlyingValue() {
-    return value;
-  }
-
-  private static final Map<Integer, Direction> lookup = new HashMap<>();
-
-  static {
-    for (Direction dir : Direction.values()) {
-      lookup.put(dir.toUnderlyingValue(), dir);
+    static {
+        for (Direction dir : Direction.values()) {
+            lookup.put(dir.toUnderlyingValue(), dir);
+        }
     }
-  }
 
-  public static Direction fromUnderlyingValue(Integer dir) {
-    return lookup.get(dir);
-  }
+    private final int value;
+
+    Direction(int dir) {
+        this.value = dir;
+    }
+
+    public static Direction fromUnderlyingValue(Integer dir) {
+        return lookup.get(dir);
+    }
+
+    public Integer toUnderlyingValue() {
+        return value;
+    }
 }

@@ -35,118 +35,121 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
     androidMinSdk = 19
 ) */
 /* @SimpleObject
- */@SuppressWarnings("checkstyle:JavadocParagraph")
+ */
+@SuppressWarnings("checkstyle:JavadocParagraph")
 public class FilePicker extends Picker {
-  private FileAction action = FileAction.PickExistingFile;
-  private String selection = "";
-  private String mimeType = "*/*";
+    private FileAction action = FileAction.PickExistingFile;
+    private String selection = "";
+    private String mimeType = "*/*";
 
-  public FilePicker(ComponentContainer container) {
-    super(container);
-  }
+    public FilePicker(ComponentContainer container) {
+        super(container);
+    }
 
-  /**
-   * Sets the desired action for the FilePicker. One of:
-   *
-   *     - Pick Existing File: Open an existing file
-   *     - Pick Directory: Open an existing directory
-   *     - Pick New File: Create a new file for saving
-   *
-   * @param action the desired action
-   */
+    private static String actionToIntent(FileAction action) {
+        switch (action) {
+            case PickExistingFile:
+                return ACTION_OPEN_DOCUMENT;
+            case PickDirectory:
+                return ACTION_OPEN_DOCUMENT_TREE;
+            case PickNewFile:
+                return ACTION_CREATE_DOCUMENT;
+            default:
+                throw new IllegalArgumentException("Unknown file action: " + action);
+        }
+    }
+
+    /**
+     * Sets the desired action for the FilePicker. One of:
+     * <p>
+     * - Pick Existing File: Open an existing file
+     * - Pick Directory: Open an existing directory
+     * - Pick New File: Create a new file for saving
+     *
+     * @param action the desired action
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_CHOICES,
       defaultValue = "Pick Existing File",
       editorArgs = {"Pick Existing File", "Pick New File", "Pick Directory"}) */
-  /* @SimpleProperty
-   */public void Action(FileAction action) {
-    this.action = action;
-  }
+    /* @SimpleProperty
+     */
+    public void Action(FileAction action) {
+        this.action = action;
+    }
 
-  // This version helps Kawa type-cast the designer property value to the FileAction form.
-  @SuppressWarnings("checkstyle:MethodName")
-  public void Action(String action) {
-    Action(FileAction.fromUnderlyingValue(action));
-  }
+    // This version helps Kawa type-cast the designer property value to the FileAction form.
+    @SuppressWarnings("checkstyle:MethodName")
+    public void Action(String action) {
+        Action(FileAction.fromUnderlyingValue(action));
+    }
 
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
-  public FileAction Action() {
-    return action;
-  }
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+    public FileAction Action() {
+        return action;
+    }
 
-  /**
-   * Sets the desired MIME type for picking a file.
-   *
-   * @param mimeType a valid MIME type specfiication
-   */
+    /**
+     * Sets the desired MIME type for picking a file.
+     *
+     * @param mimeType a valid MIME type specfiication
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING,
       defaultValue = "*//*") */
-  /* @SimpleProperty
-   */public void MimeType(/* @Options(FileType.class) */ String mimeType) {
-    this.mimeType = mimeType;
-  }
-
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
-  public String MimeType() {
-    return mimeType;
-  }
-
-  /**
-   * Returns the selected file, possibly as a content URI.
-   *
-   * @return the selected file
-   */
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
-  public String Selection() {
-    return selection;
-  }
-
-  @Override
-  public void resultReturned(int requestCode, int resultCode, Intent data) {
-    if (data != null) {
-      Uri uri = data.getData();
-      final int takeFlags = data.getFlags() & (
-          Intent.FLAG_GRANT_READ_URI_PERMISSION
-              | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-          );
-      container.$form().getContentResolver().takePersistableUriPermission(uri, takeFlags);
-      selection = uri.toString();
-      AfterPicking();
-    } else {
-      container.$form().dispatchErrorOccurredEvent(this, "Open",
-          ErrorMessages.ERROR_FILEPICKER_NO_URI_RETURNED);
+    /* @SimpleProperty
+     */
+    public void MimeType(/* @Options(FileType.class) */ String mimeType) {
+        this.mimeType = mimeType;
     }
-  }
 
-  @Override
-  protected Intent getIntent() {
-    Intent intent = new Intent(actionToIntent(action));
-    if (action == FileAction.PickExistingFile) {
-      intent.addCategory(Intent.CATEGORY_OPENABLE);
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+    public String MimeType() {
+        return mimeType;
     }
-    if (action == FileAction.PickDirectory) {
-      intent = Intent.createChooser(intent, "Test");
-    } else {
-      intent.setType(mimeType);
-      int flags = Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-          | Intent.FLAG_GRANT_READ_URI_PERMISSION;
-      if (action == FileAction.PickExistingFile) {
-        flags |= Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-      }
-      intent.setFlags(flags);
-    }
-    return intent;
-  }
 
-  private static String actionToIntent(FileAction action) {
-    switch (action) {
-      case PickExistingFile:
-        return ACTION_OPEN_DOCUMENT;
-      case PickDirectory:
-        return ACTION_OPEN_DOCUMENT_TREE;
-      case PickNewFile:
-        return ACTION_CREATE_DOCUMENT;
-      default:
-        throw new IllegalArgumentException("Unknown file action: " + action);
+    /**
+     * Returns the selected file, possibly as a content URI.
+     *
+     * @return the selected file
+     */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+    public String Selection() {
+        return selection;
     }
-  }
+
+    @Override
+    public void resultReturned(int requestCode, int resultCode, Intent data) {
+        if (data != null) {
+            Uri uri = data.getData();
+            final int takeFlags = data.getFlags() & (
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            );
+            container.$form().getContentResolver().takePersistableUriPermission(uri, takeFlags);
+            selection = uri.toString();
+            AfterPicking();
+        } else {
+            container.$form().dispatchErrorOccurredEvent(this, "Open",
+                    ErrorMessages.ERROR_FILEPICKER_NO_URI_RETURNED);
+        }
+    }
+
+    @Override
+    protected Intent getIntent() {
+        Intent intent = new Intent(actionToIntent(action));
+        if (action == FileAction.PickExistingFile) {
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+        if (action == FileAction.PickDirectory) {
+            intent = Intent.createChooser(intent, "Test");
+        } else {
+            intent.setType(mimeType);
+            int flags = Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    | Intent.FLAG_GRANT_READ_URI_PERMISSION;
+            if (action == FileAction.PickExistingFile) {
+                flags |= Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+            }
+            intent.setFlags(flags);
+        }
+        return intent;
+    }
 }

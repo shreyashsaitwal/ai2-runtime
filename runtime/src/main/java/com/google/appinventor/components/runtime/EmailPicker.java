@@ -17,14 +17,14 @@ import android.widget.AutoCompleteTextView;
  * a contact, the phone will show a dropdown menu of choices that complete the entry. If there are
  * many contacts, the dropdown can take several seconds to appear, and can show intermediate
  * results while the matches are being computed.
- *
+ * <p>
  * The initial contents of the text box and the contents< after user entry is in the {@link #Text()}
  * property. If the {@link #Text()} property is initially empty, the contents of the {@link #Hint()}
  * property will be faintly shown in the text box as a hint to the user.
- *
+ * <p>
  * Other properties affect the appearance of the text box ({@link #TextAlignment()},
  * {@link #BackgroundColor()}, etc.) and whether it can be used ({@link #Enabled()}).
- *
+ * <p>
  * Text boxes like this are usually used with [`Button`](userinterface.html#Button) components, with
  * the user clicking on the button when text entry is complete.
  *
@@ -53,39 +53,40 @@ import android.widget.AutoCompleteTextView;
  *//* @UsesPermissions(permissionNames = "android.permission.READ_CONTACTS") */
 public class EmailPicker extends TextBoxBase {
 
-  private final EmailAddressAdapter addressAdapter;
+    private final EmailAddressAdapter addressAdapter;
 
-  /**
-   * Create a new EmailPicker component.
-   *
-   * @param container the parent container.
-   */
-  public EmailPicker(ComponentContainer container) {
-    super(container, new AutoCompleteTextView(container.$context()));
-    addressAdapter = new EmailAddressAdapter(container.$context());
-  }
+    /**
+     * Create a new EmailPicker component.
+     *
+     * @param container the parent container.
+     */
+    public EmailPicker(ComponentContainer container) {
+        super(container, new AutoCompleteTextView(container.$context()));
+        addressAdapter = new EmailAddressAdapter(container.$context());
+    }
 
-  @SuppressWarnings("unused")  // Will be called from Scheme
-  public void Initialize() {
-    container.$form().askPermission(Manifest.permission.READ_CONTACTS, new PermissionResultHandler() {
-      @Override
-      public void HandlePermissionResponse(String permission, boolean granted) {
-        if (granted) {
-          ((AutoCompleteTextView) view).setAdapter(addressAdapter);
-        } else {
-          container.$form().dispatchPermissionDeniedEvent(EmailPicker.this, "Initialize", permission);
-        }
-      }
-    });
-  }
+    @SuppressWarnings("unused")  // Will be called from Scheme
+    public void Initialize() {
+        container.$form().askPermission(Manifest.permission.READ_CONTACTS, new PermissionResultHandler() {
+            @Override
+            public void HandlePermissionResponse(String permission, boolean granted) {
+                if (granted) {
+                    ((AutoCompleteTextView) view).setAdapter(addressAdapter);
+                } else {
+                    container.$form().dispatchPermissionDeniedEvent(EmailPicker.this, "Initialize", permission);
+                }
+            }
+        });
+    }
 
-  /**
-   * Event raised when the `%type%` is selected for input, such as by
-   * the user touching it.
-   */
-  /* @SimpleEvent
-   */@Override
-  public void GotFocus() {
+    /**
+     * Event raised when the `%type%` is selected for input, such as by
+     * the user touching it.
+     */
+    /* @SimpleEvent
+     */
+    @Override
+    public void GotFocus() {
 
 //     Note(halabelson):  I am commenting out this test.  Android provider.Constacts was
 //     deprecated in Donut, but email picking still seems to work on newer versions of the SDK.
@@ -97,6 +98,6 @@ public class EmailPicker extends TextBoxBase {
 //          ErrorMessages.ERROR_FUNCTIONALITY_NOT_SUPPORTED_EMAIL_PICKER);
 //    }
 
-    EventDispatcher.dispatchEvent(this, "GotFocus");
-  }
+        EventDispatcher.dispatchEvent(this, "GotFocus");
+    }
 }

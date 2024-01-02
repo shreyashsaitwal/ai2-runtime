@@ -48,129 +48,129 @@ import com.google.appinventor.components.runtime.util.SdkLevel;
     )
 }) */
 public class BarcodeScanner extends AndroidNonvisibleComponent
-    implements ActivityResultListener, Component {
+        implements ActivityResultListener, Component {
 
-  private static final String SCAN_INTENT = "com.google.zxing.client.android.SCAN";
-  private static final String LOCAL_SCAN = "com.google.zxing.client.android.AppInvCaptureActivity";
-  private static final String SCANNER_RESULT_NAME = "SCAN_RESULT";
-  private String result = "";
-  private boolean useExternalScanner = true;
-  private final ComponentContainer container;
-  private boolean havePermission = false; // Do we have CAMERA permission?
+    private static final String SCAN_INTENT = "com.google.zxing.client.android.SCAN";
+    private static final String LOCAL_SCAN = "com.google.zxing.client.android.AppInvCaptureActivity";
+    private static final String SCANNER_RESULT_NAME = "SCAN_RESULT";
+    private final ComponentContainer container;
+    private String result = "";
+    private boolean useExternalScanner = true;
+    private boolean havePermission = false; // Do we have CAMERA permission?
 
-  /* Used to identify the call to startActivityForResult. Will be passed back into the
-  resultReturned() callback method. */
-  private int requestCode;
+    /* Used to identify the call to startActivityForResult. Will be passed back into the
+    resultReturned() callback method. */
+    private int requestCode;
 
-  /**
-   * Creates a Bar Code scanning component.
-   *
-   * @param container container, component will be placed in
-   */
-  public BarcodeScanner(ComponentContainer container) {
-    super(container.$form());
-    this.container = container;
-  }
+    /**
+     * Creates a Bar Code scanning component.
+     *
+     * @param container container, component will be placed in
+     */
+    public BarcodeScanner(ComponentContainer container) {
+        super(container.$form());
+        this.container = container;
+    }
 
-  /**
-   * Gets the text result of the previous scan.
-   */
+    /**
+     * Gets the text result of the previous scan.
+     */
   /* @SimpleProperty(description = "Text result of the previous scan.",
       category = PropertyCategory.BEHAVIOR) */
-  public String Result() {
-    return result;
-  }
+    public String Result() {
+        return result;
+    }
 
-  /**
-   * Begins a barcode scan, using the camera. When the scan is complete, the
-   * AfterScan event will be raised.
-   */
+    /**
+     * Begins a barcode scan, using the camera. When the scan is complete, the
+     * AfterScan event will be raised.
+     */
   /* @SimpleFunction(description = "Begins a barcode scan, using the camera. When the scan " +
       "is complete, the AfterScan event will be raised.") */
-  public void DoScan() {
-    Intent intent = new Intent(SCAN_INTENT);
-    if (!useExternalScanner && (SdkLevel.getLevel() >= SdkLevel.LEVEL_ECLAIR)) {  // Should we attempt to use an internal scanner?
-      // Make sure we have CAMERA permission
-      if (!havePermission) {
-        container.$form()
-          .askPermission(Manifest.permission.CAMERA,
-                         new PermissionResultHandler() {
-                           @Override
-                           public void HandlePermissionResponse(String permission, boolean granted) {
-                             if (granted) {
-                               BarcodeScanner.this.havePermission = true;
-                               DoScan();
-                             } else {
-                               form.dispatchPermissionDeniedEvent(BarcodeScanner.this, "DoScan",
-                                   Manifest.permission.CAMERA);
-                             }
-                           }
-                         });
-        return;
-      }
-      String packageName = container.$form().getPackageName();
-      intent.setComponent(new ComponentName(packageName, "com.google.zxing.client.android.AppInvCaptureActivity"));
+    public void DoScan() {
+        Intent intent = new Intent(SCAN_INTENT);
+        if (!useExternalScanner && (SdkLevel.getLevel() >= SdkLevel.LEVEL_ECLAIR)) {  // Should we attempt to use an internal scanner?
+            // Make sure we have CAMERA permission
+            if (!havePermission) {
+                container.$form()
+                        .askPermission(Manifest.permission.CAMERA,
+                                new PermissionResultHandler() {
+                                    @Override
+                                    public void HandlePermissionResponse(String permission, boolean granted) {
+                                        if (granted) {
+                                            BarcodeScanner.this.havePermission = true;
+                                            DoScan();
+                                        } else {
+                                            form.dispatchPermissionDeniedEvent(BarcodeScanner.this, "DoScan",
+                                                    Manifest.permission.CAMERA);
+                                        }
+                                    }
+                                });
+                return;
+            }
+            String packageName = container.$form().getPackageName();
+            intent.setComponent(new ComponentName(packageName, "com.google.zxing.client.android.AppInvCaptureActivity"));
+        }
+        if (requestCode == 0) {
+            requestCode = form.registerForActivityResult(this);
+        }
+        try {
+            container.$context().startActivityForResult(intent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+            container.$form().dispatchErrorOccurredEvent(this, "BarcodeScanner",
+                    ErrorMessages.ERROR_NO_SCANNER_FOUND, "");
+        }
     }
-    if (requestCode == 0) {
-      requestCode = form.registerForActivityResult(this);
-    }
-    try {
-      container.$context().startActivityForResult(intent, requestCode);
-    } catch (ActivityNotFoundException e) {
-      e.printStackTrace();
-      container.$form().dispatchErrorOccurredEvent(this, "BarcodeScanner",
-        ErrorMessages.ERROR_NO_SCANNER_FOUND, "");
-    }
-  }
 
-  @Override
-  public void resultReturned(int requestCode, int resultCode, Intent data) {
-    if (requestCode == this.requestCode && resultCode == Activity.RESULT_OK) {
-      if (data.hasExtra(SCANNER_RESULT_NAME)) {
-        result = data.getStringExtra(SCANNER_RESULT_NAME);
-      } else {
-        result = "";
-      }
-      AfterScan(result);
+    @Override
+    public void resultReturned(int requestCode, int resultCode, Intent data) {
+        if (requestCode == this.requestCode && resultCode == Activity.RESULT_OK) {
+            if (data.hasExtra(SCANNER_RESULT_NAME)) {
+                result = data.getStringExtra(SCANNER_RESULT_NAME);
+            } else {
+                result = "";
+            }
+            AfterScan(result);
+        }
     }
-  }
 
-  /**
-   * Indicates that the scanner has read a (text) result and provides the result 
-   */
-  /* @SimpleEvent
-   */public void AfterScan(String result) {
-    EventDispatcher.dispatchEvent(this, "AfterScan", result);
-  }
+    /**
+     * Indicates that the scanner has read a (text) result and provides the result
+     */
+    /* @SimpleEvent
+     */
+    public void AfterScan(String result) {
+        EventDispatcher.dispatchEvent(this, "AfterScan", result);
+    }
 
-  /**
-   * Gets whether or not you want to use an external scanning program to
-   * scan barcodes.
-   *
-   * @return 'true' or 'false' depending on whether or not you want to use
-   *         an external scanning program.
-   */
+    /**
+     * Gets whether or not you want to use an external scanning program to
+     * scan barcodes.
+     *
+     * @return 'true' or 'false' depending on whether or not you want to use
+     * an external scanning program.
+     */
 
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
     description = "If true App Inventor will look for and use an external scanning" +
     " program such as \"Bar Code Scanner.\"") */
-  public boolean UseExternalScanner() {
-    return useExternalScanner;
-  }
+    public boolean UseExternalScanner() {
+        return useExternalScanner;
+    }
 
-  /**
-   * Set whether or not you wish to use an External Scanning program such as
-   * Bar Code Scanner. If false a version of ZXing integrated into App Inventor
-   * will be used.
-   *
-   * @param useExternalScanner  Set true to use an external scanning program,
-   *                            false to use internal copy of ZXing.
-   *
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True") */
-  /* @SimpleProperty() */
-  public void UseExternalScanner(boolean useExternalScanner) {
-    this.useExternalScanner = useExternalScanner;
-  }
+    /**
+     * Set whether or not you wish to use an External Scanning program such as
+     * Bar Code Scanner. If false a version of ZXing integrated into App Inventor
+     * will be used.
+     *
+     * @param useExternalScanner Set true to use an external scanning program,
+     *                           false to use internal copy of ZXing.
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "True") */
+    /* @SimpleProperty() */
+    public void UseExternalScanner(boolean useExternalScanner) {
+        this.useExternalScanner = useExternalScanner;
+    }
 
 }

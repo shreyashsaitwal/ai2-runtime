@@ -7,7 +7,6 @@ package com.google.appinventor.components.runtime.util;
 
 import com.google.appinventor.components.runtime.Component;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -17,23 +16,24 @@ import java.lang.reflect.Method;
  */
 public class PropertyUtil {
 
-  /**
-   * Copy properties from one component to another of the same class.
-   * @param source the source component
-   * @param target the target component
-   * @return the target component (for convenience in chaining)
-   * @throws Throwable
-   */
-  public static Component copyComponentProperties(Component source, Component target)
-      throws Throwable {
-    if (!source.getClass().equals(target.getClass())) {
-      throw new IllegalArgumentException("Source and target classes must be identical");
-    }
+    /**
+     * Copy properties from one component to another of the same class.
+     *
+     * @param source the source component
+     * @param target the target component
+     * @return the target component (for convenience in chaining)
+     * @throws Throwable
+     */
+    public static Component copyComponentProperties(Component source, Component target)
+            throws Throwable {
+        if (!source.getClass().equals(target.getClass())) {
+            throw new IllegalArgumentException("Source and target classes must be identical");
+        }
 
-    final Class componentClass = source.getClass();
-    final Method[] componentMethods = componentClass.getMethods();
-    for (Method componentMethod : componentMethods) {
-      // A SimpleProperty which takes a single argument is a property setter.
+        final Class componentClass = source.getClass();
+        final Method[] componentMethods = componentClass.getMethods();
+        for (Method componentMethod : componentMethods) {
+            // A SimpleProperty which takes a single argument is a property setter.
 //      if (componentMethod.isAnnotationPresent(SimpleProperty.class)
 //          && componentMethod.getParameterTypes().length == 1) {
 //        final Method propertySetterMethod = componentMethod;
@@ -67,16 +67,16 @@ public class PropertyUtil {
 //          throw e2.getCause();
 //        }
 //      }
+        }
+        return target;
     }
-    return target;
-  }
 
-  private static Method getPropertyCopierMethod(String copierMethodName, Class componentClass) {
-    // If the copier method is declared in a superclass of componentClass, the parameter
-    // would be the superclass also.
-    // For example, componentClass might be Button. But the CopyWidth method is declared in
-    // AndroidViewComponent and the paremeter is also AndroidViewComponent.
-    // So, we may need to look up the superclass chain to
+    private static Method getPropertyCopierMethod(String copierMethodName, Class componentClass) {
+        // If the copier method is declared in a superclass of componentClass, the parameter
+        // would be the superclass also.
+        // For example, componentClass might be Button. But the CopyWidth method is declared in
+        // AndroidViewComponent and the paremeter is also AndroidViewComponent.
+        // So, we may need to look up the superclass chain to
 //    do {
 //      try {
 //        Method propertyCopierMethod = componentClass.getMethod(copierMethodName, componentClass);
@@ -89,7 +89,7 @@ public class PropertyUtil {
 //      componentClass = componentClass.getSuperclass();
 //    } while (componentClass != null);
 
-    // It's fine if we didn't find a copier method. Just return null;
-    return null;
-  }
+        // It's fine if we didn't find a copier method. Just return null;
+        return null;
+    }
 }

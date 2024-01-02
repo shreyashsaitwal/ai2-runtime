@@ -7,11 +7,10 @@
 package com.google.appinventor.components.runtime.util;
 
 import com.google.appinventor.components.runtime.errors.YailRuntimeError;
-import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Arrays;  
-import java.util.ArrayList;  
 
 /**
  * Utilities for Components that display a number of options on Screen such as ListPicker,
@@ -19,140 +18,144 @@ import java.util.ArrayList;
  */
 public class ElementsUtil {
 
-  public static YailList elementsFromString(String itemString){
-    YailList items = new YailList();
-    if (itemString.length() > 0) {
-      items = YailList.makeList((Object[]) itemString.split(" *, *"));
+    public static YailList elementsFromString(String itemString) {
+        YailList items = new YailList();
+        if (itemString.length() > 0) {
+            items = YailList.makeList((Object[]) itemString.split(" *, *"));
+        }
+
+        return items;
     }
 
-    return items;
-  }
-
-  /** Check a Yail list of items to verify that they are all strings
-   *
-   * @param itemList
-   * @param componentName
-   * @return the original list
-   */
-  public static List<String> elementsStrings(YailList itemList, String componentName){
-    Object[] objects = itemList.toStringArray();
-    for (int i = 0; i < objects.length; i++) {
-      if (!(objects[i] instanceof String)) {
-        throw new YailRuntimeError("Items passed to " + componentName + " must be Strings",
-            "Error");
-      }
+    /**
+     * Check a Yail list of items to verify that they are all strings
+     *
+     * @param itemList
+     * @param componentName
+     * @return the original list
+     */
+    public static List<String> elementsStrings(YailList itemList, String componentName) {
+        Object[] objects = itemList.toStringArray();
+        for (int i = 0; i < objects.length; i++) {
+            if (!(objects[i] instanceof String)) {
+                throw new YailRuntimeError("Items passed to " + componentName + " must be Strings",
+                        "Error");
+            }
+        }
+        // this is not changing itemlist.  it's just checking that the items are strings
+        String[] strings = (String[]) objects;
+        List<String> ans = new ArrayList<>(Arrays.asList(strings));
+        return ans;
     }
-    // this is not changing itemlist.  it's just checking that the items are strings
-    String[] strings = (String[]) objects;
-    List<String> ans = new ArrayList<>(Arrays.asList(strings));
-    return ans;
-  }
 
-  /**
-   * Returns a list of string from a comma-separated string
-   * @param itemString
-   * @return items
-   */
-  public static List<String> elementsListFromString(String itemString){
-    List<String> items;
-    if (itemString.length() > 0) {
-      String[] words = itemString.split(" *, *");
-      items = new ArrayList<>(Arrays.asList(words));
-    } else {
-      items = new ArrayList();
+    /**
+     * Returns a list of string from a comma-separated string
+     *
+     * @param itemString
+     * @return items
+     */
+    public static List<String> elementsListFromString(String itemString) {
+        List<String> items;
+        if (itemString.length() > 0) {
+            String[] words = itemString.split(" *, *");
+            items = new ArrayList<>(Arrays.asList(words));
+        } else {
+            items = new ArrayList();
+        }
+        return items;
     }
-    return items;
-  }
 
-  /**
-   * Converts a List of string to YailList
-   * @param stringItems
-   * @return YailList
-   */
-  public static YailList makeYailListFromList(List<String> stringItems) {
-    if (stringItems == null || stringItems.size() == 0) return YailList.makeEmptyList();
-    return YailList.makeList(stringItems);
-  }
-
-  public static int selectionIndexInStringList(int index, List<String> items) {
-    if (index < 1 || index > items.size()) {
-      return 0;
-    } else {
-      return index;
+    /**
+     * Converts a List of string to YailList
+     *
+     * @param stringItems
+     * @return YailList
+     */
+    public static YailList makeYailListFromList(List<String> stringItems) {
+        if (stringItems == null || stringItems.size() == 0) return YailList.makeEmptyList();
+        return YailList.makeList(stringItems);
     }
-  }
 
-  public static String setSelectionFromIndexInStringList(int index, List<String> items) {
-    if (index < 1 || index > items.size()) {
-      return "";
+    public static int selectionIndexInStringList(int index, List<String> items) {
+        if (index < 1 || index > items.size()) {
+            return 0;
+        } else {
+            return index;
+        }
     }
-    return items.get(index - 1);
-  }
 
-  public static int setSelectedIndexFromValueInStringList(String value, List<String> items) {
-    // Now, we need to change SelectionIndex to correspond to Selection.
-    // If multiple Selections have the same SelectionIndex, use the first.
-    // If none do, arbitrarily set the SelectionIndex to its default value
-    // of 0.
-    for (int i = 0; i < items.size(); i++) {
-      // The comparison is case-sensitive to be consistent with yail-equal?.
-      if (items.get(i).equals(value)) {
-        return i + 1;
-      }
+    public static String setSelectionFromIndexInStringList(int index, List<String> items) {
+        if (index < 1 || index > items.size()) {
+            return "";
+        }
+        return items.get(index - 1);
     }
-    return 0;
-  }
 
- /** Check a Yail list of items to verify that they are all strings and
-  *
-  * @param itemList
-  * @param componentName
-  * @return the original list
-  */
-
-  public static YailList elements(YailList itemList, String componentName){
-    Object[] objects = itemList.toStringArray();
-    for (int i = 0; i < objects.length; i++) {
-      if (!(objects[i] instanceof String)) {
-        throw new YailRuntimeError("Items passed to " + componentName + " must be Strings",
-            "Error");
-      }
+    public static int setSelectedIndexFromValueInStringList(String value, List<String> items) {
+        // Now, we need to change SelectionIndex to correspond to Selection.
+        // If multiple Selections have the same SelectionIndex, use the first.
+        // If none do, arbitrarily set the SelectionIndex to its default value
+        // of 0.
+        for (int i = 0; i < items.size(); i++) {
+            // The comparison is case-sensitive to be consistent with yail-equal?.
+            if (items.get(i).equals(value)) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
-    // this is not changing itemlist.  it's just checking that the items are strings
-    return itemList;
-  }
 
-  public static int selectionIndex(int index, YailList items){
-    if (index <= 0 || index > items.size()) {
-      return 0;
-    } else {
-      return index;
+    /**
+     * Check a Yail list of items to verify that they are all strings and
+     *
+     * @param itemList
+     * @param componentName
+     * @return the original list
+     */
+
+    public static YailList elements(YailList itemList, String componentName) {
+        Object[] objects = itemList.toStringArray();
+        for (int i = 0; i < objects.length; i++) {
+            if (!(objects[i] instanceof String)) {
+                throw new YailRuntimeError("Items passed to " + componentName + " must be Strings",
+                        "Error");
+            }
+        }
+        // this is not changing itemlist.  it's just checking that the items are strings
+        return itemList;
     }
-  }
 
-  public static String setSelectionFromIndex(int index, YailList items){
-    if (index == 0 || index > items.size()) {
-      return "";
+    public static int selectionIndex(int index, YailList items) {
+        if (index <= 0 || index > items.size()) {
+            return 0;
+        } else {
+            return index;
+        }
     }
-    // YailLists are 0-based, but we want to be 1-based.
-    return items.getString(index - 1);
-  }
 
-  public static int setSelectedIndexFromValue(String value, YailList items){
-    // Now, we need to change SelectionIndex to correspond to Selection.
-    // If multiple Selections have the same SelectionIndex, use the first.
-    // If none do, arbitrarily set the SelectionIndex to its default value
-    // of 0.
-    for (int i = 0; i < items.size(); i++) {
-      // The comparison is case-sensitive to be consistent with yail-equal?.
-      if (items.getString(i).equals(value)) {
-        return i + 1;
-      }
+    public static String setSelectionFromIndex(int index, YailList items) {
+        if (index == 0 || index > items.size()) {
+            return "";
+        }
+        // YailLists are 0-based, but we want to be 1-based.
+        return items.getString(index - 1);
     }
-    return 0;
-  }
 
-  public static String toStringEmptyIfNull(Object o) {
-    return o == null ? "" : o.toString();
-  }
+    public static int setSelectedIndexFromValue(String value, YailList items) {
+        // Now, we need to change SelectionIndex to correspond to Selection.
+        // If multiple Selections have the same SelectionIndex, use the first.
+        // If none do, arbitrarily set the SelectionIndex to its default value
+        // of 0.
+        for (int i = 0; i < items.size(); i++) {
+            // The comparison is case-sensitive to be consistent with yail-equal?.
+            if (items.getString(i).equals(value)) {
+                return i + 1;
+            }
+        }
+        return 0;
+    }
+
+    public static String toStringEmptyIfNull(Object o) {
+        return o == null ? "" : o.toString();
+    }
 }

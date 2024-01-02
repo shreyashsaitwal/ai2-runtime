@@ -21,39 +21,40 @@ import android.hardware.Sensor;
     iconName = "images//barometer.png") */
 /* @SimpleObject
  */public class Barometer extends SingleValueSensor {
-  /**
-   * Creates a new Barometer component.
-   *
-   * @param container  ignored (because this is a non-visible component)
-   */
-  public Barometer(ComponentContainer container) {
-    super(container.$form(), Sensor.TYPE_PRESSURE);
-  }
+    /**
+     * Creates a new Barometer component.
+     *
+     * @param container ignored (because this is a non-visible component)
+     */
+    public Barometer(ComponentContainer container) {
+        super(container.$form(), Sensor.TYPE_PRESSURE);
+    }
 
-  @Override
-  protected void onValueChanged(float value) {
-    AirPressureChanged(value);
-  }
-  
-  /**
-   * Called when a change is detected in the air pressure (provided in hPa).
-   *
-   * @param the new air pressure in hPa (millibar)
-   */
-  /* @SimpleEvent
-   */public void AirPressureChanged(float pressure) {
-    EventDispatcher.dispatchEvent(this, "AirPressureChanged", pressure);
-  }
+    @Override
+    protected void onValueChanged(float value) {
+        AirPressureChanged(value);
+    }
 
-  /**
-   * The atmospheric pressure in hPa (millibar), if the sensor is available 
-   * and enabled.
-   *
-   * @return the atmospheric pressure in hPa (millibar)
-   */
+    /**
+     * Called when a change is detected in the air pressure (provided in hPa).
+     *
+     * @param the new air pressure in hPa (millibar)
+     */
+    /* @SimpleEvent
+     */
+    public void AirPressureChanged(float pressure) {
+        EventDispatcher.dispatchEvent(this, "AirPressureChanged", pressure);
+    }
+
+    /**
+     * The atmospheric pressure in hPa (millibar), if the sensor is available
+     * and enabled.
+     *
+     * @return the atmospheric pressure in hPa (millibar)
+     */
   /* @SimpleProperty(description = "The air pressure in hPa (millibar), if the sensor is available " +
       "and enabled.") */
-   public float AirPressure() {
-      return getValue();
-  }
+    public float AirPressure() {
+        return getValue();
+    }
 }

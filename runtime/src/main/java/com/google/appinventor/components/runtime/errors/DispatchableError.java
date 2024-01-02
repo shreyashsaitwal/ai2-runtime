@@ -11,27 +11,27 @@ import java.util.Arrays;
 
 public class DispatchableError extends RuntimeError {
 
-  private final int errorCode;
-  @SuppressWarnings("squid:S1948")
-  private final Object[] arguments;
+    private final int errorCode;
+    @SuppressWarnings("squid:S1948")
+    private final Object[] arguments;
 
-  public DispatchableError(int errorCode) {
-    super(ErrorMessages.formatMessage(errorCode, null));
-    this.errorCode = errorCode;
-    this.arguments = new Object[0];
-  }
+    public DispatchableError(int errorCode) {
+        super(ErrorMessages.formatMessage(errorCode, null));
+        this.errorCode = errorCode;
+        this.arguments = new Object[0];
+    }
 
-  public DispatchableError(int errorCode, Object... arguments) {
-    super(ErrorMessages.formatMessage(errorCode, arguments));
-    this.errorCode = errorCode;
-    this.arguments = arguments;
-  }
+    public DispatchableError(int errorCode, Object... arguments) {
+        super(ErrorMessages.formatMessage(errorCode, arguments));
+        this.errorCode = errorCode;
+        this.arguments = arguments;
+    }
 
-  public int getErrorCode() {
-    return errorCode;
-  }
+    public int getErrorCode() {
+        return errorCode;
+    }
 
-  public Object[] getArguments() {
-    return Arrays.copyOf(arguments, arguments.length);
-  }
+    public Object[] getArguments() {
+        return Arrays.copyOf(arguments, arguments.length);
+    }
 }

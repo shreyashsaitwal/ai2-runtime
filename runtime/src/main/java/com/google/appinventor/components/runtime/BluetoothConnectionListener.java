@@ -12,13 +12,13 @@ package com.google.appinventor.components.runtime;
  * @author lizlooney@google.com (Liz Looney)
  */
 interface BluetoothConnectionListener {
-  /**
-   *
-   */
-  void afterConnect(BluetoothConnectionBase bluetoothConnection);
+    /**
+     *
+     */
+    void afterConnect(BluetoothConnectionBase bluetoothConnection);
 
-  /**
-   *
-   */
-  void beforeDisconnect(BluetoothConnectionBase bluetoothConnection);
+    /**
+     *
+     */
+    void beforeDisconnect(BluetoothConnectionBase bluetoothConnection);
 }

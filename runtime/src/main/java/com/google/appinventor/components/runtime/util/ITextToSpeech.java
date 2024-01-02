@@ -5,9 +5,7 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 package com.google.appinventor.components.runtime.util;
 
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * This abstracts out what a text to speech implementation needs to have.  In particular we use
@@ -18,69 +16,72 @@ import java.util.Set;
  */
 public interface ITextToSpeech {
 
-  /**
-   * Callback specifying methods for successful and failed attempts to generate speech.
-   */
-  interface TextToSpeechCallback {
+    /**
+     * Speaks the given message corresponding to the language and country of the given locale.
+     *
+     * @param message the message to speak
+     * @param loc     the locale to use
+     */
+    public void speak(String message, Locale loc);
 
     /**
-     * Callback to be invoked when a message has finished being spoken.
+     * This will be called when the Activity is stopped, to give us a chance to cleanup resources,
+     * if necessary.
      */
-    public void onSuccess();
+    public void onStop();
 
     /**
-     * Callback to be invoked when we have a failure to communicate.
+     * This will be called when the Activity is resumed, to give us a chance to re-initialize
+     * resources, if necessary.
      */
-    public void onFailure();
-  }
+    public void onResume();
 
-  /**
-   * Speaks the given message corresponding to the language and country of the given locale.
-   * @param message the message to speak
-   * @param loc the locale to use
-   */
-  public void speak(String message, Locale loc);
+    /**
+     * This will be called when the Activity is destroyed, to give us a chance to cleanup resources,
+     * if necessary.
+     */
+    public void onDestroy();
 
-  /**
-   * This will be called when the Activity is stopped, to give us a chance to cleanup resources,
-   * if necessary.
-   */
-  public void onStop();
+    /**
+     * Sets the speech pitch for the TextToSpeech
+     *
+     * @param pitch 1.0 is the normal pitch, lower values lower the tone of the synthesized voice,
+     *              greater values increase it.
+     */
+    public void setPitch(float pitch);
 
-  /**
-   * This will be called when the Activity is resumed, to give us a chance to re-initialize
-   * resources, if necessary.
-   */
-  public void onResume();
+    /**
+     * Sets the speech rate
+     *
+     * @param speechRate Speech rate. 1.0 is the normal speech rate, lower values slow down the
+     *                   speech (0.5 is half the normal speech rate), greater values
+     *                   accelerate it (2.0 is twice the normal speech rate).
+     */
+    public void setSpeechRate(float speechRate);
 
-  /**
-   * This will be called when the Activity is destroyed, to give us a chance to cleanup resources,
-   * if necessary.
-   */
-  public void onDestroy();
+    /**
+     * Stops any current speech, if possible.
+     */
+    public void stop();
 
-  /**
-   * Sets the speech pitch for the TextToSpeech
-   * @param pitch 1.0 is the normal pitch, lower values lower the tone of the synthesized voice,
-   *              greater values increase it.
-   */
-  public void setPitch(float pitch);
+    public int isLanguageAvailable(Locale loc);
 
-  /**
-   * Sets the speech rate
-   * @param speechRate Speech rate. 1.0 is the normal speech rate, lower values slow down the
-   *                   speech (0.5 is half the normal speech rate), greater values
-   *                   accelerate it (2.0 is twice the normal speech rate).
-   */
-  public void setSpeechRate(float speechRate);
+    public boolean isInitialized();
 
-  /**
-   * Stops any current speech, if possible.
-   */
-  public void stop();
+    /**
+     * Callback specifying methods for successful and failed attempts to generate speech.
+     */
+    interface TextToSpeechCallback {
 
-  public int isLanguageAvailable(Locale loc);
+        /**
+         * Callback to be invoked when a message has finished being spoken.
+         */
+        public void onSuccess();
 
-  public boolean isInitialized() ;
+        /**
+         * Callback to be invoked when we have a failure to communicate.
+         */
+        public void onFailure();
+    }
 
 }

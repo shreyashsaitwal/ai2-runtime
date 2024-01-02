@@ -6,70 +6,71 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.runtime.util.AnimationUtil;
 import android.content.Intent;
+import com.google.appinventor.components.runtime.util.AnimationUtil;
 
 /**
  * Abstract superclass for all of the "Picker" components.
- *
  */
 /* @SimpleObject
  */public abstract class Picker extends ButtonBase implements ActivityResultListener {
-  protected final ComponentContainer container;
+    protected final ComponentContainer container;
 
-  /* Used to identify the call to startActivityForResult. Will be passed back into the
-  resultReturned() callback method. */
-  protected int requestCode;
+    /* Used to identify the call to startActivityForResult. Will be passed back into the
+    resultReturned() callback method. */
+    protected int requestCode;
 
-  public Picker(ComponentContainer container) {
-    super(container);
-    this.container = container;
-  }
-
-  /**
-   *  Provides the Intent used to launch the picker activity.
-   */
-  protected abstract Intent getIntent();
-
-  @Override
-  public void click() {
-    BeforePicking();
-    if (requestCode == 0) { // only need to register once
-      requestCode = container.$form().registerForActivityResult(this);
+    public Picker(ComponentContainer container) {
+        super(container);
+        this.container = container;
     }
-    container.$context().startActivityForResult(getIntent(), requestCode);
-    String openAnim = container.$form().OpenScreenAnimation();
-    AnimationUtil.ApplyOpenScreenAnimation(container.$context(), openAnim);
-  }
 
-  // Functions
+    /**
+     * Provides the Intent used to launch the picker activity.
+     */
+    protected abstract Intent getIntent();
 
-  /**
-   * Opens the `%type%`, as though the user clicked on it.
-   */
-  /* @SimpleFunction(description = "Opens the %type%, as though the user clicked on it.") */
-  public void Open() {
-    click();
-  }
+    @Override
+    public void click() {
+        BeforePicking();
+        if (requestCode == 0) { // only need to register once
+            requestCode = container.$form().registerForActivityResult(this);
+        }
+        container.$context().startActivityForResult(getIntent(), requestCode);
+        String openAnim = container.$form().OpenScreenAnimation();
+        AnimationUtil.ApplyOpenScreenAnimation(container.$context(), openAnim);
+    }
 
-  // Events
+    // Functions
 
-  /**
-   * Event to raise when the `%type%` is clicked or the picker is shown
-   * using the {@link #Open()} method.  This event occurs before the picker is displayed, and
-   * can be used to prepare the picker before it is shown.
-   */
-  /* @SimpleEvent
-   */public void BeforePicking() {
-    EventDispatcher.dispatchEvent(this, "BeforePicking");
-  }
+    /**
+     * Opens the `%type%`, as though the user clicked on it.
+     */
+    /* @SimpleFunction(description = "Opens the %type%, as though the user clicked on it.") */
+    public void Open() {
+        click();
+    }
 
-  /**
-   * Event to be raised after the `%type%` activity returns its
-   * result and the properties have been filled in.
-   */
-  /* @SimpleEvent
-   */public void AfterPicking() {
-    EventDispatcher.dispatchEvent(this, "AfterPicking");
-  }
+    // Events
+
+    /**
+     * Event to raise when the `%type%` is clicked or the picker is shown
+     * using the {@link #Open()} method.  This event occurs before the picker is displayed, and
+     * can be used to prepare the picker before it is shown.
+     */
+    /* @SimpleEvent
+     */
+    public void BeforePicking() {
+        EventDispatcher.dispatchEvent(this, "BeforePicking");
+    }
+
+    /**
+     * Event to be raised after the `%type%` activity returns its
+     * result and the properties have been filled in.
+     */
+    /* @SimpleEvent
+     */
+    public void AfterPicking() {
+        EventDispatcher.dispatchEvent(this, "AfterPicking");
+    }
 }

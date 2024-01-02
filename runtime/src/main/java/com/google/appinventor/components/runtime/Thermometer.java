@@ -22,39 +22,39 @@ import android.hardware.Sensor;
     iconName = "images//thermometer.png") */
 /* @SimpleObject
  */public class Thermometer extends SingleValueSensor {
-  /**
-   * Creates a new Thermometer component.
-   *
-   * @param container  ignored (because this is a non-visible component)
-   */
-  public Thermometer(ComponentContainer container) {
-    super(container.$form(), Sensor.TYPE_AMBIENT_TEMPERATURE);
-  }
+    /**
+     * Creates a new Thermometer component.
+     *
+     * @param container ignored (because this is a non-visible component)
+     */
+    public Thermometer(ComponentContainer container) {
+        super(container.$form(), Sensor.TYPE_AMBIENT_TEMPERATURE);
+    }
 
-  @Override
-  protected void onValueChanged(float value) {
-    TemperatureChanged(value);
-  }
-  
-  /**
-   * Indicates a change of temperature, provided in degrees Celsius.
-   *
-   * @param the temperature in degrees Celsius
-   */
-  /* @SimpleEvent(description = "Called when a change is detected in the temperature (in degrees Celsius).") */
-  public void TemperatureChanged(float temperature) {
-    EventDispatcher.dispatchEvent(this, "TemperatureChanged", temperature);
-  }
+    @Override
+    protected void onValueChanged(float value) {
+        TemperatureChanged(value);
+    }
 
-  /**
-   * Returns the temperature in degrees Celsius.
-   * The sensor must be enabled and available 
-   * to return meaningful values.
-   *
-   * @return the temperature in degrees Celsius
-   */
-  /* @SimpleProperty(description = "The temperature in degrees Celsius, if the sensor is available and enabled") */
-   public float Temperature() {
-    return getValue();
-  }
+    /**
+     * Indicates a change of temperature, provided in degrees Celsius.
+     *
+     * @param the temperature in degrees Celsius
+     */
+    /* @SimpleEvent(description = "Called when a change is detected in the temperature (in degrees Celsius).") */
+    public void TemperatureChanged(float temperature) {
+        EventDispatcher.dispatchEvent(this, "TemperatureChanged", temperature);
+    }
+
+    /**
+     * Returns the temperature in degrees Celsius.
+     * The sensor must be enabled and available
+     * to return meaningful values.
+     *
+     * @return the temperature in degrees Celsius
+     */
+    /* @SimpleProperty(description = "The temperature in degrees Celsius, if the sensor is available and enabled") */
+    public float Temperature() {
+        return getValue();
+    }
 }

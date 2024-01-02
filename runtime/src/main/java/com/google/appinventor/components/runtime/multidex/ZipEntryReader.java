@@ -30,7 +30,7 @@ import java.util.zip.ZipException;
 
 class ZipEntryReader {
     static final Charset UTF_8 = Charset.forName("UTF-8");
-   /**
+    /**
      * General Purpose Bit Flags, Bit 0.
      * If set, indicates that the file is encrypted.
      */
@@ -51,7 +51,7 @@ class ZipEntryReader {
 
         int sig = in.getInt();
         if (sig != CENSIG) {
-             throw new ZipException("Central Directory Entry not found");
+            throw new ZipException("Central Directory Entry not found");
         }
 
         in.position(8);

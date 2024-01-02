@@ -16,65 +16,65 @@ import com.google.appinventor.components.runtime.util.ImageViewUtil;
 
 public class IceCreamSandwichThemeHelper implements ThemeHelper {
 
-  private final AppInventorCompatActivity activity;
+    private final AppInventorCompatActivity activity;
 
-  public IceCreamSandwichThemeHelper(AppInventorCompatActivity activity) {
-    this.activity = activity;
-  }
-
-  @Override
-  public void requestActionBar() {
-    activity.getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-  }
-
-  @Override
-  public boolean setActionBarVisible(boolean visible) {
-    ActionBar actionBar = activity.getSupportActionBar();
-    if (actionBar == null) {
-      if (activity instanceof Form) {
-        ((Form) activity).dispatchErrorOccurredEvent((Form) activity, "ActionBar", ErrorMessages.ERROR_ACTIONBAR_NOT_SUPPORTED);
-      }
-      return false;
-    } else if (visible) {
-      actionBar.show();
-    } else {
-      actionBar.hide();
+    public IceCreamSandwichThemeHelper(AppInventorCompatActivity activity) {
+        this.activity = activity;
     }
-    return true;
-  }
 
-  @Override
-  public boolean hasActionBar() {
-    return activity.getSupportActionBar() != null;
-  }
-
-  @Override
-  public void setTitle(String title) {
-    ActionBar actionBar = activity.getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setTitle(title);
+    @Override
+    public void requestActionBar() {
+        activity.getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
     }
-  }
 
-  @Override
-  public void setActionBarAnimation(boolean enabled) {
-    ActionBar actionBar = activity.getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setShowHideAnimationEnabled(enabled);
+    @Override
+    public boolean setActionBarVisible(boolean visible) {
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar == null) {
+            if (activity instanceof Form) {
+                ((Form) activity).dispatchErrorOccurredEvent((Form) activity, "ActionBar", ErrorMessages.ERROR_ACTIONBAR_NOT_SUPPORTED);
+            }
+            return false;
+        } else if (visible) {
+            actionBar.show();
+        } else {
+            actionBar.hide();
+        }
+        return true;
     }
-  }
 
-  @Override
-  public void setTitle(String title, boolean black) {
-    ActionBar actionBar = activity.getSupportActionBar();
-    if (actionBar != null) {
-      if (black) {
-        actionBar.setTitle(Html.fromHtml("<font color=\"black\">" + title + "</font>"));
-        ImageViewUtil.setMenuButtonColor(activity, Color.BLACK);
-      } else {
-        actionBar.setTitle(title);
-        ImageViewUtil.setMenuButtonColor(activity, Color.WHITE);
-      }
+    @Override
+    public boolean hasActionBar() {
+        return activity.getSupportActionBar() != null;
     }
-  }
+
+    @Override
+    public void setTitle(String title) {
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    public void setActionBarAnimation(boolean enabled) {
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setShowHideAnimationEnabled(enabled);
+        }
+    }
+
+    @Override
+    public void setTitle(String title, boolean black) {
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            if (black) {
+                actionBar.setTitle(Html.fromHtml("<font color=\"black\">" + title + "</font>"));
+                ImageViewUtil.setMenuButtonColor(activity, Color.BLACK);
+            } else {
+                actionBar.setTitle(title);
+                ImageViewUtil.setMenuButtonColor(activity, Color.WHITE);
+            }
+        }
+    }
 }

@@ -30,102 +30,102 @@ import java.io.IOException;
  */
 /* @SimpleObject
  */public abstract class FileBase extends AndroidNonvisibleComponent implements Component {
-  protected static final String LOG_TAG = "FileComponent";
+    protected static final String LOG_TAG = "FileComponent";
 
-  protected FileScope scope = FileScope.App;
+    protected FileScope scope = FileScope.App;
 
-  /**
-   * Creates a new FileBase component.
-   *
-   * @param container the Form that this component is contained in.
-   */
-  protected FileBase(ComponentContainer container) {
-    super(container.$form());
-    DefaultScope(FileScope.App);
-  }
+    /**
+     * Creates a new FileBase component.
+     *
+     * @param container the Form that this component is contained in.
+     */
+    protected FileBase(ComponentContainer container) {
+        super(container.$form());
+        DefaultScope(FileScope.App);
+    }
 
-  /**
-   * Specifies the default scope for files accessed using the File component. The App scope should
-   * work for most apps. Legacy mode can be used for apps that predate the newer constraints in
-   * Android on app file access.
-   *
-   * @param scope the default file access scope
-   */
+    /**
+     * Specifies the default scope for files accessed using the File component. The App scope should
+     * work for most apps. Legacy mode can be used for apps that predate the newer constraints in
+     * Android on app file access.
+     *
+     * @param scope the default file access scope
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_FILESCOPE,
       defaultValue = "App") */
-  /* @SimpleProperty(userVisible = false, category = PropertyCategory.BEHAVIOR) */
-  public void DefaultScope(FileScope scope) {
-    this.scope = scope;
-  }
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.BEHAVIOR) */
+    public void DefaultScope(FileScope scope) {
+        this.scope = scope;
+    }
 
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, userVisible = false) */
-  @Deprecated
-  public void LegacyMode(boolean legacy) {
-    this.scope = legacy ? FileScope.Legacy : FileScope.App;
-  }
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, userVisible = false) */
+    @Deprecated
+    public void LegacyMode(boolean legacy) {
+        this.scope = legacy ? FileScope.Legacy : FileScope.App;
+    }
 
-  /**
-   * Allows app to access files from the root of the external storage directory (legacy mode).
-   * Starting with Android 11, this will no longer be allowed and the behavior is strongly
-   * discouraged on Android 10. Starting with Android 10, App Inventor by default will attempt to
-   * store files relative to the app-specific private directory on external storage in accordance
-   * with this security change.
-   *
-   *   <p><b>Note:</b> Apps that enable this property will likely stop working after upgrading to
-   * Android 11, which strongly enforces that apps only write to app-private directories.
-   */
+    /**
+     * Allows app to access files from the root of the external storage directory (legacy mode).
+     * Starting with Android 11, this will no longer be allowed and the behavior is strongly
+     * discouraged on Android 10. Starting with Android 10, App Inventor by default will attempt to
+     * store files relative to the app-specific private directory on external storage in accordance
+     * with this security change.
+     *
+     * <p><b>Note:</b> Apps that enable this property will likely stop working after upgrading to
+     * Android 11, which strongly enforces that apps only write to app-private directories.
+     */
   /* @SimpleProperty(description = "Allows app to access files from the root of the external storage "
       + "directory (legacy mode).") */
-  @Deprecated
-  public boolean LegacyMode() {
-    return scope == FileScope.Legacy;
-  }
-
-  /**
-   * Establishes the file path and reads the contents of the specified File
-   * asynchronously.
-   *
-   * <p>Filename formats:
-   * /file.txt - reads from SD card
-   * //file.txt - reads from packaged application files
-   * file.txt - application private storage (for packaged apps) or
-   * /sdcard/AppInventor/data for companion
-   *
-   * @param fileName name of the file to read from
-   */
-  protected void readFromFile(final String fileName) {
-    try {
-      new FileStreamReadOperation(form, this, "ReadFrom", fileName, scope, true) {
-        @Override
-        public boolean process(String contents) {
-          final String text = IOUtils.normalizeNewLines(contents);
-          afterRead(text);
-          return true;
-        }
-
-        @Override
-        public void onError(IOException e) {
-          if (e instanceof FileNotFoundException) {
-            Log.e(LOG_TAG, "FileNotFoundException", e);
-            form.dispatchErrorOccurredEvent(FileBase.this, "ReadFrom",
-                ErrorMessages.ERROR_CANNOT_FIND_FILE, fileName);
-          } else {
-            Log.e(LOG_TAG, "IOException", e);
-            form.dispatchErrorOccurredEvent(FileBase.this, "ReadFrom",
-                ErrorMessages.ERROR_CANNOT_READ_FILE, fileName);
-          }
-        }
-      }.run();
-    } catch (StopBlocksExecution e) {
-      // This is okay because the block is designed to be asynchronous.
+    @Deprecated
+    public boolean LegacyMode() {
+        return scope == FileScope.Legacy;
     }
-  }
 
-  /**
-   * Asynchronously reads the contents of the specified Input Stream, the
-   * content of which is expected to originate from the specified filename.
-   *
-   * @param result  the contents of the file that was read
-   */
-  protected abstract void afterRead(String result);
+    /**
+     * Establishes the file path and reads the contents of the specified File
+     * asynchronously.
+     *
+     * <p>Filename formats:
+     * /file.txt - reads from SD card
+     * //file.txt - reads from packaged application files
+     * file.txt - application private storage (for packaged apps) or
+     * /sdcard/AppInventor/data for companion
+     *
+     * @param fileName name of the file to read from
+     */
+    protected void readFromFile(final String fileName) {
+        try {
+            new FileStreamReadOperation(form, this, "ReadFrom", fileName, scope, true) {
+                @Override
+                public boolean process(String contents) {
+                    final String text = IOUtils.normalizeNewLines(contents);
+                    afterRead(text);
+                    return true;
+                }
+
+                @Override
+                public void onError(IOException e) {
+                    if (e instanceof FileNotFoundException) {
+                        Log.e(LOG_TAG, "FileNotFoundException", e);
+                        form.dispatchErrorOccurredEvent(FileBase.this, "ReadFrom",
+                                ErrorMessages.ERROR_CANNOT_FIND_FILE, fileName);
+                    } else {
+                        Log.e(LOG_TAG, "IOException", e);
+                        form.dispatchErrorOccurredEvent(FileBase.this, "ReadFrom",
+                                ErrorMessages.ERROR_CANNOT_READ_FILE, fileName);
+                    }
+                }
+            }.run();
+        } catch (StopBlocksExecution e) {
+            // This is okay because the block is designed to be asynchronous.
+        }
+    }
+
+    /**
+     * Asynchronously reads the contents of the specified Input Stream, the
+     * content of which is expected to originate from the specified filename.
+     *
+     * @param result the contents of the file that was read
+     */
+    protected abstract void afterRead(String result);
 }

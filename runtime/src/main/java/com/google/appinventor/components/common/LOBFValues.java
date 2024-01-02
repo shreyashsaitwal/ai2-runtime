@@ -13,32 +13,32 @@ import java.util.Map;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public enum LOBFValues implements OptionList<String> {
-  CorrCoef("correlation coefficient"),
-  @Default
-  Slope("slope"),
-  Yintercept("Yintercept"),
-  Predictions("predictions"),
-  AllValues("all values");
+    CorrCoef("correlation coefficient"),
+    @Default
+    Slope("slope"),
+    Yintercept("Yintercept"),
+    Predictions("predictions"),
+    AllValues("all values");
 
-  private final String lobfValues;
+    private static final Map<String, LOBFValues> lookup = new HashMap<>();
 
-  LOBFValues(String lobfV) {
-    this.lobfValues = lobfV;
-  }
-
-  public String toUnderlyingValue() {
-    return lobfValues;
-  }
-
-  private static final Map<String, LOBFValues> lookup = new HashMap<>();
-
-  static {
-    for (LOBFValues value : LOBFValues.values()) {
-      lookup.put(value.toUnderlyingValue(), value);
+    static {
+        for (LOBFValues value : LOBFValues.values()) {
+            lookup.put(value.toUnderlyingValue(), value);
+        }
     }
-  }
 
-  public static LOBFValues fromUnderlyingValue(String value) {
-    return lookup.get(value);
-  }
+    private final String lobfValues;
+
+    LOBFValues(String lobfV) {
+        this.lobfValues = lobfV;
+    }
+
+    public static LOBFValues fromUnderlyingValue(String value) {
+        return lookup.get(value);
+    }
+
+    public String toUnderlyingValue() {
+        return lobfValues;
+    }
 }

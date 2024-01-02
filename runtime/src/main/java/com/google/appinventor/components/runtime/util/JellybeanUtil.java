@@ -6,21 +6,18 @@
 package com.google.appinventor.components.runtime.util;
 
 import android.graphics.Point;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 
 /**
  * Helper methods for calling methods added in Jellybean
- *
  */
 public class JellybeanUtil {
 
-  private JellybeanUtil() {
-  }
+    private JellybeanUtil() {
+    }
 
-  public static void getRealSize(Display display, Point outSize) {
-    display.getRealSize(outSize);
-  }
+    public static void getRealSize(Display display, Point outSize) {
+        display.getRealSize(outSize);
+    }
 
 }

@@ -8,17 +8,16 @@ package com.google.appinventor.components.runtime.errors;
 
 /**
  * Runtime error indicating a problem accessing a file.
- *
  */
 /* @SimpleObject
  */public class FileIOError extends RuntimeError {
 
-  /**
-   * Creates a new File I/O error.
-   *
-   * @param message  detailed message
-   */
-  public FileIOError(String message) {
-    super(message);
-  }
+    /**
+     * Creates a new File I/O error.
+     *
+     * @param message detailed message
+     */
+    public FileIOError(String message) {
+        super(message);
+    }
 }

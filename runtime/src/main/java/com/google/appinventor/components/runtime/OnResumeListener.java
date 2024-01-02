@@ -12,5 +12,5 @@ package com.google.appinventor.components.runtime;
  * @author markf@google.com (Mark Friedman)
  */
 public interface OnResumeListener {
-  public void onResume();
+    public void onResume();
 }

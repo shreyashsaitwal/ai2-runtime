@@ -9,35 +9,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ChartType implements OptionList<Integer> {
-  Line(0),
-  Scatter(1),
-  Area(2),
-  Bar(3),
-  Pie(4);
+    Line(0),
+    Scatter(1),
+    Area(2),
+    Bar(3),
+    Pie(4);
 
-  private static final Map<Integer, ChartType> LOOKUP = new HashMap<>();
+    private static final Map<Integer, ChartType> LOOKUP = new HashMap<>();
 
-  static {
-    for (ChartType type : ChartType.values()) {
-      LOOKUP.put(type.toUnderlyingValue(), type);
+    static {
+        for (ChartType type : ChartType.values()) {
+            LOOKUP.put(type.toUnderlyingValue(), type);
+        }
     }
-  }
 
-  private final int value;
+    private final int value;
 
-  ChartType(int value) {
-    this.value = value;
-  }
+    ChartType(int value) {
+        this.value = value;
+    }
 
-  public Integer toUnderlyingValue() {
-    return value;
-  }
+    public static ChartType fromUnderlyingValue(Integer type) {
+        return LOOKUP.get(type);
+    }
 
-  public static ChartType fromUnderlyingValue(Integer type) {
-    return LOOKUP.get(type);
-  }
+    public static ChartType fromUnderlyingValue(String type) {
+        return fromUnderlyingValue(Integer.parseInt(type));
+    }
 
-  public static ChartType fromUnderlyingValue(String type) {
-    return fromUnderlyingValue(Integer.parseInt(type));
-  }
+    public Integer toUnderlyingValue() {
+        return value;
+    }
 }

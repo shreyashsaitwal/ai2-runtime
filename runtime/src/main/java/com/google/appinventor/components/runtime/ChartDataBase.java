@@ -32,282 +32,285 @@ import java.util.List;
  */
 @SuppressWarnings({"checkstyle:JavadocParagraph"})
 /* @SimpleObject
- */public abstract class ChartDataBase extends DataCollection<Chart, ChartDataModel<?, ?, ?, ?, ?>>
-    implements OnChartGestureListener, OnChartValueSelectedListener {
+ */ public abstract class ChartDataBase extends DataCollection<Chart, ChartDataModel<?, ?, ?, ?, ?>>
+        implements OnChartGestureListener, OnChartValueSelectedListener {
 
-  private String label;
-  private int color;
-  private YailList colors;
+    private String label;
+    private int color;
+    private YailList colors;
 
-  /**
-   * Creates a new Chart Data component.
-   */
-  protected ChartDataBase(Chart chartContainer) {
-    super(chartContainer);
-    chartContainer.addDataComponent(this);
+    /**
+     * Creates a new Chart Data component.
+     */
+    protected ChartDataBase(Chart chartContainer) {
+        super(chartContainer);
+        chartContainer.addDataComponent(this);
 
-    // Set default properties and instantiate Chart Data Model
-    initChartData();
-    DataSourceKey("");
+        // Set default properties and instantiate Chart Data Model
+        initChartData();
+        DataSourceKey("");
 
-  }
+    }
 
-  /**
-   * Initializes the Chart Data object by setting
-   * the default properties and initializing the
-   * corresponding ChartDataModel object instance.
-   */
-  public void initChartData() {
-    // Creates a ChartDataModel based on the current
-    // Chart type being used.
-    dataModel = container.createChartModel();
+    /**
+     * Initializes the Chart Data object by setting
+     * the default properties and initializing the
+     * corresponding ChartDataModel object instance.
+     */
+    public void initChartData() {
+        // Creates a ChartDataModel based on the current
+        // Chart type being used.
+        dataModel = container.createChartModel();
 
-    // Set default values
-    Color(Component.COLOR_BLACK);
-    Label("");
-    dataModel.view.chart.setOnChartGestureListener(this);
-    dataModel.view.chart.setOnChartValueSelectedListener(this);
-  }
+        // Set default values
+        Color(Component.COLOR_BLACK);
+        Label("");
+        dataModel.view.chart.setOnChartGestureListener(this);
+        dataModel.view.chart.setOnChartValueSelectedListener(this);
+    }
 
-  /*
-   * SimpleProperties
-   */
+    /*
+     * SimpleProperties
+     */
 
-  /**
-   * Returns the data series color as an alpha-red-green-blue integer.
-   *
-   * @return background RGB color with alpha
-   */
+    /**
+     * Returns the data series color as an alpha-red-green-blue integer.
+     *
+     * @return background RGB color with alpha
+     */
   /* @SimpleProperty(
       category = PropertyCategory.APPEARANCE) */
-  public int Color() {
-    return color;
-  }
+    public int Color() {
+        return color;
+    }
 
-  /**
-   * Specifies the data series color as an alpha-red-green-blue integer.
-   *
-   * @param argb background RGB color with alpha
-   */
+    /**
+     * Specifies the data series color as an alpha-red-green-blue integer.
+     *
+     * @param argb background RGB color with alpha
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
       defaultValue = Component.DEFAULT_VALUE_COLOR_BLACK) */
-  /* @SimpleProperty
-   */public void Color(int argb) {
-    color = argb;
-    dataModel.setColor(color);
-    onDataChange();
-  }
+    /* @SimpleProperty
+     */
+    public void Color(int argb) {
+        color = argb;
+        dataModel.setColor(color);
+        onDataChange();
+    }
 
-  /**
-   * Returns the Chart's colors as a List.
-   *
-   * @return List of colors
-   */
+    /**
+     * Returns the Chart's colors as a List.
+     *
+     * @return List of colors
+     */
   /* @SimpleProperty(
       category = PropertyCategory.APPEARANCE
   ) */
-  public YailList Colors() {
-    return colors;
-  }
-
-  /**
-   * Specifies the data series colors as a list of alpha-red-green-blue integers.
-   *
-   *   If there is more data than there are colors, the colors will be alternated
-   * in order. E.g. if there are two colors Red and Blue, the colors will be applied
-   * in the order: Red, Blue, Red, Blue, ...
-   *
-   * @param colors List of argb values
-   */
-  /* @SimpleProperty
-   */public void Colors(YailList colors) {
-    // TODO: Perhaps a Designer property selector could be devised here to select
-    // TODO: the colors of the Chart.
-
-    // Parse the entries of the YailList
-    List<Integer> resultColors = new ArrayList<>();
-
-    for (int i = 0; i < colors.size(); ++i) {
-      // Get the element of the YailList as a String
-      String color = colors.getString(i);
-
-      try {
-        // Parse the color value and add it to the results List
-        long colorValue = Long.parseLong(color);
-        if (colorValue > Integer.MAX_VALUE) {
-          // Convert from positive long to negative int for AARRGGBB format
-          colorValue = colorValue + 2L * Integer.MIN_VALUE;
-        }
-        resultColors.add((int) colorValue);
-      } catch (NumberFormatException e) {
-        // Skip invalid entry
-        this.container.$form().dispatchErrorOccurredEvent(this.container,
-            "Colors",
-            ErrorMessages.ERROR_INVALID_CHART_DATA_COLOR,
-            color);
-      }
+    public YailList Colors() {
+        return colors;
     }
 
-    // Update the Colors YailList variable
-    this.colors = YailList.makeList(resultColors);
+    /**
+     * Specifies the data series colors as a list of alpha-red-green-blue integers.
+     * <p>
+     * If there is more data than there are colors, the colors will be alternated
+     * in order. E.g. if there are two colors Red and Blue, the colors will be applied
+     * in the order: Red, Blue, Red, Blue, ...
+     *
+     * @param colors List of argb values
+     */
+    /* @SimpleProperty
+     */
+    public void Colors(YailList colors) {
+        // TODO: Perhaps a Designer property selector could be devised here to select
+        // TODO: the colors of the Chart.
 
-    // Set the colors from the constructed List of colors
-    // and refresh the Chart.
-    dataModel.setColors(resultColors);
-    onDataChange();
-  }
+        // Parse the entries of the YailList
+        List<Integer> resultColors = new ArrayList<>();
 
-  /**
-   * Returns the label text of the data series.
-   *
-   * @return label text
-   */
+        for (int i = 0; i < colors.size(); ++i) {
+            // Get the element of the YailList as a String
+            String color = colors.getString(i);
+
+            try {
+                // Parse the color value and add it to the results List
+                long colorValue = Long.parseLong(color);
+                if (colorValue > Integer.MAX_VALUE) {
+                    // Convert from positive long to negative int for AARRGGBB format
+                    colorValue = colorValue + 2L * Integer.MIN_VALUE;
+                }
+                resultColors.add((int) colorValue);
+            } catch (NumberFormatException e) {
+                // Skip invalid entry
+                this.container.$form().dispatchErrorOccurredEvent(this.container,
+                        "Colors",
+                        ErrorMessages.ERROR_INVALID_CHART_DATA_COLOR,
+                        color);
+            }
+        }
+
+        // Update the Colors YailList variable
+        this.colors = YailList.makeList(resultColors);
+
+        // Set the colors from the constructed List of colors
+        // and refresh the Chart.
+        dataModel.setColors(resultColors);
+        onDataChange();
+    }
+
+    /**
+     * Returns the label text of the data series.
+     *
+     * @return label text
+     */
   /* @SimpleProperty(
       category = PropertyCategory.APPEARANCE) */
-  public String Label() {
-    return label;
-  }
+    public String Label() {
+        return label;
+    }
 
-  /**
-   * Specifies the text for the data series label.
-   *
-   * @param text label text
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING) */
-  /* @SimpleProperty
-   */public void Label(String text) {
-    this.label = text;
-    dataModel.setLabel(text);
-    onDataChange();
-  }
+    /**
+     * Specifies the text for the data series label.
+     *
+     * @param text label text
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING) */
+    /* @SimpleProperty
+     */
+    public void Label(String text) {
+        this.label = text;
+        dataModel.setLabel(text);
+        onDataChange();
+    }
 
-  /**
-   * Changes the Point Shape of the Data Series, provided that the
-   * Data component is attached to a Chart that has the type set to
-   * the Scatter Chart. Valid types include circle, square, triangle, cross, x.
-   *
-   * @param shape the desired shape of the data points
-   */
+    /**
+     * Changes the Point Shape of the Data Series, provided that the
+     * Data component is attached to a Chart that has the type set to
+     * the Scatter Chart. Valid types include circle, square, triangle, cross, x.
+     *
+     * @param shape the desired shape of the data points
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_CHART_POINT_SHAPE,
       defaultValue = "0") */
-  /* @SimpleProperty(userVisible = false, category = PropertyCategory.APPEARANCE) */
-  public void PointShape(PointStyle shape) {
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.APPEARANCE) */
+    public void PointShape(PointStyle shape) {
 
-    // Only change the Point Shape if the Chart Data Model is a
-    // ScatterChartDataModel (other models do not support changing
-    // the Point Shape)
-    if (dataModel instanceof ScatterChartDataModel) {
-      ((ScatterChartDataModel) dataModel).setPointShape(shape);
+        // Only change the Point Shape if the Chart Data Model is a
+        // ScatterChartDataModel (other models do not support changing
+        // the Point Shape)
+        if (dataModel instanceof ScatterChartDataModel) {
+            ((ScatterChartDataModel) dataModel).setPointShape(shape);
+        }
     }
-  }
 
-  /**
-   * Changes the Line Type of the Data Series, provided that the
-   * Data component is attached to a Chart that has the type set to
-   * a line-based Chart(applies to area and line Chart types).
-    Valid types include linear, curved or stepped.
-   *
-   * @param type the desired style of line type
-   */
+    /**
+     * Changes the Line Type of the Data Series, provided that the
+     * Data component is attached to a Chart that has the type set to
+     * a line-based Chart(applies to area and line Chart types).
+     * Valid types include linear, curved or stepped.
+     *
+     * @param type the desired style of line type
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_CHART_LINE_TYPE,
       defaultValue = "0") */
-  /* @SimpleProperty(userVisible = false, category = PropertyCategory.APPEARANCE) */
-  public void LineType(LineType type) {
+    /* @SimpleProperty(userVisible = false, category = PropertyCategory.APPEARANCE) */
+    public void LineType(LineType type) {
 
-    // Only change the Line Type if the Chart Data Model is a
-    // LineChartBaseDataModel (other models do not support changing
-    // the Line Type)
-    if (dataModel instanceof LineChartBaseDataModel) {
-      ((LineChartBaseDataModel<?>) dataModel).setLineType(type);
-    }
-  }
-
-  /*
-   * Helper methods & overrides
-   */
-
-  /**
-   * Refreshes the Chart View object with the current up to date
-   * Data Series data.
-   */
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public void onDataChange() {
-    // Update the Chart with the Chart Data Model's current
-    // data and refresh the Chart itself.
-    container.getChartView().refresh((ChartDataModel) dataModel);
-  }
-
-  @Override
-  public void onChartGestureStart(MotionEvent motionEvent,
-      ChartTouchListener.ChartGesture chartGesture) {
-
-  }
-
-  @Override
-  public void onChartGestureEnd(MotionEvent motionEvent,
-      ChartTouchListener.ChartGesture chartGesture) {
-
-  }
-
-  @Override
-  public void onChartLongPressed(MotionEvent motionEvent) {
-
-  }
-
-  @Override
-  public void onChartDoubleTapped(MotionEvent motionEvent) {
-
-  }
-
-  @Override
-  public void onChartSingleTapped(MotionEvent motionEvent) {
-
-  }
-
-  @Override
-  public void onChartFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-
-  }
-
-  @Override
-  public void onChartScale(MotionEvent motionEvent, float v, float v1) {
-
-  }
-
-  @Override
-  public void onChartTranslate(MotionEvent motionEvent, float v, float v1) {
-
-  }
-
-  @Override
-  public void onValueSelected(final Entry entry, Highlight highlight) {
-    container.$form().runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (entry instanceof PieEntry) {
-          EntryClick(((PieEntry) entry).getLabel(), ((PieEntry) entry).getValue());
-        } else {
-          EntryClick(entry.getX(), entry.getY());
+        // Only change the Line Type if the Chart Data Model is a
+        // LineChartBaseDataModel (other models do not support changing
+        // the Line Type)
+        if (dataModel instanceof LineChartBaseDataModel) {
+            ((LineChartBaseDataModel<?>) dataModel).setLineType(type);
         }
-      }
-    });
-  }
+    }
 
-  /**
-   * Indicates that the user tapped on a data point in the chart. The x and y values of the
-   * tapped entry are reported.
-   *
-   * @param x the x position of the clicked entry
-   * @param y the y position of the clicked entry
-   */
-  /* @SimpleEvent() */
-  public void EntryClick(Object x, double y) {
-    EventDispatcher.dispatchEvent(this, "EntryClick", x, y);
-    container.EntryClick(this, x, y);
-  }
+    /*
+     * Helper methods & overrides
+     */
 
-  @Override
-  public void onNothingSelected() {
+    /**
+     * Refreshes the Chart View object with the current up to date
+     * Data Series data.
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void onDataChange() {
+        // Update the Chart with the Chart Data Model's current
+        // data and refresh the Chart itself.
+        container.getChartView().refresh((ChartDataModel) dataModel);
+    }
 
-  }
+    @Override
+    public void onChartGestureStart(MotionEvent motionEvent,
+                                    ChartTouchListener.ChartGesture chartGesture) {
+
+    }
+
+    @Override
+    public void onChartGestureEnd(MotionEvent motionEvent,
+                                  ChartTouchListener.ChartGesture chartGesture) {
+
+    }
+
+    @Override
+    public void onChartLongPressed(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public void onChartDoubleTapped(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public void onChartSingleTapped(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public void onChartFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+
+    }
+
+    @Override
+    public void onChartScale(MotionEvent motionEvent, float v, float v1) {
+
+    }
+
+    @Override
+    public void onChartTranslate(MotionEvent motionEvent, float v, float v1) {
+
+    }
+
+    @Override
+    public void onValueSelected(final Entry entry, Highlight highlight) {
+        container.$form().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (entry instanceof PieEntry) {
+                    EntryClick(((PieEntry) entry).getLabel(), ((PieEntry) entry).getValue());
+                } else {
+                    EntryClick(entry.getX(), entry.getY());
+                }
+            }
+        });
+    }
+
+    /**
+     * Indicates that the user tapped on a data point in the chart. The x and y values of the
+     * tapped entry are reported.
+     *
+     * @param x the x position of the clicked entry
+     * @param y the y position of the clicked entry
+     */
+    /* @SimpleEvent() */
+    public void EntryClick(Object x, double y) {
+        EventDispatcher.dispatchEvent(this, "EntryClick", x, y);
+        container.EntryClick(this, x, y);
+    }
+
+    @Override
+    public void onNothingSelected() {
+
+    }
 }

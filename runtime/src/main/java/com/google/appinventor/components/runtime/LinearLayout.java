@@ -13,112 +13,113 @@ import android.view.ViewGroup;
 
 /**
  * Linear layout for placing components horizontally or vertically.
- *
  */
 /* @SimpleObject
  */public final class LinearLayout implements Layout {
 
-  private final android.widget.LinearLayout layoutManager;
+    private final android.widget.LinearLayout layoutManager;
 
-  /**
-   * Creates a new linear layout.
-   *
-   * @param context  view context
-   * @param orientation one of
-   *     {@link ComponentConstants#LAYOUT_ORIENTATION_HORIZONTAL}.
-   *     {@link ComponentConstants#LAYOUT_ORIENTATION_VERTICAL}
-   */
-  LinearLayout(Context context, int orientation) {
-    this(context, orientation, null, null);
-  }
-
-  /**
-   * Creates a new linear layout with a preferred empty width/height.
-   *
-   * @param context  view context
-   * @param orientation one of
-   *     {@link ComponentConstants#LAYOUT_ORIENTATION_HORIZONTAL}.
-   *     {@link ComponentConstants#LAYOUT_ORIENTATION_VERTICAL}
-   * @param preferredEmptyWidth the preferred width of an empty layout
-   * @param preferredEmptyHeight the preferred height of an empty layout
-   */
-  LinearLayout(Context context, int orientation, final Integer preferredEmptyWidth,
-      final Integer preferredEmptyHeight) {
-    if (preferredEmptyWidth == null && preferredEmptyHeight != null ||
-        preferredEmptyWidth != null && preferredEmptyHeight == null) {
-      throw new IllegalArgumentException("LinearLayout - preferredEmptyWidth and " +
-          "preferredEmptyHeight must be either both null or both not null");
+    /**
+     * Creates a new linear layout.
+     *
+     * @param context     view context
+     * @param orientation one of
+     *                    {@link ComponentConstants#LAYOUT_ORIENTATION_HORIZONTAL}.
+     *                    {@link ComponentConstants#LAYOUT_ORIENTATION_VERTICAL}
+     */
+    LinearLayout(Context context, int orientation) {
+        this(context, orientation, null, null);
     }
 
-    // Create an Android LinearLayout, but override onMeasure so that we can use our preferred
-    // empty width/height.
-    layoutManager = new android.widget.LinearLayout(context) {
-      @Override
-      protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // If there was no preferred empty width/height specified (see constructors above), just
-        // call super. (This is the case for the Form component.)
-        if (preferredEmptyWidth == null || preferredEmptyHeight == null) {
-          super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-          return;
+    /**
+     * Creates a new linear layout with a preferred empty width/height.
+     *
+     * @param context              view context
+     * @param orientation          one of
+     *                             {@link ComponentConstants#LAYOUT_ORIENTATION_HORIZONTAL}.
+     *                             {@link ComponentConstants#LAYOUT_ORIENTATION_VERTICAL}
+     * @param preferredEmptyWidth  the preferred width of an empty layout
+     * @param preferredEmptyHeight the preferred height of an empty layout
+     */
+    LinearLayout(Context context, int orientation, final Integer preferredEmptyWidth,
+                 final Integer preferredEmptyHeight) {
+        if (preferredEmptyWidth == null && preferredEmptyHeight != null ||
+                preferredEmptyWidth != null && preferredEmptyHeight == null) {
+            throw new IllegalArgumentException("LinearLayout - preferredEmptyWidth and " +
+                    "preferredEmptyHeight must be either both null or both not null");
         }
 
-        // If the layout has any children, just call super.
-        if (getChildCount() != 0) {
-          super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-          return;
-        }
+        // Create an Android LinearLayout, but override onMeasure so that we can use our preferred
+        // empty width/height.
+        layoutManager = new android.widget.LinearLayout(context) {
+            @Override
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                // If there was no preferred empty width/height specified (see constructors above), just
+                // call super. (This is the case for the Form component.)
+                if (preferredEmptyWidth == null || preferredEmptyHeight == null) {
+                    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+                    return;
+                }
 
-        setMeasuredDimension(getSize(widthMeasureSpec, preferredEmptyWidth),
-                             getSize(heightMeasureSpec, preferredEmptyHeight));
-      }
+                // If the layout has any children, just call super.
+                if (getChildCount() != 0) {
+                    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+                    return;
+                }
 
-      private int getSize(int measureSpec, int preferredSize) {
-        int result;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
+                setMeasuredDimension(getSize(widthMeasureSpec, preferredEmptyWidth),
+                        getSize(heightMeasureSpec, preferredEmptyHeight));
+            }
 
-        if (specMode == MeasureSpec.EXACTLY) {
-        // We were told how big to be
-          result = specSize;
-        } else {
-        // Use the preferred size.
-          result = preferredSize;
-          if (specMode == MeasureSpec.AT_MOST) {
-          // Respect AT_MOST value if that was what is called for by measureSpec
-            result = Math.min(result, specSize);
-          }
-        }
+            private int getSize(int measureSpec, int preferredSize) {
+                int result;
+                int specMode = MeasureSpec.getMode(measureSpec);
+                int specSize = MeasureSpec.getSize(measureSpec);
 
-        return result;
-      }
-    };
+                if (specMode == MeasureSpec.EXACTLY) {
+                    // We were told how big to be
+                    result = specSize;
+                } else {
+                    // Use the preferred size.
+                    result = preferredSize;
+                    if (specMode == MeasureSpec.AT_MOST) {
+                        // Respect AT_MOST value if that was what is called for by measureSpec
+                        result = Math.min(result, specSize);
+                    }
+                }
 
-    layoutManager.setOrientation(
-        orientation == ComponentConstants.LAYOUT_ORIENTATION_HORIZONTAL ?
-        android.widget.LinearLayout.HORIZONTAL : android.widget.LinearLayout.VERTICAL);
-  }
+                return result;
+            }
+        };
 
-  // Layout implementation
+        layoutManager.setOrientation(
+                orientation == ComponentConstants.LAYOUT_ORIENTATION_HORIZONTAL ?
+                        android.widget.LinearLayout.HORIZONTAL : android.widget.LinearLayout.VERTICAL);
+    }
 
-  public ViewGroup getLayoutManager() {
-    return layoutManager;
-  }
+    // Layout implementation
 
-  public void add(AndroidViewComponent component) {
-    layoutManager.addView(component.getView(), new android.widget.LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT,  // width
-        ViewGroup.LayoutParams.WRAP_CONTENT,  // height
-        0f));                                 // weight
-  }
+    public ViewGroup getLayoutManager() {
+        return layoutManager;
+    }
 
-  public void setHorizontalGravity(int gravity) {
-    layoutManager.setHorizontalGravity(gravity);
-  }
+    public void add(AndroidViewComponent component) {
+        layoutManager.addView(component.getView(), new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,  // width
+                ViewGroup.LayoutParams.WRAP_CONTENT,  // height
+                0f));                                 // weight
+    }
 
-  public void setVerticalGravity(int gravity) {
-    layoutManager.setVerticalGravity(gravity);
-  }
+    public void setHorizontalGravity(int gravity) {
+        layoutManager.setHorizontalGravity(gravity);
+    }
 
-  public void setBaselineAligned(boolean baselineAligned) { layoutManager.setBaselineAligned(baselineAligned); }
+    public void setVerticalGravity(int gravity) {
+        layoutManager.setVerticalGravity(gravity);
+    }
+
+    public void setBaselineAligned(boolean baselineAligned) {
+        layoutManager.setBaselineAligned(baselineAligned);
+    }
 
 }

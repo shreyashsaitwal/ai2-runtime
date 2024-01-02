@@ -12,29 +12,29 @@ import java.util.Map;
  * Defines a ReceivingState type used by the Texting component.
  */
 public enum ReceivingState implements OptionList<Integer> {
-  Off(1),
-  Foreground(2),
-  Always(3);
+    Off(1),
+    Foreground(2),
+    Always(3);
 
-  private final int value;
+    private static final Map<Integer, ReceivingState> lookup = new HashMap<>();
 
-  ReceivingState(int status) {
-    this.value = status;
-  }
-
-  public Integer toUnderlyingValue() {
-    return value;
-  }
-
-  private static final Map<Integer, ReceivingState> lookup = new HashMap<>();
-
-  static {
-    for (ReceivingState status : ReceivingState.values()) {
-      lookup.put(status.toUnderlyingValue(), status);
+    static {
+        for (ReceivingState status : ReceivingState.values()) {
+            lookup.put(status.toUnderlyingValue(), status);
+        }
     }
-  }
 
-  public static ReceivingState fromUnderlyingValue(Integer status) {
-    return lookup.get(status);
-  }
+    private final int value;
+
+    ReceivingState(int status) {
+        this.value = status;
+    }
+
+    public static ReceivingState fromUnderlyingValue(Integer status) {
+        return lookup.get(status);
+    }
+
+    public Integer toUnderlyingValue() {
+        return value;
+    }
 }

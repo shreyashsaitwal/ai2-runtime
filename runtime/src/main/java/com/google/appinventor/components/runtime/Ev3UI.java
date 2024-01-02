@@ -5,16 +5,13 @@
 
 package com.google.appinventor.components.runtime;
 
-import com.google.appinventor.components.common.ComponentCategory;
-import com.google.appinventor.components.common.YaVersion;
-
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.Ev3BinaryParser;
 import com.google.appinventor.components.runtime.util.Ev3Constants;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
- *
+ * <p>
  * A component that provides a high-level interface to a LEGO MINDSTORMS EV3
  * robot, which provides graphic functionalities.
  *
@@ -30,209 +27,209 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
 /* @SimpleObject
  */public class Ev3UI extends LegoMindstormsEv3Base {
 
-  /**
-   * Creates a new Ev3UI component.
-   */
-  public Ev3UI(ComponentContainer container) {
-    super(container, "Ev3UI");
-  }
-
-  /**
-   * Draw a point on the screen.
-   */
-  /* @SimpleFunction(description = "Draw a point on the screen.") */
-  public void DrawPoint(int color, int x, int y) {
-    String functionName = "DrawPoint";
-
-    if (color != 0 && color != 1) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+    /**
+     * Creates a new Ev3UI component.
+     */
+    public Ev3UI(ComponentContainer container) {
+        super(container, "Ev3UI");
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "cccc",
-                                                         Ev3Constants.UIDrawSubcode.PIXEL,
-                                                         (byte) color,
-                                                         (short) x,
-                                                         (short) y);
-    sendCommand(functionName, command, false);
+    /**
+     * Draw a point on the screen.
+     */
+    /* @SimpleFunction(description = "Draw a point on the screen.") */
+    public void DrawPoint(int color, int x, int y) {
+        String functionName = "DrawPoint";
 
-    command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                  false,
-                                                  0,
-                                                  0,
-                                                  "c",
-                                                  Ev3Constants.UIDrawSubcode.UPDATE);
-    sendCommand(functionName, command, false);
-  }
+        if (color != 0 && color != 1) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
 
-  /**
-   * Draw a built-in icon on screen.
-   */
-  /* @SimpleFunction(description = "Draw a built-in icon on screen.") */
-  public void DrawIcon(int color, int x, int y, int type, int no) {
-    String functionName = "DrawIcon";
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "cccc",
+                Ev3Constants.UIDrawSubcode.PIXEL,
+                (byte) color,
+                (short) x,
+                (short) y);
+        sendCommand(functionName, command, false);
 
-    if (color != 0 && color != 1) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+        command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.UIDrawSubcode.UPDATE);
+        sendCommand(functionName, command, false);
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "cccccc",
-                                                         Ev3Constants.UIDrawSubcode.ICON,
-                                                         (byte) color,
-                                                         (short) x,
-                                                         (short) y,
-                                                         type,
-                                                         no);
-    sendCommand(functionName, command, false);
+    /**
+     * Draw a built-in icon on screen.
+     */
+    /* @SimpleFunction(description = "Draw a built-in icon on screen.") */
+    public void DrawIcon(int color, int x, int y, int type, int no) {
+        String functionName = "DrawIcon";
 
-    command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                  false,
-                                                  0,
-                                                  0,
-                                                  "c",
-                                                  Ev3Constants.UIDrawSubcode.UPDATE);
-    sendCommand(functionName, command, false);
-  }
+        if (color != 0 && color != 1) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
 
-  /**
-   * Draw a line on the screen.
-   */
-  /* @SimpleFunction(description = "Draw a line on the screen.") */
-  public void DrawLine(int color, int x1, int y1, int x2, int y2) {
-    String functionName = "DrawLine";
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "cccccc",
+                Ev3Constants.UIDrawSubcode.ICON,
+                (byte) color,
+                (short) x,
+                (short) y,
+                type,
+                no);
+        sendCommand(functionName, command, false);
 
-    if (color != 0 && color != 1) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+        command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.UIDrawSubcode.UPDATE);
+        sendCommand(functionName, command, false);
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "cccccc",
-                                                         Ev3Constants.UIDrawSubcode.LINE,
-                                                         (byte) color,
-                                                         (short) x1,
-                                                         (short) y1,
-                                                         (short) x2,
-                                                         (short) y2);
-    sendCommand(functionName, command, false);
+    /**
+     * Draw a line on the screen.
+     */
+    /* @SimpleFunction(description = "Draw a line on the screen.") */
+    public void DrawLine(int color, int x1, int y1, int x2, int y2) {
+        String functionName = "DrawLine";
 
-    command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                  false,
-                                                  0,
-                                                  0,
-                                                  "c",
-                                                  Ev3Constants.UIDrawSubcode.UPDATE);
-    sendCommand(functionName, command, false);
-  }
+        if (color != 0 && color != 1) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
 
-  /**
-   * Draw a rectangle on the screen.
-   */
-  /* @SimpleFunction(description = "Draw a rectangle on the screen.") */
-  public void DrawRect(int color, int x, int y, int width, int height, boolean fill) {
-    String functionName = "DrawRect";
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "cccccc",
+                Ev3Constants.UIDrawSubcode.LINE,
+                (byte) color,
+                (short) x1,
+                (short) y1,
+                (short) x2,
+                (short) y2);
+        sendCommand(functionName, command, false);
 
-    if (color != 0 && color != 1) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+        command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.UIDrawSubcode.UPDATE);
+        sendCommand(functionName, command, false);
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "cccccc",
-                                                         fill ? Ev3Constants.UIDrawSubcode.FILLRECT : Ev3Constants.UIDrawSubcode.RECT,
-                                                         (byte) color,
-                                                         (short) x,
-                                                         (short) y,
-                                                         (short) width,
-                                                         (short) height);
-    sendCommand(functionName, command, false);
+    /**
+     * Draw a rectangle on the screen.
+     */
+    /* @SimpleFunction(description = "Draw a rectangle on the screen.") */
+    public void DrawRect(int color, int x, int y, int width, int height, boolean fill) {
+        String functionName = "DrawRect";
 
-    command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                  false,
-                                                  0,
-                                                  0,
-                                                  "c",
-                                                  Ev3Constants.UIDrawSubcode.UPDATE);
-    sendCommand(functionName, command, false);
-  }
+        if (color != 0 && color != 1) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
 
-  /**
-   * Draw a circle on the screen.
-   */
-  /* @SimpleFunction(description = "Draw a circle on the screen.") */
-  public void DrawCircle(int color, int x, int y, int radius, boolean fill) {
-    String functionName = "DrawCircle";
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "cccccc",
+                fill ? Ev3Constants.UIDrawSubcode.FILLRECT : Ev3Constants.UIDrawSubcode.RECT,
+                (byte) color,
+                (short) x,
+                (short) y,
+                (short) width,
+                (short) height);
+        sendCommand(functionName, command, false);
 
-    if (color != 0 && color != 1 || radius < 0) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+        command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.UIDrawSubcode.UPDATE);
+        sendCommand(functionName, command, false);
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "ccccc",
-                                                         fill ? Ev3Constants.UIDrawSubcode.FILLCIRCLE : Ev3Constants.UIDrawSubcode.CIRCLE,
-                                                         (byte) color,
-                                                         (short) x,
-                                                         (short) y,
-                                                         (short) radius);
-    sendCommand(functionName, command, false);
+    /**
+     * Draw a circle on the screen.
+     */
+    /* @SimpleFunction(description = "Draw a circle on the screen.") */
+    public void DrawCircle(int color, int x, int y, int radius, boolean fill) {
+        String functionName = "DrawCircle";
 
-    command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                  false,
-                                                  0,
-                                                  0,
-                                                  "c",
-                                                  Ev3Constants.UIDrawSubcode.UPDATE);
-    sendCommand(functionName, command, false);
-  }
+        if (color != 0 && color != 1 || radius < 0) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
 
-  /**
-   * Fill the screen with a color.
-   */
-  /* @SimpleFunction(description = "Fill the screen with a color.") */
-  public void FillScreen(int color) {
-    String functionName = "FillScreen";
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "ccccc",
+                fill ? Ev3Constants.UIDrawSubcode.FILLCIRCLE : Ev3Constants.UIDrawSubcode.CIRCLE,
+                (byte) color,
+                (short) x,
+                (short) y,
+                (short) radius);
+        sendCommand(functionName, command, false);
 
-    if (color != 0 && color != 1) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+        command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.UIDrawSubcode.UPDATE);
+        sendCommand(functionName, command, false);
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "cccc",
-                                                         Ev3Constants.UIDrawSubcode.FILLWINDOW,
-                                                         (byte) color,
-                                                         (short) 0,
-                                                         (short) 0);
-    sendCommand(functionName, command, false);
+    /**
+     * Fill the screen with a color.
+     */
+    /* @SimpleFunction(description = "Fill the screen with a color.") */
+    public void FillScreen(int color) {
+        String functionName = "FillScreen";
 
-    command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
-                                                  false,
-                                                  0,
-                                                  0,
-                                                  "c",
-                                                  Ev3Constants.UIDrawSubcode.UPDATE);
-    sendCommand(functionName, command, false);
-  }
+        if (color != 0 && color != 1) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
+
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "cccc",
+                Ev3Constants.UIDrawSubcode.FILLWINDOW,
+                (byte) color,
+                (short) 0,
+                (short) 0);
+        sendCommand(functionName, command, false);
+
+        command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.UI_DRAW,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.UIDrawSubcode.UPDATE);
+        sendCommand(functionName, command, false);
+    }
 }

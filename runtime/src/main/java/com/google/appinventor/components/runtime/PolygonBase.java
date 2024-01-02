@@ -14,7 +14,7 @@ import com.google.appinventor.components.runtime.util.MapFactory.MapFeatureVisit
  */
 /* @SimpleObject
  */public abstract class PolygonBase extends MapFeatureBaseWithFill {
-  public PolygonBase(MapFactory.MapFeatureContainer container, MapFeatureVisitor<Double> distanceComputation) {
-    super(container, distanceComputation);
-  }
+    public PolygonBase(MapFactory.MapFeatureContainer container, MapFeatureVisitor<Double> distanceComputation) {
+        super(container, distanceComputation);
+    }
 }

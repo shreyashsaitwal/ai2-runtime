@@ -9,7 +9,6 @@ package com.google.appinventor.components.runtime.errors;
 /**
  * Runtime error indicating an access to an instance or array variable that
  * is not properly initialized.
- *
  */
 /* @SimpleObject
  */public class UninitializedInstanceError extends RuntimeError {

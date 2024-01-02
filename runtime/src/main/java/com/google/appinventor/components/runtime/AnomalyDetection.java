@@ -9,6 +9,7 @@ import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.YailList;
 import gnu.lists.LList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * A data science component to apply different anomaly detection models.
  * The component only needs a data source to apply the model on.
- *
+ * <p>
  * The anomaly detection models only return a list of anomalies.
  * ChartData2D component is needed to highlight the anomalies on a chart
  */
@@ -26,216 +27,216 @@ import java.util.List;
     iconName = "images//anomaly.png",
     nonVisible = true) */
 /* @SimpleObject
- */@SuppressWarnings("checkstyle:JavadocParagraph")
+ */
+@SuppressWarnings("checkstyle:JavadocParagraph")
 public final class AnomalyDetection extends DataCollection<ComponentContainer, DataModel<?>> {
-  /**
-   * Creates a new Anomaly Detection component.
-   */
-  public AnomalyDetection(ComponentContainer container) {
-    super(container);
-  }
+    /**
+     * Creates a new Anomaly Detection component.
+     */
+    public AnomalyDetection(ComponentContainer container) {
+        super(container);
+    }
 
-  /**
-   * Calculates the mean and standard deviation of the data, and then checks each data point's
-   * Z-score against the threshold. If a data point's Z-score is greater than the threshold,
-   * the data point is labeled as anomaly.
-   *
-   * @param dataList - the data array represents the data you want to check for anomalies
-   * @return List of detected anomaly data points
-   */
+    /**
+     * Given a single anomaly: [(anomaly index, anomaly value)] return the anomaly index.
+     *
+     * @param anomaly - a single YailList tuple of anomaly index and value
+     * @return double anomaly index
+     */
+    public static double getAnomalyIndex(YailList anomaly) {
+        if (!anomaly.isEmpty()) {
+            LList anomalyValue = (LList) anomaly.getCdr();
+            List<Double> anomalyNr = castToDouble(anomalyValue);
+            return anomalyNr.get(0);
+        } else {
+            throw new IllegalStateException("Must have equal X and Y data points");
+        }
+    }
+
+    /**
+     * Calculates the mean and standard deviation of the data, and then checks each data point's
+     * Z-score against the threshold. If a data point's Z-score is greater than the threshold,
+     * the data point is labeled as anomaly.
+     *
+     * @param dataList - the data array represents the data you want to check for anomalies
+     * @return List of detected anomaly data points
+     */
   /* @SimpleFunction(description = "Z-Score Anomaly Detection: checks each data point's Z-score"
       + "against the given threshold if a data point's Z-score is greater than the threshold, the "
       + "data point is labeled as anomaly and returned in a list of pairs (anomaly index, anomaly "
       + "value)") */
-  public List<List<?>> DetectAnomalies(final YailList dataList, double threshold) {
-    List<List<?>> anomalies = new ArrayList<>();
+    public List<List<?>> DetectAnomalies(final YailList dataList, double threshold) {
+        List<List<?>> anomalies = new ArrayList<>();
 
-    LList dataListValues = (LList) dataList.getCdr();
-    List<Double> data = castToDouble(dataListValues);
+        LList dataListValues = (LList) dataList.getCdr();
+        List<Double> data = castToDouble(dataListValues);
 
-    // Calculate mean and standard deviation
-    double sum = 0;
-    for (int i = 0; i < data.size(); i++) {
-      sum += data.get(i);
+        // Calculate mean and standard deviation
+        double sum = 0;
+        for (int i = 0; i < data.size(); i++) {
+            sum += data.get(i);
+        }
+        double mean = sum / data.size();
+        // The variance
+        double variance = 0;
+        for (int i = 0; i < data.size(); i++) {
+            variance += Math.pow(data.get(i) - mean, 2);
+        }
+        variance /= data.size();
+
+        double sd = Math.sqrt(variance);
+
+        // Detect anomalies using Z-score
+        for (int i = 0; i < data.size(); i++) {
+            // The z-score is a measure of how many standard deviations a data point is away from the mean
+            double zScore = Math.abs((data.get(i) - mean) / sd);
+            if (zScore > threshold) {
+                anomalies.add(Arrays.asList(i + 1, data.get(i)));
+            }
+        }
+        return anomalies;
     }
-    double mean = sum / data.size();
-    // The variance
-    double variance = 0;
-    for (int i = 0; i < data.size(); i++) {
-      variance += Math.pow(data.get(i) - mean, 2);
-    }
-    variance /= data.size();
 
-    double sd = Math.sqrt(variance);
-
-    // Detect anomalies using Z-score
-    for (int i = 0; i < data.size(); i++) {
-      // The z-score is a measure of how many standard deviations a data point is away from the mean
-      double zScore = Math.abs((data.get(i) - mean) / sd);
-      if (zScore > threshold) {
-        anomalies.add(Arrays.asList(i + 1, data.get(i)));
-      }
-    }
-    return anomalies;
-  }
-
-  /**
-   * Given a single anomaly: [(anomaly index, anomaly value)]
-   *
-   * 1. Iterate over the xList and delete value at anomaly index
-   * 2. Iterate over the yList and delete the value at anomaly index with the same value as anomaly
-   *    value
-   * 3. combine the xList and yList after modification in a list of x and y pairs
-   *
-   * We assume x and y lists are the same size and are ordered.
-   *
-   * @param anomaly - a single YailList tuple of anomaly index and value
-   * @return List of combined x and y pairs without the anomaly pair
-   */
+    /**
+     * Given a single anomaly: [(anomaly index, anomaly value)]
+     * <p>
+     * 1. Iterate over the xList and delete value at anomaly index
+     * 2. Iterate over the yList and delete the value at anomaly index with the same value as anomaly
+     * value
+     * 3. combine the xList and yList after modification in a list of x and y pairs
+     * <p>
+     * We assume x and y lists are the same size and are ordered.
+     *
+     * @param anomaly - a single YailList tuple of anomaly index and value
+     * @return List of combined x and y pairs without the anomaly pair
+     */
   /* @SimpleFunction(description = "Given a single anomaly and the x and y values of your data."
       + " This block will return the x and y value pairs of your data without the anomaly") */
-  public List<List<?>> CleanData(final YailList anomaly, YailList xList, YailList yList) {
-    LList xValues = (LList) xList.getCdr();
-    List<Double> xData = castToDouble(xValues);
+    public List<List<?>> CleanData(final YailList anomaly, YailList xList, YailList yList) {
+        LList xValues = (LList) xList.getCdr();
+        List<Double> xData = castToDouble(xValues);
 
-    LList yValues = (LList) yList.getCdr();
-    List<Double> yData = castToDouble(yValues);
+        LList yValues = (LList) yList.getCdr();
+        List<Double> yData = castToDouble(yValues);
 
-    if (xData.size() != yData.size()) {
-      throw new IllegalStateException("Must have equal X and Y data points");
+        if (xData.size() != yData.size()) {
+            throw new IllegalStateException("Must have equal X and Y data points");
+        }
+        if (xData.size() == 0 || yData.size() == 0) {
+            throw new IllegalStateException("List must have at least one element");
+        }
+        int index = (int) getAnomalyIndex(anomaly);
+
+        xData.remove(index - 1);
+        yData.remove(index - 1);
+
+        List<List<?>> cleanData = new ArrayList<>();
+
+        if (xData.size() == yData.size()) {
+            for (int i = 0; i < xData.size(); i++) {
+                cleanData.add(Arrays.asList(xData.get(i), yData.get(i)));
+            }
+        }
+        return cleanData;
     }
-    if (xData.size() == 0 || yData.size() == 0) {
-      throw new IllegalStateException("List must have at least one element");
+
+    // MARK: Properties and methods not currently needed
+
+    @Override
+    public void ElementsFromPairs(String elements) {
     }
-    int index = (int) getAnomalyIndex(anomaly);
 
-    xData.remove(index - 1);
-    yData.remove(index - 1);
-
-    List<List<?>> cleanData = new ArrayList<>();
-
-    if (xData.size() == yData.size()) {
-      for (int i = 0; i < xData.size(); i++) {
-        cleanData.add(Arrays.asList(xData.get(i),yData.get(i)));
-      }
+    @Override
+    public void SpreadsheetUseHeaders(boolean useHeaders) {
     }
-    return cleanData;
-  }
 
-  /**
-   * Given a single anomaly: [(anomaly index, anomaly value)] return the anomaly index.
-   *
-   *
-   * @param anomaly - a single YailList tuple of anomaly index and value
-   * @return double anomaly index
-   */
-  public static double getAnomalyIndex(YailList anomaly) {
-    if (!anomaly.isEmpty()) {
-      LList anomalyValue = (LList) anomaly.getCdr();
-      List<Double> anomalyNr = castToDouble(anomalyValue);
-      return anomalyNr.get(0);
-    } else {
-      throw new IllegalStateException("Must have equal X and Y data points");
+    @Override
+    public void DataFileXColumn(String column) {
     }
-  }
 
-  // MARK: Properties and methods not currently needed
+    @Override
+    public void WebXColumn(String column) {
+    }
 
-  @Override
-  public void ElementsFromPairs(String elements) {
-  }
+    @Override
+    public void SpreadsheetXColumn(String column) {
+    }
 
-  @Override
-  public void SpreadsheetUseHeaders(boolean useHeaders) {
-  }
+    @Override
+    public void DataFileYColumn(String column) {
+    }
 
-  @Override
-  public void DataFileXColumn(String column) {
-  }
+    @Override
+    public void WebYColumn(String column) {
+    }
 
-  @Override
-  public void WebXColumn(String column) {
-  }
+    @Override
+    public void SpreadsheetYColumn(String column) {
+    }
 
-  @Override
-  public void SpreadsheetXColumn(String column) {
-  }
+    @Override
+    public void DataSourceKey(String key) {
+    }
 
-  @Override
-  public void DataFileYColumn(String column) {
-  }
+    @Override
+    public <K, V> void Source(DataSource<K, V> dataSource) {
+    }
 
-  @Override
-  public void WebYColumn(String column) {
-  }
+    @Override
+    public void ImportFromList(YailList list) {
+    }
 
-  @Override
-  public void SpreadsheetYColumn(String column) {
-  }
+    @Override
+    public void Clear() {
+    }
 
-  @Override
-  public void DataSourceKey(String key) {
-  }
+    @Override
+    public <K, V> void ChangeDataSource(DataSource<K, V> source, String keyValue) {
+    }
 
-  @Override
-  public <K, V> void Source(DataSource<K, V> dataSource) {
-  }
+    @Override
+    public void RemoveDataSource() {
+    }
 
-  @Override
-  public void ImportFromList(YailList list) {
-  }
+    @Override
+    public YailList GetEntriesWithXValue(String x) {
+        return YailList.makeEmptyList();
+    }
 
-  @Override
-  public void Clear() {
-  }
+    @Override
+    public YailList GetEntriesWithYValue(String y) {
+        return YailList.makeEmptyList();
+    }
 
-  @Override
-  public <K, V> void ChangeDataSource(DataSource<K, V> source, String keyValue) {
-  }
+    @Override
+    public YailList GetAllEntries() {
+        return YailList.makeEmptyList();
+    }
 
-  @Override
-  public void RemoveDataSource() {
-  }
+    @Override
+    public void ImportFromTinyDB(TinyDB tinyDB, String tag) {
+    }
 
-  @Override
-  public YailList GetEntriesWithXValue(String x) {
-    return YailList.makeEmptyList();
-  }
+    @Override
+    public void ImportFromCloudDB(CloudDB cloudDB, String tag) {
+    }
 
-  @Override
-  public YailList GetEntriesWithYValue(String y) {
-    return YailList.makeEmptyList();
-  }
+    @Override
+    public void ImportFromDataFile(DataFile dataFile, String xValueColumn,
+                                   String yValueColumn) {
+    }
 
-  @Override
-  public YailList GetAllEntries() {
-    return YailList.makeEmptyList();
-  }
+    @Override
+    public void ImportFromSpreadsheet(Spreadsheet spreadsheet, String xColumn, String yColumn,
+                                      boolean useHeaders) {
+    }
 
-  @Override
-  public void ImportFromTinyDB(TinyDB tinyDB, String tag) {
-  }
+    @Override
+    public void ImportFromWeb(Web web, String xValueColumn, String yValueColumn) {
+    }
 
-  @Override
-  public void ImportFromCloudDB(CloudDB cloudDB, String tag) {
-  }
+    @Override
+    public void onDataChange() {
 
-  @Override
-  public void ImportFromDataFile(DataFile dataFile, String xValueColumn,
-      String yValueColumn) {
-  }
-
-  @Override
-  public void ImportFromSpreadsheet(Spreadsheet spreadsheet, String xColumn, String yColumn,
-      boolean useHeaders) {
-  }
-
-  @Override
-  public void ImportFromWeb(Web web, String xValueColumn, String yValueColumn) {
-  }
-
-  @Override
-  public void onDataChange() {
-
-  }
+    }
 }

@@ -4,28 +4,31 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 
 package com.google.appinventor.components.runtime;
+
 /**
  * This class is used to implement start and stop functionality of SpeechRecognizer,
  * and registering SpeechListener.
  */
 public abstract class SpeechRecognizerController {
 
-  SpeechListener speechListener;
+    SpeechListener speechListener;
 
-  /**
-   * Registering Listener to handle SpeechRecognition events
-   */
-  void addListener(SpeechListener speechListener){
-    this.speechListener = speechListener;
-  }
+    /**
+     * Registering Listener to handle SpeechRecognition events
+     */
+    void addListener(SpeechListener speechListener) {
+        this.speechListener = speechListener;
+    }
 
-  /**
-   * Starting SpeechRecognition
-   */
-  void start(){}
+    /**
+     * Starting SpeechRecognition
+     */
+    void start() {
+    }
 
-  /**
-   * Stopping SpeechRecognition
-   */
-  void stop(){}
+    /**
+     * Stopping SpeechRecognition
+     */
+    void stop() {
+    }
 }

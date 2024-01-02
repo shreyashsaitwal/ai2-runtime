@@ -24,32 +24,32 @@ import java.util.List;
  * @param <V> (Chart) View that the model is compatible with (ChartView (sub)classes)
  */
 public abstract class Chart2DDataModel<
-    E extends Entry,
-    T extends IDataSet<E>,
-    D extends ChartData<T>,
-    C extends Chart<D>,
-    V extends ChartView<E, T, D, C, V>>
-    extends ChartDataModel<E, T, D, C, V> {
-  /**
-   * Initializes a new Chart2DDataModel object instance.
-   *
-   * @param data Chart data instance
-   * @param view Chart View to link model to
-   */
-  protected Chart2DDataModel(D data, V view) {
-    super(data, view);
-  }
+        E extends Entry,
+        T extends IDataSet<E>,
+        D extends ChartData<T>,
+        C extends Chart<D>,
+        V extends ChartView<E, T, D, C, V>>
+        extends ChartDataModel<E, T, D, C, V> {
+    /**
+     * Initializes a new Chart2DDataModel object instance.
+     *
+     * @param data Chart data instance
+     * @param view Chart View to link model to
+     */
+    protected Chart2DDataModel(D data, V view) {
+        super(data, view);
+    }
 
-  @Override
-  protected int getTupleSize() {
-    return 2;
-  }
+    @Override
+    protected int getTupleSize() {
+        return 2;
+    }
 
-  @Override
-  public YailList getTupleFromEntry(Entry entry) {
-    // Create a list with the X and Y values of the entry, and
-    // convert the generic List to a YailList
-    List<?> tupleEntries = Arrays.asList(entry.getX(), entry.getY());
-    return YailList.makeList(tupleEntries);
-  }
+    @Override
+    public YailList getTupleFromEntry(Entry entry) {
+        // Create a list with the X and Y values of the entry, and
+        // convert the generic List to a YailList
+        List<?> tupleEntries = Arrays.asList(entry.getX(), entry.getY());
+        return YailList.makeList(tupleEntries);
+    }
 }

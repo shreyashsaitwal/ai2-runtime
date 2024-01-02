@@ -12,38 +12,38 @@ import java.util.Map;
  * Defines a NxtMotorPort type used by the NxtDirectCommands component.
  */
 public enum NxtMotorPort implements OptionList<String> {
-  PortA("A", 0),
-  PortB("B", 1),
-  PortC("C", 2);
+    PortA("A", 0),
+    PortB("B", 1),
+    PortC("C", 2);
 
-  private final String value;
-  private final int intValue;
+    private static final Map<String, NxtMotorPort> lookup = new HashMap<>();
 
-  NxtMotorPort(String port, int intPort) {
-    this.value = port;
-    this.intValue = intPort;
-  }
-
-  public String toUnderlyingValue() {
-    return value;
-  }
-
-  public Integer toInt() {
-    return intValue;
-  }
-
-  private static final Map<String, NxtMotorPort> lookup = new HashMap<>();
-
-  static {
-    for (NxtMotorPort port : NxtMotorPort.values()) {
-      String str = port.toUnderlyingValue();
-      lookup.put(str, port);
-      lookup.put(str.toLowerCase(), port);
+    static {
+        for (NxtMotorPort port : NxtMotorPort.values()) {
+            String str = port.toUnderlyingValue();
+            lookup.put(str, port);
+            lookup.put(str.toLowerCase(), port);
+        }
     }
-  }
 
-  public static NxtMotorPort fromUnderlyingValue(String port) {
-    return lookup.get(port);
-  }
+    private final String value;
+    private final int intValue;
+
+    NxtMotorPort(String port, int intPort) {
+        this.value = port;
+        this.intValue = intPort;
+    }
+
+    public static NxtMotorPort fromUnderlyingValue(String port) {
+        return lookup.get(port);
+    }
+
+    public String toUnderlyingValue() {
+        return value;
+    }
+
+    public Integer toInt() {
+        return intValue;
+    }
 }
 

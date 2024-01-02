@@ -44,134 +44,137 @@ import java.util.List;
  */
 public class WebServiceUtil {
 
-  private static final WebServiceUtil INSTANCE = new WebServiceUtil();
-  private static final String LOG_TAG = "WebServiceUtil";
-  private static HttpClient httpClient = null;
-  private static Object httpClientSynchronizer = new Object();
+    private static final WebServiceUtil INSTANCE = new WebServiceUtil();
+    private static final String LOG_TAG = "WebServiceUtil";
+    private static HttpClient httpClient = null;
+    private static Object httpClientSynchronizer = new Object();
 
-  private WebServiceUtil(){
-  }
-
-  /**
-   * Returns the one <code>WebServiceUtil</code> instance
-   * @return the one <code>WebServiceUtil</code> instance
-   */
-  public static WebServiceUtil getInstance() {
-    // This needs to be here instead of in the constructor because
-    // it uses classes that are in the AndroidSDK and thus would
-    // cause Stub! errors when running the component descriptor.
-    synchronized(httpClientSynchronizer) {
-      if (httpClient == null) {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-        BasicHttpParams params = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(params, 20 * 1000);
-        HttpConnectionParams.setSoTimeout(params, 20 * 1000);
-        ConnManagerParams.setMaxTotalConnections(params, 20);
-        ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params,
-            schemeRegistry);
-        WebServiceUtil.httpClient = new DefaultHttpClient(manager, params);
-      }
+    private WebServiceUtil() {
     }
-    return INSTANCE;
-  }
 
-  /**
-   * Make a post command to serviceURL with params and return the
-   * response String as a JSON array.
-   *
-   * @param serviceURL The URL of the server to post to.
-   * @param commandName The path to the command.
-   * @param params A List of NameValuePairs to send as parameters
-   * with the post.
-   * @param callback A callback function that accepts a JSON array
-   * on success.
-   */
-  public void postCommandReturningArray(String serviceURL, String commandName,
-      List<NameValuePair> params, final AsyncCallbackPair<JSONArray> callback) {
-    AsyncCallbackPair<String> thisCallback = new AsyncCallbackPair<String>() {
-      public void onSuccess(String httpResponseString) {
-        try {
-          callback.onSuccess(new JSONArray(httpResponseString));
-        } catch (JSONException e) {
-          callback.onFailure(e.getMessage());
+    /**
+     * Returns the one <code>WebServiceUtil</code> instance
+     *
+     * @return the one <code>WebServiceUtil</code> instance
+     */
+    public static WebServiceUtil getInstance() {
+        // This needs to be here instead of in the constructor because
+        // it uses classes that are in the AndroidSDK and thus would
+        // cause Stub! errors when running the component descriptor.
+        synchronized (httpClientSynchronizer) {
+            if (httpClient == null) {
+                SchemeRegistry schemeRegistry = new SchemeRegistry();
+                schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+                schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+                BasicHttpParams params = new BasicHttpParams();
+                HttpConnectionParams.setConnectionTimeout(params, 20 * 1000);
+                HttpConnectionParams.setSoTimeout(params, 20 * 1000);
+                ConnManagerParams.setMaxTotalConnections(params, 20);
+                ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params,
+                        schemeRegistry);
+                WebServiceUtil.httpClient = new DefaultHttpClient(manager, params);
+            }
         }
-      }
-      public void onFailure(String failureMessage) {
-        callback.onFailure(failureMessage);
-      }
-    };
-    postCommand(serviceURL, commandName, params, thisCallback);
-  }
+        return INSTANCE;
+    }
 
-  /**
-   * Make a post command to serviceURL with paramaterss and
-   * return the response String as a JSON object.
-   *
-   * @param serviceURL The URL of the server to post to.
-   * @param commandName The path to the command.
-   * @param params A List of NameValuePairs to send as parameters
-   * with the post.
-   * @param callback A callback function that accepts a JSON object
-   * on success.
-   */
-  public void postCommandReturningObject(final String serviceURL,final String commandName,
-      List<NameValuePair> params, final AsyncCallbackPair<JSONObject> callback) {
-    AsyncCallbackPair<String> thisCallback = new AsyncCallbackPair<String>() {
-    public void onSuccess(String httpResponseString) {
-        try {
-          callback.onSuccess(new JSONObject(httpResponseString));
-        } catch (JSONException e) {
-          callback.onFailure(e.getMessage());
+    /**
+     * Make a post command to serviceURL with params and return the
+     * response String as a JSON array.
+     *
+     * @param serviceURL  The URL of the server to post to.
+     * @param commandName The path to the command.
+     * @param params      A List of NameValuePairs to send as parameters
+     *                    with the post.
+     * @param callback    A callback function that accepts a JSON array
+     *                    on success.
+     */
+    public void postCommandReturningArray(String serviceURL, String commandName,
+                                          List<NameValuePair> params, final AsyncCallbackPair<JSONArray> callback) {
+        AsyncCallbackPair<String> thisCallback = new AsyncCallbackPair<String>() {
+            public void onSuccess(String httpResponseString) {
+                try {
+                    callback.onSuccess(new JSONArray(httpResponseString));
+                } catch (JSONException e) {
+                    callback.onFailure(e.getMessage());
+                }
+            }
+
+            public void onFailure(String failureMessage) {
+                callback.onFailure(failureMessage);
+            }
+        };
+        postCommand(serviceURL, commandName, params, thisCallback);
+    }
+
+    /**
+     * Make a post command to serviceURL with paramaterss and
+     * return the response String as a JSON object.
+     *
+     * @param serviceURL  The URL of the server to post to.
+     * @param commandName The path to the command.
+     * @param params      A List of NameValuePairs to send as parameters
+     *                    with the post.
+     * @param callback    A callback function that accepts a JSON object
+     *                    on success.
+     */
+    public void postCommandReturningObject(final String serviceURL, final String commandName,
+                                           List<NameValuePair> params, final AsyncCallbackPair<JSONObject> callback) {
+        AsyncCallbackPair<String> thisCallback = new AsyncCallbackPair<String>() {
+            public void onSuccess(String httpResponseString) {
+                try {
+                    callback.onSuccess(new JSONObject(httpResponseString));
+                } catch (JSONException e) {
+                    callback.onFailure(e.getMessage());
+                }
+            }
+
+            public void onFailure(String failureMessage) {
+                callback.onFailure(failureMessage);
+            }
+        };
+        postCommand(serviceURL, commandName, params, thisCallback);
+    }
+
+    /**
+     * Make a post command to serviceURL with params and return the
+     * response String.
+     *
+     * @param serviceURL  The URL of the server to post to.
+     * @param commandName The path to the command.
+     * @param params      A List of NameValuePairs to send as parameters
+     *                    with the post.
+     * @param callback    A callback function that accepts a String on
+     *                    success.
+     */
+    public void postCommand(final String serviceURL, final String commandName,
+                            List<NameValuePair> params, AsyncCallbackPair<String> callback) {
+        Log.d(LOG_TAG, "Posting " + commandName + " to " + serviceURL + " with arguments " + params);
+
+        if (serviceURL == null || serviceURL.equals("")) {
+            callback.onFailure("No service url to post command to.");
         }
-      }
-      public void onFailure(String failureMessage) {
-        callback.onFailure(failureMessage);
-      }
-    };
-    postCommand(serviceURL, commandName, params, thisCallback);
-  }
+        final HttpPost httpPost = new HttpPost(serviceURL + "/" + commandName);
 
-  /**
-   * Make a post command to serviceURL with params and return the
-   * response String.
-   *
-   * @param serviceURL The URL of the server to post to.
-   * @param commandName The path to the command.
-   * @param params A List of NameValuePairs to send as parameters
-   * with the post.
-   * @param callback A callback function that accepts a String on
-   * success.
-   */
-  public void postCommand(final String serviceURL, final String commandName,
-      List<NameValuePair> params, AsyncCallbackPair<String> callback) {
-    Log.d(LOG_TAG, "Posting " + commandName + " to " + serviceURL + " with arguments " + params);
-
-    if (serviceURL == null || serviceURL.equals("")) {
-      callback.onFailure("No service url to post command to.");
+        if (params == null) {
+            params = new ArrayList<NameValuePair>();
+        }
+        try {
+            String httpResponseString;
+            ResponseHandler<String> responseHandler = new BasicResponseHandler();
+            httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+            httpPost.setHeader("Accept", "application/json");
+            httpResponseString = httpClient.execute(httpPost, responseHandler);
+            callback.onSuccess(httpResponseString);
+        } catch (UnsupportedEncodingException e) {
+            Log.w(LOG_TAG, e);
+            callback.onFailure("Failed to encode params for web service call.");
+        } catch (ClientProtocolException e) {
+            Log.w(LOG_TAG, e);
+            callback.onFailure("Communication with the web service encountered a protocol exception.");
+        } catch (IOException e) {
+            Log.w(LOG_TAG, e);
+            callback.onFailure("Communication with the web service timed out.");
+        }
     }
-    final HttpPost httpPost = new HttpPost(serviceURL + "/" + commandName);
-
-    if (params == null) {
-      params = new ArrayList<NameValuePair>();
-    }
-    try {
-      String httpResponseString;
-      ResponseHandler<String> responseHandler = new BasicResponseHandler();
-      httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-      httpPost.setHeader("Accept", "application/json");
-      httpResponseString = httpClient.execute(httpPost, responseHandler);
-      callback.onSuccess(httpResponseString);
-    } catch (UnsupportedEncodingException e) {
-      Log.w(LOG_TAG, e);
-      callback.onFailure("Failed to encode params for web service call.");
-    } catch (ClientProtocolException e) {
-      Log.w(LOG_TAG, e);
-      callback.onFailure("Communication with the web service encountered a protocol exception.");
-    } catch (IOException e) {
-      Log.w(LOG_TAG, e);
-      callback.onFailure("Communication with the web service timed out.");
-    }
-  }
 }

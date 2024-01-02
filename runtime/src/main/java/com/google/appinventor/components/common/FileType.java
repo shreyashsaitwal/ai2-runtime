@@ -17,46 +17,46 @@ import java.util.Map;
  * enumeration is acceptable (but not required).
  */
 public enum FileType implements OptionList<String> {
-  /**
-   * Accept any file type.
-   */
-  Any("*/*"),
+    /**
+     * Accept any file type.
+     */
+    Any("*/*"),
 
-  /**
-   * Files associated with audio MIME types.
-   */
-  Audio("audio/*"),
+    /**
+     * Files associated with audio MIME types.
+     */
+    Audio("audio/*"),
 
-  /**
-   * Files associated with image MIME types.
-   */
-  Image("image/*"),
+    /**
+     * Files associated with image MIME types.
+     */
+    Image("image/*"),
 
-  /**
-   * Files associated with video MIME types.
-   */
-  Video("video/*");
+    /**
+     * Files associated with video MIME types.
+     */
+    Video("video/*");
 
-  private static final Map<String, FileType> LOOKUP = new HashMap<>();
+    private static final Map<String, FileType> LOOKUP = new HashMap<>();
 
-  static {
-    for (FileType type : values()) {
-      LOOKUP.put(type.toUnderlyingValue(), type);
+    static {
+        for (FileType type : values()) {
+            LOOKUP.put(type.toUnderlyingValue(), type);
+        }
     }
-  }
 
-  private final String mimeType;
+    private final String mimeType;
 
-  FileType(String mimeType) {
-    this.mimeType = mimeType;
-  }
+    FileType(String mimeType) {
+        this.mimeType = mimeType;
+    }
 
-  @Override
-  public String toUnderlyingValue() {
-    return mimeType;
-  }
+    public static FileType fromUnderlyingValue(String value) {
+        return LOOKUP.get(value);
+    }
 
-  public static FileType fromUnderlyingValue(String value) {
-    return LOOKUP.get(value);
-  }
+    @Override
+    public String toUnderlyingValue() {
+        return mimeType;
+    }
 }

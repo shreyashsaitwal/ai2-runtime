@@ -14,5 +14,5 @@ import android.view.MenuItem;
  * @author lizlooney@google.com (Liz Looney)
  */
 public interface OnOptionsItemSelectedListener {
-  public boolean onOptionsItemSelected(MenuItem item);
+    public boolean onOptionsItemSelected(MenuItem item);
 }

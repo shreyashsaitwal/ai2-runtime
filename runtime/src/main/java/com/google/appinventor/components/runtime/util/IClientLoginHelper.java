@@ -21,29 +21,29 @@ import java.io.IOException;
  */
 
 public interface IClientLoginHelper {
-  /**
-   * Wraps an HttpClient.execute() to manage the authorization headers.
-   * This will add the proper Authorization header, and retry if the
-   * auth token has expired.
-   */
-  public HttpResponse execute(HttpUriRequest request) throws ClientProtocolException, IOException;
+    /**
+     * Wraps an HttpClient.execute() to manage the authorization headers.
+     * This will add the proper Authorization header, and retry if the
+     * auth token has expired.
+     */
+    public HttpResponse execute(HttpUriRequest request) throws ClientProtocolException, IOException;
 
-  /**
-   * Forget about the account the user chose.
-   * The AccountChooser remembers (in shared prefs) the
-   * chosen account.  Call this if you want to change the account
-   * this service is associated with.
-   */
-  public void forgetAccountName();
- 
-  /**
-   * Uses AccountManager to retrieve an accessToken that can be
-   * used to access Google APIs.
-   * 
-   * Added to support Texting Component. Allows the authToken to
-   * be requested by external objects.
-   */
+    /**
+     * Forget about the account the user chose.
+     * The AccountChooser remembers (in shared prefs) the
+     * chosen account.  Call this if you want to change the account
+     * this service is associated with.
+     */
+    public void forgetAccountName();
 
-  public String getAuthToken() throws ClientProtocolException; 
+    /**
+     * Uses AccountManager to retrieve an accessToken that can be
+     * used to access Google APIs.
+     * <p>
+     * Added to support Texting Component. Allows the authToken to
+     * be requested by external objects.
+     */
+
+    public String getAuthToken() throws ClientProtocolException;
 
 }

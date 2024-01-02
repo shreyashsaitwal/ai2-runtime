@@ -31,100 +31,102 @@ import org.json.JSONException;
     iconName = "images//featurecollection.png") */
 /* @SimpleObject
  */public class FeatureCollection extends MapFeatureContainerBase implements MapFeatureCollection {
-  private String source = "";
-  private Map map;
+    private String source = "";
+    private Map map;
 
-  public FeatureCollection(MapFactory.MapFeatureContainer container) {
-    super(container);
-    map = container.getMap();
-  }
+    public FeatureCollection(MapFactory.MapFeatureContainer container) {
+        super(container);
+        map = container.getMap();
+    }
 
-  /**
-   * Populates the feature collection from a string containing GeoJSON content. Given the size of
-   * such strings, it is recommended to load the feature collection from assets or the web using
-   * the {@link #Source(String)} property.
-   *
-   * @param geojson
-   */
-  @SuppressWarnings("squid:S00100")
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA) */
+    /**
+     * Populates the feature collection from a string containing GeoJSON content. Given the size of
+     * such strings, it is recommended to load the feature collection from assets or the web using
+     * the {@link #Source(String)} property.
+     *
+     * @param geojson
+     */
+    @SuppressWarnings("squid:S00100")
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_TEXTAREA) */
   /* @SimpleProperty(description = "Loads a collection of features from the given string. If the " +
       "string is not valid GeoJSON, the ErrorLoadingFeatureCollection error will be run with " +
       "url = <string>.",
       category = PropertyCategory.APPEARANCE) */
-  public void FeaturesFromGeoJSON(String geojson) {
-    try {
-      processGeoJSON("<string>", geojson);
-    } catch(JSONException e) {
-      $form().dispatchErrorOccurredEvent(this, "FeaturesFromGeoJSON",
-          ErrorMessages.ERROR_INVALID_GEOJSON, e.getMessage());
+    public void FeaturesFromGeoJSON(String geojson) {
+        try {
+            processGeoJSON("<string>", geojson);
+        } catch (JSONException e) {
+            $form().dispatchErrorOccurredEvent(this, "FeaturesFromGeoJSON",
+                    ErrorMessages.ERROR_INVALID_GEOJSON, e.getMessage());
+        }
     }
-  }
 
-  /**
-   * The `GotFeatures` event is run when when a feature collection is successfully read from the
-   * given `url`{:.variable.block}. The `features`{:.variable.block} parameter will be a list of
-   * feature descriptions that can be converted into components using the
-   * {@link #FeatureFromDescription(YailList)} method.
-   *
-   * @param url the url corresponding to the requested url in {@link #LoadFromURL(String)}
-   * @param features the list of feature descriptions read from the resource at {@code url}
-   */
-  @Override
+    /**
+     * The `GotFeatures` event is run when when a feature collection is successfully read from the
+     * given `url`{:.variable.block}. The `features`{:.variable.block} parameter will be a list of
+     * feature descriptions that can be converted into components using the
+     * {@link #FeatureFromDescription(YailList)} method.
+     *
+     * @param url      the url corresponding to the requested url in {@link #LoadFromURL(String)}
+     * @param features the list of feature descriptions read from the resource at {@code url}
+     */
+    @Override
   /* @SimpleEvent(description = "A GeoJSON document was successfully read from url. The features " +
       "specified in the document are provided as a list in features.") */
-  public void GotFeatures(String url, YailList features) {
-    source = url;
-    super.GotFeatures(url, features);
-  }
+    public void GotFeatures(String url, YailList features) {
+        source = url;
+        super.GotFeatures(url, features);
+    }
 
-  @Override
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_GEOJSON_TYPE) */
-  public void Source(String source) {
-    // Only set from the designer. Blocks will call {@link #LoadFromURL} instead.
-    this.source = source;
-  }
+    @Override
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_GEOJSON_TYPE) */
+    public void Source(String source) {
+        // Only set from the designer. Blocks will call {@link #LoadFromURL} instead.
+        this.source = source;
+    }
 
-  @Override
+    @Override
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR,
       description = "Specifies the source URL used to populate the feature collection. If " +
           "the feature collection was not loaded from a URL, this will be the empty string.") */
-  public String Source() {
-    return source;
-  }
+    public String Source() {
+        return source;
+    }
 
-  /**
-   * Returns true iff the component is visible.
-   * @return  true iff the component is visible
-   */
+    /**
+     * Returns true iff the component is visible.
+     *
+     * @return true iff the component is visible
+     */
   /* @SimpleProperty(
       category = PropertyCategory.APPEARANCE) */
-  public boolean Visible() {
-    return getMap().getController().isFeatureCollectionVisible(this);
-  }
+    public boolean Visible() {
+        return getMap().getController().isFeatureCollectionVisible(this);
+    }
 
-  /**
-   * Specifies whether the `%type%` should be visible on the screen.  Value is `true`{:.logic.block}
-   * if the `%type%` is showing and `false`{:.logic.block} if hidden.
-   * @param  visibility desired state
-   */
+    /**
+     * Specifies whether the `%type%` should be visible on the screen.  Value is `true`{:.logic.block}
+     * if the `%type%` is showing and `false`{:.logic.block} if hidden.
+     *
+     * @param visibility desired state
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_VISIBILITY,
       defaultValue = "True") */
   /* @SimpleProperty(description = "Specifies whether the component should be visible on the screen. "
       + "Value is true if the component is showing and false if hidden.") */
-  public void Visible(boolean visibility) {
-    getMap().getController().setFeatureCollectionVisible(this, visibility);
-  }
+    public void Visible(boolean visibility) {
+        getMap().getController().setFeatureCollectionVisible(this, visibility);
+    }
 
-  @Override
-  public View getView() {
-    // Even though we are an AndroidViewComponent, we don't actually have a view because the view
-    // hierarchy is handled by the map controller.
-    return null;
-  }
+    @Override
+    public View getView() {
+        // Even though we are an AndroidViewComponent, we don't actually have a view because the view
+        // hierarchy is handled by the map controller.
+        return null;
+    }
 
-  @Override
-  public Map getMap() {
-    return map;
-  }
+    @Override
+    public Map getMap() {
+        return map;
+    }
 }

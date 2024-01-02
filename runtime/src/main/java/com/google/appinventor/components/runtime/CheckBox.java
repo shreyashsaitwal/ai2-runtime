@@ -12,9 +12,9 @@ import com.google.appinventor.components.common.YaVersion;
 
 /**
  * ![Example of a CheckBox](images/checkbox.png)
- *
+ * <p>
  * `CheckBox` components can detect user taps and can change their boolean state in response.
- *
+ * <p>
  * A `CheckBox` component raises an event when the user taps it. There are many properties affecting
  * its appearance that can be set in the Designer or Blocks Editor.
  */
@@ -27,42 +27,43 @@ import com.google.appinventor.components.common.YaVersion;
 /* @SimpleObject
  */public final class CheckBox extends ToggleBase<android.widget.CheckBox> {
 
-  /**
-   * Creates a new CheckBox component.
-   *
-   * @param container  container, component will be placed in
-   */
-  public CheckBox(ComponentContainer container) {
-    super(container);
-    view = new android.widget.CheckBox(container.$context());
-    Checked(false);
-    initToggle();
-  }
+    /**
+     * Creates a new CheckBox component.
+     *
+     * @param container container, component will be placed in
+     */
+    public CheckBox(ComponentContainer container) {
+        super(container);
+        view = new android.widget.CheckBox(container.$context());
+        Checked(false);
+        initToggle();
+    }
 
-  /**
-   * Set to `true`{:.logic.block} if the box is checked, `false`{:.logic.block} otherwise.
-   *
-   * @return  {@code true} indicates checked, {@code false} unchecked
-   */
+    /**
+     * Set to `true`{:.logic.block} if the box is checked, `false`{:.logic.block} otherwise.
+     *
+     * @return {@code true} indicates checked, {@code false} unchecked
+     */
   /* @SimpleProperty(
       category = PropertyCategory.BEHAVIOR,
       description = "True if the box is checked, false otherwise.") */
-  public boolean Checked() {
-    return view.isChecked();
-  }
+    public boolean Checked() {
+        return view.isChecked();
+    }
 
-  /**
-   * Checked property setter method.
-   *
-   * @suppressdoc
-   * @param value  {@code true} indicates checked, {@code false} unchecked
-   */
+    /**
+     * Checked property setter method.
+     *
+     * @param value {@code true} indicates checked, {@code false} unchecked
+     * @suppressdoc
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "False") */
-  /* @SimpleProperty
-   */public void Checked(boolean value) {
-    view.setChecked(value);
-    view.invalidate();
-  }
+    /* @SimpleProperty
+     */
+    public void Checked(boolean value) {
+        view.setChecked(value);
+        view.invalidate();
+    }
 
 }

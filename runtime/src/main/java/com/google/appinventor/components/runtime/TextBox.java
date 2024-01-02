@@ -18,27 +18,27 @@ import android.widget.EditText;
 
 /**
  * Users enter text in a text box component.
- *
+ * <p>
  * ![Example of a TextBox](images/textbox.png)
- *
+ * <p>
  * The initial or user-entered text value in a text box component is in the {@link #Text(String)}
  * property. If {@link #Text()} is blank, you can use the {@link #Hint(String)} property to provide
  * the user with a suggestion of what to type. The {@link #Hint()} appears as faint text in the box.
- *
+ * <p>
  * The {@link #MultiLine(boolean)} property determines if the text can have more than one line.
  * For a single line text box, the keyboard will close automatically when the user presses the Done
  * key. To close the keyboard for multiline text boxes, the app should use the
  * {@link #HideKeyboard()} method or rely on the user to press the Back key.
- *
+ * <p>
  * The {@link #NumbersOnly(boolean)} property restricts the keyboard to accept numeric input only.
- *
+ * <p>
  * Other properties affect the appearance of the text box
  * ({@link #TextAlignment(int)}, {@link #BackgroundColor(int)}, etc.) and whether it can be used
  * ({@link #Enabled(boolean)}).
- *
+ * <p>
  * Text boxes are usually used with the {@link Button} component, with the user clicking on the
  * `Button` when text entry is complete.
- *
+ * <p>
  * If the text entered by the user should not be displayed, use {@link PasswordTextBox} instead.
  *
  * @author sharon@google.com (Sharon Perl)
@@ -89,99 +89,99 @@ import android.widget.EditText;
  }
 */
 
-  // If true, then accept numeric keyboard input only
-  private boolean acceptsNumbersOnly;
+    // If true, then accept numeric keyboard input only
+    private boolean acceptsNumbersOnly;
 
-  // If true, then text box is multiline
-  private boolean multiLine;
+    // If true, then text box is multiline
+    private boolean multiLine;
 
-  // If true, then text box is read-only
-  private boolean readOnly;
+    // If true, then text box is read-only
+    private boolean readOnly;
 
-  /**
-   * Creates a new TextBox component.
-   *
-   * @param container  container, component will be placed in
-   */
-  public TextBox(ComponentContainer container) {
-    super(container, new EditText(container.$context()));
-    NumbersOnly(false);
-    MultiLine(false);
-    ReadOnly(false);
+    /**
+     * Creates a new TextBox component.
+     *
+     * @param container container, component will be placed in
+     */
+    public TextBox(ComponentContainer container) {
+        super(container, new EditText(container.$context()));
+        NumbersOnly(false);
+        MultiLine(false);
+        ReadOnly(false);
 
-    // We need to set the IME options here.  Otherwise, Android's default
-    // behavior is that the action button will be Done or Next, depending on
-    // whether there is a next textbox on the screen,  That might be convenient,
-    // but it seems a little obscure to be the standard behavior for
-    // App Inventor.  Perhaps we could make that a property.
-    // This same line must be in to PasswordTextBox.  We could have put it into
-    // TextBoxBase, but we might later be adding
-    // other flavors of text boxes that might want their own defaults.
-    view.setImeOptions(EditorInfo.IME_ACTION_DONE);
-  }
+        // We need to set the IME options here.  Otherwise, Android's default
+        // behavior is that the action button will be Done or Next, depending on
+        // whether there is a next textbox on the screen,  That might be convenient,
+        // but it seems a little obscure to be the standard behavior for
+        // App Inventor.  Perhaps we could make that a property.
+        // This same line must be in to PasswordTextBox.  We could have put it into
+        // TextBoxBase, but we might later be adding
+        // other flavors of text boxes that might want their own defaults.
+        view.setImeOptions(EditorInfo.IME_ACTION_DONE);
+    }
 
-  /**
-   * NumbersOnly property getter method.
-   *
-   * @return {@code true} indicates that the textbox accepts numbers only, {@code false} indicates
-   *         that it accepts any text
-   */
+    /**
+     * NumbersOnly property getter method.
+     *
+     * @return {@code true} indicates that the textbox accepts numbers only, {@code false} indicates
+     * that it accepts any text
+     */
   /* @SimpleProperty(
       category = PropertyCategory.BEHAVIOR,
       description = "If true, then this text box accepts only numbers as keyboard input.  " +
       "Numbers can include a decimal point and an optional leading minus sign.  " +
       "This applies to keyboard input only.  Even if NumbersOnly is true, you " +
       "can use [set Text to] to enter any text at all.") */
-  public boolean NumbersOnly() {
-    return acceptsNumbersOnly;
-  }
+    public boolean NumbersOnly() {
+        return acceptsNumbersOnly;
+    }
 
-  /**
-   * If true, then this `%type%`` accepts only numbers as keyboard input. Numbers can include a
-   * decimal point and an optional leading minus sign. This applies to keyboard input only. Even
-   * if `NumbersOnly` is true, you can set the text to anything at all using the
-   * {@link #Text(String)} property.
-   *
-   * @param acceptsNumbersOnly {@code true} restricts input to numeric,
-   * {@code false} allows any text
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /**
+     * If true, then this `%type%`` accepts only numbers as keyboard input. Numbers can include a
+     * decimal point and an optional leading minus sign. This applies to keyboard input only. Even
+     * if `NumbersOnly` is true, you can set the text to anything at all using the
+     * {@link #Text(String)} property.
+     *
+     * @param acceptsNumbersOnly {@code true} restricts input to numeric,
+     *                           {@code false} allows any text
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
   /* @SimpleProperty(
       description = "If true, then this text box accepts only numbers as keyboard input.  " +
       "Numbers can include a decimal point and an optional leading minus sign.  " +
       "This applies to keyboard input only.  Even if NumbersOnly is true, you " +
       "can use [set Text to] to enter any text at all.") */
-  public void NumbersOnly(boolean acceptsNumbersOnly) {
-    if (acceptsNumbersOnly) {
-      view.setInputType(
-          InputType.TYPE_CLASS_NUMBER |
-          InputType.TYPE_NUMBER_FLAG_SIGNED |
-          InputType.TYPE_NUMBER_FLAG_DECIMAL);
-    } else {
-      view.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+    public void NumbersOnly(boolean acceptsNumbersOnly) {
+        if (acceptsNumbersOnly) {
+            view.setInputType(
+                    InputType.TYPE_CLASS_NUMBER |
+                            InputType.TYPE_NUMBER_FLAG_SIGNED |
+                            InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        } else {
+            view.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        }
+        this.acceptsNumbersOnly = acceptsNumbersOnly;
     }
-    this.acceptsNumbersOnly = acceptsNumbersOnly;
-  }
 
-  /**
-   * Hide the keyboard. Only multiline text boxes need this. Single line text boxes close the
-   * keyboard when the users presses the Done key.
-   */
+    /**
+     * Hide the keyboard. Only multiline text boxes need this. Single line text boxes close the
+     * keyboard when the users presses the Done key.
+     */
   /* @SimpleFunction(
       description = "Hide the keyboard.  Only multiline text boxes need this. " +
       "Single line text boxes close the keyboard when the users presses the Done key.") */
-  public void HideKeyboard() {
-    InputMethodManager imm =
-      (InputMethodManager) container.$context().getSystemService(Context.INPUT_METHOD_SERVICE);
-    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-  }
+    public void HideKeyboard() {
+        InputMethodManager imm =
+                (InputMethodManager) container.$context().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
-  /**
-   * Multi line property getter method.
-   *
-   * @return {@code true} indicates that the textbox accepts multiple lines
-   *         {@code false} lines that the textbox  accepts only a single line of input,
-   */
+    /**
+     * Multi line property getter method.
+     *
+     * @return {@code true} indicates that the textbox accepts multiple lines
+     * {@code false} lines that the textbox  accepts only a single line of input,
+     */
   /* @SimpleProperty(
       category = PropertyCategory.BEHAVIOR,
       description = "If true, then this text box accepts multiple lines of input, which are " +
@@ -189,51 +189,53 @@ import android.widget.EditText;
                     "key instead of a return key, and pressing Done hides the keyboard.  " +
                     "The app should call the HideKeyboard method to hide the keyboard for " +
                     "a mutiline text box.") */
-  public boolean MultiLine() {
-    return multiLine;
-  }
+    public boolean MultiLine() {
+        return multiLine;
+    }
 
-  /**
-   * If true, then this `%type%` accepts multiple lines of input, which are entered using the
-   * return key. For single line text boxes there is a Done key instead of a return key, and
-   * pressing Done hides the keyboard. The app should call the HideKeyboard method to hide the
-   * keyboard for a mutiline text box.
-   *
-   * @param multiLine {@code true} lets to textbox accept multiple lines of input
-   * {@code false} restricts the textbox to only a single line
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
-  /* @SimpleProperty() */
-  public void MultiLine(boolean multiLine) {
-    this.multiLine = multiLine;
-    view.setSingleLine(!multiLine);
-  }
+    /**
+     * If true, then this `%type%` accepts multiple lines of input, which are entered using the
+     * return key. For single line text boxes there is a Done key instead of a return key, and
+     * pressing Done hides the keyboard. The app should call the HideKeyboard method to hide the
+     * keyboard for a mutiline text box.
+     *
+     * @param multiLine {@code true} lets to textbox accept multiple lines of input
+     *                  {@code false} restricts the textbox to only a single line
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty() */
+    public void MultiLine(boolean multiLine) {
+        this.multiLine = multiLine;
+        view.setSingleLine(!multiLine);
+    }
 
-  /* @SimpleProperty(
-    category = PropertyCategory.BEHAVIOR,
-    description = "Whether the %type% is read-only. By default, this is false."
-  ) */
-  public boolean ReadOnly() {
-    return readOnly;
-  }
+    /* @SimpleProperty(
+      category = PropertyCategory.BEHAVIOR,
+      description = "Whether the %type% is read-only. By default, this is false."
+    ) */
+    public boolean ReadOnly() {
+        return readOnly;
+    }
 
-  /**
-   * Whether the %type% is read-only. By default, this is `false`{:.logic.block}.
-   * @param readOnly
-   */
+    /**
+     * Whether the %type% is read-only. By default, this is `false`{:.logic.block}.
+     *
+     * @param readOnly
+     */
   /* @DesignerProperty(
     editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
     defaultValue = "False"
   ) */
-  /* @SimpleProperty
-   */public void ReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-    view.setEnabled(!readOnly);
-  }
+    /* @SimpleProperty
+     */
+    public void ReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+        view.setEnabled(!readOnly);
+    }
 
-  // TODO(halabelson): We might also want a method to show the keyboard.
-  // Currently the text box keyboard will open when the text field becomes
-  // active, and that may be the best simple thing.  If we implement show keyboard,
-  // note that showSoftInputFromWindow seems to open the keyboard only if it
-  // has been previously opened and closed.
-  }
+    // TODO(halabelson): We might also want a method to show the keyboard.
+    // Currently the text box keyboard will open when the text field becomes
+    // active, and that may be the best simple thing.  If we implement show keyboard,
+    // note that showSoftInputFromWindow seems to open the keyboard only if it
+    // has been previously opened and closed.
+}

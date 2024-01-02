@@ -11,7 +11,6 @@ package com.google.appinventor.components.runtime.errors;
  * into a value of another type, e.g. the String "foo" into an Integer, but
  * also converting from a base type to a derived type where there is no
  * relationship.
- *
  */
 /* @SimpleObject
  */public class ConversionError extends RuntimeError {

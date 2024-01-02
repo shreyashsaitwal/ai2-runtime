@@ -12,30 +12,30 @@ import java.util.Map;
  * Defines a TransportMethod type used by the Navigation component.
  */
 public enum TransportMethod implements OptionList<String> {
-  Foot("foot-walking"),
-  Car("driving-car"),
-  Bicycle("cycling-regular"),
-  Wheelchair("wheelchair");
+    Foot("foot-walking"),
+    Car("driving-car"),
+    Bicycle("cycling-regular"),
+    Wheelchair("wheelchair");
 
-  private final String value;
+    private static final Map<String, TransportMethod> lookup = new HashMap<>();
 
-  TransportMethod(String value) {
-    this.value = value;
-  }
-
-  public String toUnderlyingValue() {
-    return value;
-  }
-
-  private static final Map<String, TransportMethod> lookup = new HashMap<>();
-
-  static {
-    for (TransportMethod method : TransportMethod.values()) {
-      lookup.put(method.toUnderlyingValue(), method);
+    static {
+        for (TransportMethod method : TransportMethod.values()) {
+            lookup.put(method.toUnderlyingValue(), method);
+        }
     }
-  }
 
-  public static TransportMethod fromUnderlyingValue(String method) {
-    return lookup.get(method);
-  }
+    private final String value;
+
+    TransportMethod(String value) {
+        this.value = value;
+    }
+
+    public static TransportMethod fromUnderlyingValue(String method) {
+        return lookup.get(method);
+    }
+
+    public String toUnderlyingValue() {
+        return value;
+    }
 }

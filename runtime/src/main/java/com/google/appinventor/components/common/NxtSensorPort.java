@@ -12,37 +12,37 @@ import java.util.Map;
  * Defines a NxtSensorPort type used by the NxtDirectCommands component.
  */
 public enum NxtSensorPort implements OptionList<String> {
-  Port1("1", 0),
-  Port2("2", 1),
-  Port3("3", 2),
-  Port4("4", 3);
+    Port1("1", 0),
+    Port2("2", 1),
+    Port3("3", 2),
+    Port4("4", 3);
 
-  private final String value;
-  private final int intValue;
+    private static final Map<String, NxtSensorPort> lookup = new HashMap<>();
 
-  NxtSensorPort(String port, int intPort) {
-    this.value = port;
-    this.intValue = intPort;
-  }
-
-  public String toUnderlyingValue() {
-    return value;
-  }
-
-  public Integer toInt() {
-    return intValue;
-  }
-
-  private static final Map<String, NxtSensorPort> lookup = new HashMap<>();
-
-  static {
-    for (NxtSensorPort port : NxtSensorPort.values()) {
-      lookup.put(port.toUnderlyingValue(), port);
+    static {
+        for (NxtSensorPort port : NxtSensorPort.values()) {
+            lookup.put(port.toUnderlyingValue(), port);
+        }
     }
-  }
 
-  public static NxtSensorPort fromUnderlyingValue(String port) {
-    return lookup.get(port);
-  }
+    private final String value;
+    private final int intValue;
+
+    NxtSensorPort(String port, int intPort) {
+        this.value = port;
+        this.intValue = intPort;
+    }
+
+    public static NxtSensorPort fromUnderlyingValue(String port) {
+        return lookup.get(port);
+    }
+
+    public String toUnderlyingValue() {
+        return value;
+    }
+
+    public Integer toInt() {
+        return intValue;
+    }
 }
 

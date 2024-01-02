@@ -9,34 +9,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum LineType implements OptionList<Integer> {
-  Linear(0),
-  Curved(1),
-  Stepped(2);
+    Linear(0),
+    Curved(1),
+    Stepped(2);
 
-  private static final Map<Integer, LineType> LOOKUP = new HashMap<>();
+    private static final Map<Integer, LineType> LOOKUP = new HashMap<>();
 
-  static {
-    for (LineType type : values()) {
-      LOOKUP.put(type.toUnderlyingValue(), type);
+    static {
+        for (LineType type : values()) {
+            LOOKUP.put(type.toUnderlyingValue(), type);
+        }
     }
-  }
 
-  private final int value;
+    private final int value;
 
-  LineType(int value) {
-    this.value = value;
-  }
+    LineType(int value) {
+        this.value = value;
+    }
 
-  @Override
-  public Integer toUnderlyingValue() {
-    return value;
-  }
+    public static LineType fromUnderlyingValue(Integer value) {
+        return LOOKUP.get(value);
+    }
 
-  public static LineType fromUnderlyingValue(Integer value) {
-    return LOOKUP.get(value);
-  }
+    public static LineType fromUnderlyingValue(String value) {
+        return fromUnderlyingValue(Integer.parseInt(value));
+    }
 
-  public static LineType fromUnderlyingValue(String value) {
-    return fromUnderlyingValue(Integer.parseInt(value));
-  }
+    @Override
+    public Integer toUnderlyingValue() {
+        return value;
+    }
 }

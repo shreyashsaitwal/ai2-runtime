@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * ![NXT component icon](images/legoMindstormsNxt.png)
- *
+ * <p>
  * A component that provides a high-level interface to a color sensor on a LEGO
  * MINDSTORMS NXT robot.
  *
@@ -35,152 +35,148 @@ import java.util.Map;
 /* @SimpleObject
  */public class NxtColorSensor extends LegoMindstormsNxtSensor implements Deleteable {
 
-  private enum State { UNKNOWN, BELOW_RANGE, WITHIN_RANGE, ABOVE_RANGE }
-  private static final String DEFAULT_SENSOR_PORT = "3";
-  private static final int DEFAULT_BOTTOM_OF_RANGE = 256;
-  private static final int DEFAULT_TOP_OF_RANGE = 767;
+    private static final String DEFAULT_SENSOR_PORT = "3";
+    private static final int DEFAULT_BOTTOM_OF_RANGE = 256;
+    private static final int DEFAULT_TOP_OF_RANGE = 767;
+    private static final Map<Integer, NxtSensorType> mapColorToSensorType;
+    private static final Map<Integer, Integer> mapSensorValueToColor;
 
-  private static final Map<Integer, NxtSensorType> mapColorToSensorType;
-  private static final Map<Integer, Integer> mapSensorValueToColor;
-  static {
-    mapColorToSensorType = new HashMap<Integer, NxtSensorType>();
-    mapColorToSensorType.put(Component.COLOR_RED, NxtSensorType.ColorRed);
-    mapColorToSensorType.put(Component.COLOR_GREEN, NxtSensorType.ColorGreen);
-    mapColorToSensorType.put(Component.COLOR_BLUE, NxtSensorType.ColorBlue);
-    mapColorToSensorType.put(Component.COLOR_NONE, NxtSensorType.ColorNone);
+    static {
+        mapColorToSensorType = new HashMap<Integer, NxtSensorType>();
+        mapColorToSensorType.put(Component.COLOR_RED, NxtSensorType.ColorRed);
+        mapColorToSensorType.put(Component.COLOR_GREEN, NxtSensorType.ColorGreen);
+        mapColorToSensorType.put(Component.COLOR_BLUE, NxtSensorType.ColorBlue);
+        mapColorToSensorType.put(Component.COLOR_NONE, NxtSensorType.ColorNone);
 
-    mapSensorValueToColor = new HashMap<Integer, Integer>();
-    mapSensorValueToColor.put(0x01, Component.COLOR_BLACK);
-    mapSensorValueToColor.put(0x02, Component.COLOR_BLUE);
-    mapSensorValueToColor.put(0x03, Component.COLOR_GREEN);
-    mapSensorValueToColor.put(0x04, Component.COLOR_YELLOW);
-    mapSensorValueToColor.put(0x05, Component.COLOR_RED);
-    mapSensorValueToColor.put(0x06, Component.COLOR_WHITE);
-  }
+        mapSensorValueToColor = new HashMap<Integer, Integer>();
+        mapSensorValueToColor.put(0x01, Component.COLOR_BLACK);
+        mapSensorValueToColor.put(0x02, Component.COLOR_BLUE);
+        mapSensorValueToColor.put(0x03, Component.COLOR_GREEN);
+        mapSensorValueToColor.put(0x04, Component.COLOR_YELLOW);
+        mapSensorValueToColor.put(0x05, Component.COLOR_RED);
+        mapSensorValueToColor.put(0x06, Component.COLOR_WHITE);
+    }
 
-  private boolean detectColor;
-  private Handler handler;
-  private final Runnable sensorReader;
+    private final Runnable sensorReader;
+    private boolean detectColor;
+    private Handler handler;
+    // Fields related to detecting color
+    private int previousColor;
+    private boolean colorChangedEventEnabled;
+    // Fields related to detecting light
+    private State previousState;
+    private int bottomOfRange;
+    private int topOfRange;
+    private boolean belowRangeEventEnabled;
+    private boolean withinRangeEventEnabled;
+    private boolean aboveRangeEventEnabled;
+    private int generateColor;
+    /**
+     * Creates a new NxtColorSensor component.
+     */
+    public NxtColorSensor(ComponentContainer container) {
+        super(container, "NxtColorSensor");
+        handler = new Handler();
+        previousState = State.UNKNOWN;
+        previousColor = Component.COLOR_NONE;
+        sensorReader = new Runnable() {
+            public void run() {
+                if (bluetooth != null && bluetooth.IsConnected()) {
+                    if (detectColor) {
+                        // Detecting color
+                        SensorValue<Integer> sensorValue = getColorValue("");
+                        if (sensorValue.valid) {
+                            int currentColor = sensorValue.value;
 
-  // Fields related to detecting color
-  private int previousColor;
-  private boolean colorChangedEventEnabled;
+                            if (currentColor != previousColor) {
+                                ColorChanged(currentColor);
+                            }
 
-  // Fields related to detecting light
-  private State previousState;
-  private int bottomOfRange;
-  private int topOfRange;
-  private boolean belowRangeEventEnabled;
-  private boolean withinRangeEventEnabled;
-  private boolean aboveRangeEventEnabled;
-  private int generateColor;
+                            previousColor = currentColor;
+                        }
 
-  /**
-   * Creates a new NxtColorSensor component.
-   */
-  public NxtColorSensor(ComponentContainer container) {
-    super(container, "NxtColorSensor");
-    handler = new Handler();
-    previousState = State.UNKNOWN;
-    previousColor = Component.COLOR_NONE;
-    sensorReader = new Runnable() {
-      public void run() {
-        if (bluetooth != null && bluetooth.IsConnected()) {
-          if (detectColor) {
-            // Detecting color
-            SensorValue<Integer> sensorValue = getColorValue("");
-            if (sensorValue.valid) {
-              int currentColor = sensorValue.value;
+                    } else {
+                        // Detecting light
+                        SensorValue<Integer> sensorValue = getLightValue("");
+                        if (sensorValue.valid) {
+                            State currentState;
+                            if (sensorValue.value < bottomOfRange) {
+                                currentState = State.BELOW_RANGE;
+                            } else if (sensorValue.value > topOfRange) {
+                                currentState = State.ABOVE_RANGE;
+                            } else {
+                                currentState = State.WITHIN_RANGE;
+                            }
 
-              if (currentColor != previousColor) {
-                ColorChanged(currentColor);
-              }
+                            if (currentState != previousState) {
+                                if (currentState == State.BELOW_RANGE && belowRangeEventEnabled) {
+                                    BelowRange();
+                                }
+                                if (currentState == State.WITHIN_RANGE && withinRangeEventEnabled) {
+                                    WithinRange();
+                                }
+                                if (currentState == State.ABOVE_RANGE && aboveRangeEventEnabled) {
+                                    AboveRange();
+                                }
+                            }
 
-              previousColor = currentColor;
+                            previousState = currentState;
+                        }
+                    }
+                }
+                if (isHandlerNeeded()) {
+                    handler.post(sensorReader);
+                }
             }
+        };
 
-          } else {
-            // Detecting light
-            SensorValue<Integer> sensorValue = getLightValue("");
-            if (sensorValue.valid) {
-              State currentState;
-              if (sensorValue.value < bottomOfRange) {
-                currentState = State.BELOW_RANGE;
-              } else if (sensorValue.value > topOfRange) {
-                currentState = State.ABOVE_RANGE;
-              } else {
-                currentState = State.WITHIN_RANGE;
-              }
+        SensorPort(DEFAULT_SENSOR_PORT);
 
-              if (currentState != previousState) {
-                if (currentState == State.BELOW_RANGE && belowRangeEventEnabled) {
-                  BelowRange();
-                }
-                if (currentState == State.WITHIN_RANGE && withinRangeEventEnabled) {
-                  WithinRange();
-                }
-                if (currentState == State.ABOVE_RANGE && aboveRangeEventEnabled) {
-                  AboveRange();
-                }
-              }
+        // Detecting color
+        DetectColor(true);
+        ColorChangedEventEnabled(false);
 
-              previousState = currentState;
-            }
-          }
-        }
-        if (isHandlerNeeded()) {
-          handler.post(sensorReader);
-        }
-      }
-    };
+        // Detecting light
+        BottomOfRange(DEFAULT_BOTTOM_OF_RANGE);
+        TopOfRange(DEFAULT_TOP_OF_RANGE);
+        BelowRangeEventEnabled(false);
+        WithinRangeEventEnabled(false);
+        AboveRangeEventEnabled(false);
+        GenerateColor(Component.COLOR_NONE);
+    }
 
-    SensorPort(DEFAULT_SENSOR_PORT);
+    @Override
+    protected void initializeSensor(String functionName) {
+        NxtSensorType sensorType = detectColor
+                ? NxtSensorType.ColorFull :
+                mapColorToSensorType.get(generateColor);
+        setInputMode(functionName, port, sensorType, NxtSensorMode.Raw);
+        resetInputScaledValue(functionName, port);
+    }
 
-    // Detecting color
-    DetectColor(true);
-    ColorChangedEventEnabled(false);
-
-    // Detecting light
-    BottomOfRange(DEFAULT_BOTTOM_OF_RANGE);
-    TopOfRange(DEFAULT_TOP_OF_RANGE);
-    BelowRangeEventEnabled(false);
-    WithinRangeEventEnabled(false);
-    AboveRangeEventEnabled(false);
-    GenerateColor(Component.COLOR_NONE);
-  }
-
-  @Override
-  protected void initializeSensor(String functionName) {
-    NxtSensorType sensorType = detectColor
-        ? NxtSensorType.ColorFull :
-        mapColorToSensorType.get(generateColor);
-    setInputMode(functionName, port, sensorType, NxtSensorMode.Raw);
-    resetInputScaledValue(functionName, port);
-  }
-
-  /**
-   * Specifies the sensor port that the sensor is connected to.
-   * **Must be set in the Designer.**
-   */
+    /**
+     * Specifies the sensor port that the sensor is connected to.
+     * **Must be set in the Designer.**
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_SENSOR_PORT,
       defaultValue = DEFAULT_SENSOR_PORT) */
-  /* @SimpleProperty(userVisible = false) */
-  public void SensorPort(String sensorPortLetter) {
-    setSensorPort(sensorPortLetter);
-  }
+    /* @SimpleProperty(userVisible = false) */
+    public void SensorPort(String sensorPortLetter) {
+        setSensorPort(sensorPortLetter);
+    }
 
-  /**
-   * Returns whether the sensor should detect color or light. True indicates that
-   * the sensor should detect color; False indicates that the sensor should
-   * detect light.
-   *
-   * The ColorChanged event will not occur if the DetectColor property is set
-   * to False.
-   * The BelowRange, WithinRange, and AboveRange events will not occur if the
-   * DetectColor property is set to True.
-   * The sensor will not generate color when the DetectColor property is set to
-   * True.
-   */
+    /**
+     * Returns whether the sensor should detect color or light. True indicates that
+     * the sensor should detect color; False indicates that the sensor should
+     * detect light.
+     * <p>
+     * The ColorChanged event will not occur if the DetectColor property is set
+     * to False.
+     * The BelowRange, WithinRange, and AboveRange events will not occur if the
+     * DetectColor property is set to True.
+     * The sensor will not generate color when the DetectColor property is set to
+     * True.
+     */
   /* @SimpleProperty(description = "Whether the sensor should detect color or light. " +
       "True indicates that the sensor should detect color; False indicates that the sensor " +
       "should detect light. " +
@@ -188,370 +184,380 @@ import java.util.Map;
       "events will not occur and the sensor will not generate color. " +
       "If the DetectColor property is set to False, the ColorChanged event will not occur.",
       category = PropertyCategory.BEHAVIOR) */
-  public boolean DetectColor() {
-    return detectColor;
-  }
+    public boolean DetectColor() {
+        return detectColor;
+    }
 
-  /**
-   * Specifies whether the sensor should detect color light. True indicates
-   * that the sensor should detect color; False indicates that the sensor
-   * should detect light.
-   */
+    /**
+     * Specifies whether the sensor should detect color light. True indicates
+     * that the sensor should detect color; False indicates that the sensor
+     * should detect light.
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
       defaultValue = "True") */
-  /* @SimpleProperty
-   */public void DetectColor(boolean detectColor) {
-    boolean handlerWasNeeded = isHandlerNeeded();
+    /* @SimpleProperty
+     */
+    public void DetectColor(boolean detectColor) {
+        boolean handlerWasNeeded = isHandlerNeeded();
 
-    this.detectColor = detectColor;
-    if (bluetooth != null && bluetooth.IsConnected()) {
-      initializeSensor("DetectColor");
-    }
-
-    boolean handlerIsNeeded = isHandlerNeeded();
-    if (handlerWasNeeded && !handlerIsNeeded) {
-      handler.removeCallbacks(sensorReader);
-    }
-    previousColor = Component.COLOR_NONE;
-    previousState = State.UNKNOWN;
-    if (!handlerWasNeeded && handlerIsNeeded) {
-      handler.post(sensorReader);
-    }
-  }
-
-  // Methods for detecting color
-
-  /* @SimpleFunction(description = "Returns the current detected color, or the color None if the " +
-      "color can not be read or if the DetectColor property is set to False.") */
-  public int GetColor() {
-    String functionName = "GetColor";
-    if (!checkBluetooth(functionName)) {
-      return Component.COLOR_NONE;
-    }
-    if (!detectColor) {
-      form.dispatchErrorOccurredEvent(this, functionName,
-          ErrorMessages.ERROR_NXT_CANNOT_DETECT_COLOR);
-      return Component.COLOR_NONE;
-    }
-
-    SensorValue<Integer> sensorValue = getColorValue(functionName);
-    if (sensorValue.valid) {
-      return sensorValue.value;
-    }
-
-    // invalid response
-    return Component.COLOR_NONE;
-  }
-
-  private SensorValue<Integer> getColorValue(String functionName) {
-    byte[] returnPackage = getInputValues(functionName, port);
-    if (returnPackage != null) {
-      boolean valid = getBooleanValueFromBytes(returnPackage, 4);
-      if (valid) {
-        int scaledValue = getSWORDValueFromBytes(returnPackage, 12);
-        if (mapSensorValueToColor.containsKey(scaledValue)) {
-          int color = mapSensorValueToColor.get(scaledValue);
-          return new SensorValue<Integer>(true, color);
+        this.detectColor = detectColor;
+        if (bluetooth != null && bluetooth.IsConnected()) {
+            initializeSensor("DetectColor");
         }
-      }
+
+        boolean handlerIsNeeded = isHandlerNeeded();
+        if (handlerWasNeeded && !handlerIsNeeded) {
+            handler.removeCallbacks(sensorReader);
+        }
+        previousColor = Component.COLOR_NONE;
+        previousState = State.UNKNOWN;
+        if (!handlerWasNeeded && handlerIsNeeded) {
+            handler.post(sensorReader);
+        }
     }
 
-    // invalid response
-    return new SensorValue<Integer>(false, null);
-  }
+    /* @SimpleFunction(description = "Returns the current detected color, or the color None if the " +
+        "color can not be read or if the DetectColor property is set to False.") */
+    public int GetColor() {
+        String functionName = "GetColor";
+        if (!checkBluetooth(functionName)) {
+            return Component.COLOR_NONE;
+        }
+        if (!detectColor) {
+            form.dispatchErrorOccurredEvent(this, functionName,
+                    ErrorMessages.ERROR_NXT_CANNOT_DETECT_COLOR);
+            return Component.COLOR_NONE;
+        }
 
-  /**
-   * Returns whether the ColorChanged event should fire when the DetectColor
-   * property is set to True and the detected color changes.
-   */
+        SensorValue<Integer> sensorValue = getColorValue(functionName);
+        if (sensorValue.valid) {
+            return sensorValue.value;
+        }
+
+        // invalid response
+        return Component.COLOR_NONE;
+    }
+
+    // Methods for detecting color
+
+    private SensorValue<Integer> getColorValue(String functionName) {
+        byte[] returnPackage = getInputValues(functionName, port);
+        if (returnPackage != null) {
+            boolean valid = getBooleanValueFromBytes(returnPackage, 4);
+            if (valid) {
+                int scaledValue = getSWORDValueFromBytes(returnPackage, 12);
+                if (mapSensorValueToColor.containsKey(scaledValue)) {
+                    int color = mapSensorValueToColor.get(scaledValue);
+                    return new SensorValue<Integer>(true, color);
+                }
+            }
+        }
+
+        // invalid response
+        return new SensorValue<Integer>(false, null);
+    }
+
+    /**
+     * Returns whether the ColorChanged event should fire when the DetectColor
+     * property is set to True and the detected color changes.
+     */
   /* @SimpleProperty(description = "Whether the ColorChanged event should fire when the DetectColor" +
       " property is set to True and the detected color changes.",
       category = PropertyCategory.BEHAVIOR) */
-  public boolean ColorChangedEventEnabled() {
-    return colorChangedEventEnabled;
-  }
-
-  /**
-   * Specifies whether the ColorChanged event should fire when the DetectColor
-   * property is set to True and the detected color changes
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
-  /* @SimpleProperty
-   */public void ColorChangedEventEnabled(boolean enabled) {
-    boolean handlerWasNeeded = isHandlerNeeded();
-
-    colorChangedEventEnabled = enabled;
-
-    boolean handlerIsNeeded = isHandlerNeeded();
-    if (handlerWasNeeded && !handlerIsNeeded) {
-      handler.removeCallbacks(sensorReader);
-    }
-    if (!handlerWasNeeded && handlerIsNeeded) {
-      previousColor = Component.COLOR_NONE;
-      handler.post(sensorReader);
-    }
-  }
-
-  /* @SimpleEvent(description = "Detected color has changed. " +
-      "The ColorChanged event will not occur if the DetectColor property is set to False or if " +
-      "the ColorChangedEventEnabled property is set to False.") */
-  public void ColorChanged(int color) {
-    EventDispatcher.dispatchEvent(this, "ColorChanged", color);
-  }
-
-  // Methods for detecting light
-
-  /* @SimpleFunction(description = "Returns the current light level as a value between 0 and 1023, " +
-      "or -1 if the light level can not be read or if the DetectColor property is set to True.") */
-  public int GetLightLevel() {
-    String functionName = "GetLightLevel";
-    if (!checkBluetooth(functionName)) {
-      return -1;
-    }
-    if (detectColor) {
-      form.dispatchErrorOccurredEvent(this, functionName,
-          ErrorMessages.ERROR_NXT_CANNOT_DETECT_LIGHT);
-      return -1;
+    public boolean ColorChangedEventEnabled() {
+        return colorChangedEventEnabled;
     }
 
-    SensorValue<Integer> sensorValue = getLightValue(functionName);
-    if (sensorValue.valid) {
-      return sensorValue.value;
+    /**
+     * Specifies whether the ColorChanged event should fire when the DetectColor
+     * property is set to True and the detected color changes
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
+    public void ColorChangedEventEnabled(boolean enabled) {
+        boolean handlerWasNeeded = isHandlerNeeded();
+
+        colorChangedEventEnabled = enabled;
+
+        boolean handlerIsNeeded = isHandlerNeeded();
+        if (handlerWasNeeded && !handlerIsNeeded) {
+            handler.removeCallbacks(sensorReader);
+        }
+        if (!handlerWasNeeded && handlerIsNeeded) {
+            previousColor = Component.COLOR_NONE;
+            handler.post(sensorReader);
+        }
     }
 
-    // invalid response
-    return -1;
-  }
-
-  private SensorValue<Integer> getLightValue(String functionName) {
-    byte[] returnPackage = getInputValues(functionName, port);
-    if (returnPackage != null) {
-      boolean valid = getBooleanValueFromBytes(returnPackage, 4);
-      if (valid) {
-        int normalizedValue = getUWORDValueFromBytes(returnPackage, 10);
-        return new SensorValue<Integer>(true, normalizedValue);
-      }
+    /* @SimpleEvent(description = "Detected color has changed. " +
+        "The ColorChanged event will not occur if the DetectColor property is set to False or if " +
+        "the ColorChangedEventEnabled property is set to False.") */
+    public void ColorChanged(int color) {
+        EventDispatcher.dispatchEvent(this, "ColorChanged", color);
     }
 
-    // invalid response
-    return new SensorValue<Integer>(false, null);
-  }
+    /* @SimpleFunction(description = "Returns the current light level as a value between 0 and 1023, " +
+        "or -1 if the light level can not be read or if the DetectColor property is set to True.") */
+    public int GetLightLevel() {
+        String functionName = "GetLightLevel";
+        if (!checkBluetooth(functionName)) {
+            return -1;
+        }
+        if (detectColor) {
+            form.dispatchErrorOccurredEvent(this, functionName,
+                    ErrorMessages.ERROR_NXT_CANNOT_DETECT_LIGHT);
+            return -1;
+        }
 
-  /**
-   * Returns the bottom of the range used for the BelowRange, WithinRange,
-   * and AboveRange events.
-   */
+        SensorValue<Integer> sensorValue = getLightValue(functionName);
+        if (sensorValue.valid) {
+            return sensorValue.value;
+        }
+
+        // invalid response
+        return -1;
+    }
+
+    // Methods for detecting light
+
+    private SensorValue<Integer> getLightValue(String functionName) {
+        byte[] returnPackage = getInputValues(functionName, port);
+        if (returnPackage != null) {
+            boolean valid = getBooleanValueFromBytes(returnPackage, 4);
+            if (valid) {
+                int normalizedValue = getUWORDValueFromBytes(returnPackage, 10);
+                return new SensorValue<Integer>(true, normalizedValue);
+            }
+        }
+
+        // invalid response
+        return new SensorValue<Integer>(false, null);
+    }
+
+    /**
+     * Returns the bottom of the range used for the BelowRange, WithinRange,
+     * and AboveRange events.
+     */
   /* @SimpleProperty(description = "The bottom of the range used for the BelowRange, WithinRange," +
       " and AboveRange events.",
       category = PropertyCategory.BEHAVIOR) */
-  public int BottomOfRange() {
-    return bottomOfRange;
-  }
+    public int BottomOfRange() {
+        return bottomOfRange;
+    }
 
-  /**
-   * Specifies the bottom of the range used for the BelowRange, WithinRange,
-   * and AboveRange events.
-   */
+    /**
+     * Specifies the bottom of the range used for the BelowRange, WithinRange,
+     * and AboveRange events.
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
       defaultValue = "" + DEFAULT_BOTTOM_OF_RANGE) */
-  /* @SimpleProperty
-   */public void BottomOfRange(int bottomOfRange) {
-    this.bottomOfRange = bottomOfRange;
-    previousState = State.UNKNOWN;
-  }
+    /* @SimpleProperty
+     */
+    public void BottomOfRange(int bottomOfRange) {
+        this.bottomOfRange = bottomOfRange;
+        previousState = State.UNKNOWN;
+    }
 
-  /**
-   * Returns the top of the range used for the BelowRange, WithinRange, and
-   * AboveRange events.
-   */
+    /**
+     * Returns the top of the range used for the BelowRange, WithinRange, and
+     * AboveRange events.
+     */
   /* @SimpleProperty(description = "The top of the range used for the BelowRange, WithinRange, and" +
       " AboveRange events.",
       category = PropertyCategory.BEHAVIOR) */
-  public int TopOfRange() {
-    return topOfRange;
-  }
+    public int TopOfRange() {
+        return topOfRange;
+    }
 
-  /**
-   * Specifies the top of the range used for the BelowRange, WithinRange, and
-   * AboveRange events.
-   */
+    /**
+     * Specifies the top of the range used for the BelowRange, WithinRange, and
+     * AboveRange events.
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
       defaultValue = "" + DEFAULT_TOP_OF_RANGE) */
-  /* @SimpleProperty
-   */public void TopOfRange(int topOfRange) {
-    this.topOfRange = topOfRange;
-    previousState = State.UNKNOWN;
-  }
+    /* @SimpleProperty
+     */
+    public void TopOfRange(int topOfRange) {
+        this.topOfRange = topOfRange;
+        previousState = State.UNKNOWN;
+    }
 
-  /**
-   * Returns whether the BelowRange event should fire when the DetectColor
-   * property is set to False and the light level goes below the BottomOfRange.
-   */
+    /**
+     * Returns whether the BelowRange event should fire when the DetectColor
+     * property is set to False and the light level goes below the BottomOfRange.
+     */
   /* @SimpleProperty(description = "Whether the BelowRange event should fire when the DetectColor" +
       " property is set to False and the light level goes below the BottomOfRange.",
       category = PropertyCategory.BEHAVIOR) */
-  public boolean BelowRangeEventEnabled() {
-    return belowRangeEventEnabled;
-  }
-
-  /**
-   * Specifies whether the BelowRange event should fire when the DetectColor
-   * property is set to False and the light level goes below the BottomOfRange.
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
-  /* @SimpleProperty
-   */public void BelowRangeEventEnabled(boolean enabled) {
-    boolean handlerWasNeeded = isHandlerNeeded();
-
-    belowRangeEventEnabled = enabled;
-
-    boolean handlerIsNeeded = isHandlerNeeded();
-    if (handlerWasNeeded && !handlerIsNeeded) {
-      handler.removeCallbacks(sensorReader);
+    public boolean BelowRangeEventEnabled() {
+        return belowRangeEventEnabled;
     }
-    if (!handlerWasNeeded && handlerIsNeeded) {
-      previousState = State.UNKNOWN;
-      handler.post(sensorReader);
+
+    /**
+     * Specifies whether the BelowRange event should fire when the DetectColor
+     * property is set to False and the light level goes below the BottomOfRange.
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
+    public void BelowRangeEventEnabled(boolean enabled) {
+        boolean handlerWasNeeded = isHandlerNeeded();
+
+        belowRangeEventEnabled = enabled;
+
+        boolean handlerIsNeeded = isHandlerNeeded();
+        if (handlerWasNeeded && !handlerIsNeeded) {
+            handler.removeCallbacks(sensorReader);
+        }
+        if (!handlerWasNeeded && handlerIsNeeded) {
+            previousState = State.UNKNOWN;
+            handler.post(sensorReader);
+        }
     }
-  }
 
-  /* @SimpleEvent(description = "Light level has gone below the range. " +
-      "The BelowRange event will not occur if the DetectColor property is set to True or if " +
-      "the BelowRangeEventEnabled property is set to False.") */
-  public void BelowRange() {
-    EventDispatcher.dispatchEvent(this, "BelowRange");
-  }
+    /* @SimpleEvent(description = "Light level has gone below the range. " +
+        "The BelowRange event will not occur if the DetectColor property is set to True or if " +
+        "the BelowRangeEventEnabled property is set to False.") */
+    public void BelowRange() {
+        EventDispatcher.dispatchEvent(this, "BelowRange");
+    }
 
-  /**
-   * Returns whether the WithinRange event should fire when the DetectColor
-   * property is set to False and the light level goes between the
-   * BottomOfRange and the TopOfRange.
-   */
+    /**
+     * Returns whether the WithinRange event should fire when the DetectColor
+     * property is set to False and the light level goes between the
+     * BottomOfRange and the TopOfRange.
+     */
   /* @SimpleProperty(description = "Whether the WithinRange event should fire when the DetectColor" +
       " property is set to False and the light level goes between the BottomOfRange and the " +
       "TopOfRange.",
       category = PropertyCategory.BEHAVIOR) */
-  public boolean WithinRangeEventEnabled() {
-    return withinRangeEventEnabled;
-  }
-
-  /**
-   * Specifies whether the WithinRange event should fire when the DetectColor
-   * property is set to False and the light level goes between the
-   * BottomOfRange and the TopOfRange.
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
-  /* @SimpleProperty
-   */public void WithinRangeEventEnabled(boolean enabled) {
-    boolean handlerWasNeeded = isHandlerNeeded();
-
-    withinRangeEventEnabled = enabled;
-
-    boolean handlerIsNeeded = isHandlerNeeded();
-    if (handlerWasNeeded && !handlerIsNeeded) {
-      handler.removeCallbacks(sensorReader);
+    public boolean WithinRangeEventEnabled() {
+        return withinRangeEventEnabled;
     }
-    if (!handlerWasNeeded && handlerIsNeeded) {
-      previousState = State.UNKNOWN;
-      handler.post(sensorReader);
+
+    /**
+     * Specifies whether the WithinRange event should fire when the DetectColor
+     * property is set to False and the light level goes between the
+     * BottomOfRange and the TopOfRange.
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
+    public void WithinRangeEventEnabled(boolean enabled) {
+        boolean handlerWasNeeded = isHandlerNeeded();
+
+        withinRangeEventEnabled = enabled;
+
+        boolean handlerIsNeeded = isHandlerNeeded();
+        if (handlerWasNeeded && !handlerIsNeeded) {
+            handler.removeCallbacks(sensorReader);
+        }
+        if (!handlerWasNeeded && handlerIsNeeded) {
+            previousState = State.UNKNOWN;
+            handler.post(sensorReader);
+        }
     }
-  }
 
-  /* @SimpleEvent(description = "Light level has gone within the range. " +
-      "The WithinRange event will not occur if the DetectColor property is set to True or if " +
-      "the WithinRangeEventEnabled property is set to False.") */
-  public void WithinRange() {
-    EventDispatcher.dispatchEvent(this, "WithinRange");
-  }
+    /* @SimpleEvent(description = "Light level has gone within the range. " +
+        "The WithinRange event will not occur if the DetectColor property is set to True or if " +
+        "the WithinRangeEventEnabled property is set to False.") */
+    public void WithinRange() {
+        EventDispatcher.dispatchEvent(this, "WithinRange");
+    }
 
-  /**
-   * Returns whether the AboveRange event should fire when the DetectColor
-   * property is set to False and the light level goes above the TopOfRange.
-   */
+    /**
+     * Returns whether the AboveRange event should fire when the DetectColor
+     * property is set to False and the light level goes above the TopOfRange.
+     */
   /* @SimpleProperty(description = "Whether the AboveRange event should fire when the DetectColor" +
       " property is set to False and the light level goes above the TopOfRange.",
       category = PropertyCategory.BEHAVIOR) */
-  public boolean AboveRangeEventEnabled() {
-    return aboveRangeEventEnabled;
-  }
-
-  /**
-   * Specifies whether the AboveRange event should fire when the DetectColor
-   * property is set to False and the light level goes above the TopOfRange.
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
-  /* @SimpleProperty
-   */public void AboveRangeEventEnabled(boolean enabled) {
-    boolean handlerWasNeeded = isHandlerNeeded();
-
-    aboveRangeEventEnabled = enabled;
-
-    boolean handlerIsNeeded = isHandlerNeeded();
-    if (handlerWasNeeded && !handlerIsNeeded) {
-      handler.removeCallbacks(sensorReader);
+    public boolean AboveRangeEventEnabled() {
+        return aboveRangeEventEnabled;
     }
-    if (!handlerWasNeeded && handlerIsNeeded) {
-      previousState = State.UNKNOWN;
-      handler.post(sensorReader);
+
+    /**
+     * Specifies whether the AboveRange event should fire when the DetectColor
+     * property is set to False and the light level goes above the TopOfRange.
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN, defaultValue = "False") */
+    /* @SimpleProperty
+     */
+    public void AboveRangeEventEnabled(boolean enabled) {
+        boolean handlerWasNeeded = isHandlerNeeded();
+
+        aboveRangeEventEnabled = enabled;
+
+        boolean handlerIsNeeded = isHandlerNeeded();
+        if (handlerWasNeeded && !handlerIsNeeded) {
+            handler.removeCallbacks(sensorReader);
+        }
+        if (!handlerWasNeeded && handlerIsNeeded) {
+            previousState = State.UNKNOWN;
+            handler.post(sensorReader);
+        }
     }
-  }
 
-  /* @SimpleEvent(description = "Light level has gone above the range. " +
-      "The AboveRange event will not occur if the DetectColor property is set to True or if " +
-      "the AboveRangeEventEnabled property is set to False.") */
-  public void AboveRange() {
-    EventDispatcher.dispatchEvent(this, "AboveRange");
-  }
+    /* @SimpleEvent(description = "Light level has gone above the range. " +
+        "The AboveRange event will not occur if the DetectColor property is set to True or if " +
+        "the AboveRangeEventEnabled property is set to False.") */
+    public void AboveRange() {
+        EventDispatcher.dispatchEvent(this, "AboveRange");
+    }
 
-  /**
-   * Returns the color that should generated by the sensor.
-   * Only None, Red, Green, or Blue are valid values.
-   * The sensor will not generate color when the DetectColor property is set to
-   * True.
-   */
+    /**
+     * Returns the color that should generated by the sensor.
+     * Only None, Red, Green, or Blue are valid values.
+     * The sensor will not generate color when the DetectColor property is set to
+     * True.
+     */
   /* @SimpleProperty(description = "The color that should generated by the sensor. " +
       "Only None, Red, Green, or Blue are valid values. " +
       "The sensor will not generate color when the DetectColor property is set to True.",
       category = PropertyCategory.BEHAVIOR) */
-  public int GenerateColor() {
-    return generateColor;
-  }
+    public int GenerateColor() {
+        return generateColor;
+    }
 
-  /**
-   * Specifies the color that should generated by the sensor.
-   * Only None, Red, Green, or Blue are valid values.
-   * The sensor will not generate color when the DetectColor property is set to
-   * True.
-   */
+    /**
+     * Specifies the color that should generated by the sensor.
+     * Only None, Red, Green, or Blue are valid values.
+     * The sensor will not generate color when the DetectColor property is set to
+     * True.
+     */
   /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_LEGO_NXT_GENERATED_COLOR,
   defaultValue = Component.DEFAULT_VALUE_COLOR_NONE) */
-  /* @SimpleProperty
-   */public void GenerateColor(int generateColor) {
-    String functionName = "GenerateColor";
-    if (mapColorToSensorType.containsKey(generateColor)) {
-      this.generateColor = generateColor;
-      if (bluetooth != null && bluetooth.IsConnected()) {
-        initializeSensor(functionName);
-      }
-    } else {
-      form.dispatchErrorOccurredEvent(this, functionName,
-          ErrorMessages.ERROR_NXT_INVALID_GENERATE_COLOR);
+    /* @SimpleProperty
+     */
+    public void GenerateColor(int generateColor) {
+        String functionName = "GenerateColor";
+        if (mapColorToSensorType.containsKey(generateColor)) {
+            this.generateColor = generateColor;
+            if (bluetooth != null && bluetooth.IsConnected()) {
+                initializeSensor(functionName);
+            }
+        } else {
+            form.dispatchErrorOccurredEvent(this, functionName,
+                    ErrorMessages.ERROR_NXT_INVALID_GENERATE_COLOR);
+        }
     }
-  }
 
-  private boolean isHandlerNeeded() {
-    if (detectColor) {
-      return colorChangedEventEnabled;
-    } else {
-      return belowRangeEventEnabled || withinRangeEventEnabled || aboveRangeEventEnabled;
+    private boolean isHandlerNeeded() {
+        if (detectColor) {
+            return colorChangedEventEnabled;
+        } else {
+            return belowRangeEventEnabled || withinRangeEventEnabled || aboveRangeEventEnabled;
+        }
     }
-  }
 
-  // Deleteable implementation
+    @Override
+    public void onDelete() {
+        handler.removeCallbacks(sensorReader);
+        super.onDelete();
+    }
 
-  @Override
-  public void onDelete() {
-    handler.removeCallbacks(sensorReader);
-    super.onDelete();
-  }
+    // Deleteable implementation
+
+    private enum State {UNKNOWN, BELOW_RANGE, WITHIN_RANGE, ABOVE_RANGE}
 }

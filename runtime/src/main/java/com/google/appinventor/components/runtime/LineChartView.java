@@ -14,22 +14,23 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 /**
  * Class for handling the UI (view) of the Line Chart for the Chart component.
+ *
  * @see com.google.appinventor.components.runtime.ChartView
  */
 public class LineChartView extends LineChartViewBase<LineChartView> {
-  /**
-   * Creates a new Line Chart View with the specified Chart component
-   * instance as the parent of the View.
-   *
-   * @param chartComponent  Chart component to link View to
-   */
-  public LineChartView(Chart chartComponent) {
-    super(chartComponent);
-  }
+    /**
+     * Creates a new Line Chart View with the specified Chart component
+     * instance as the parent of the View.
+     *
+     * @param chartComponent Chart component to link View to
+     */
+    public LineChartView(Chart chartComponent) {
+        super(chartComponent);
+    }
 
-  @Override
-  public ChartDataModel<Entry, ILineDataSet, LineData, LineChart, LineChartView>
-      createChartModel() {
-    return new LineChartDataModel(data, this);
-  }
+    @Override
+    public ChartDataModel<Entry, ILineDataSet, LineData, LineChart, LineChartView>
+    createChartModel() {
+        return new LineChartDataModel(data, this);
+    }
 }

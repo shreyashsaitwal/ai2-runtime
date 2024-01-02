@@ -30,16 +30,10 @@ import java.util.zip.ZipException;
  * Tools to build a quick partial crc of zip files.
  */
 final class ZipUtil {
-    static class CentralDirectory {
-        long offset;
-        long size;
-    }
-
     /* redefine those constant here because of bug 13721174 preventing to compile using the
      * constants defined in ZipFile */
     private static final int ENDHDR = 22;
     private static final int ENDSIG = 0x6054b50;
-
     /**
      * Size of reading buffers.
      */
@@ -121,5 +115,10 @@ final class ZipUtil {
             length = raf.read(buffer, 0, length);
         }
         return crc.getValue();
+    }
+
+    static class CentralDirectory {
+        long offset;
+        long size;
     }
 }

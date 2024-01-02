@@ -11,5 +11,5 @@ import android.content.Intent;
  */
 
 public interface OnNewIntentListener {
-  public void onNewIntent(Intent intent);
+    public void onNewIntent(Intent intent);
 }

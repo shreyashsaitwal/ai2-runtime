@@ -26,22 +26,22 @@ import android.content.Context;
  * <li>Have your {@link Application} extends this class.</li>
  * <li>Have your {@link Application} override attachBaseContext starting with<br>
  * <code>
-  protected void attachBaseContext(Context base) {<br>
-    super.attachBaseContext(base);<br>
-    MultiDex.install(this);
-    </code></li>
+ * protected void attachBaseContext(Context base) {<br>
+ * super.attachBaseContext(base);<br>
+ * MultiDex.install(this);
+ * </code></li>
  *   <ul>
  */
 public class MultiDexApplication extends Application {
 
-  public static boolean installed = false;
+    public static boolean installed = false;
 
-  @Override
-  protected void attachBaseContext(Context base) {
-    super.attachBaseContext(base);
-    // Note: We call this with "true" which will force the
-    // full installation of the secondary dex files, including
-    // running the expensive DexOpt code
-    MultiDex.install(this, true);
-  }
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        // Note: We call this with "true" which will force the
+        // full installation of the secondary dex files, including
+        // running the expensive DexOpt code
+        MultiDex.install(this, true);
+    }
 }

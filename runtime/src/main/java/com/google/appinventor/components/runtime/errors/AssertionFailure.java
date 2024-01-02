@@ -8,23 +8,22 @@ package com.google.appinventor.components.runtime.errors;
 
 /**
  * Runtime error indicating an assert failure.
- *
  */
 /* @SimpleObject
  */public class AssertionFailure extends RuntimeError {
-  /**
-   * Creates a new error
-   */
-  public AssertionFailure() {
-    super();
-  }
+    /**
+     * Creates a new error
+     */
+    public AssertionFailure() {
+        super();
+    }
 
-  /**
-   * Creates a new error
-   *
-   * @param msg descriptive message
-   */
-  public AssertionFailure(String msg) {
-    super(msg);
-  }
+    /**
+     * Creates a new error
+     *
+     * @param msg descriptive message
+     */
+    public AssertionFailure(String msg) {
+        super(msg);
+    }
 }

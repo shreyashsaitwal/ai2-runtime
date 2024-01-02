@@ -14,7 +14,7 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
 
 /**
  * ![EV3 component icon](images/legoMindstormsEv3.png)
- *
+ * <p>
  * A component that provides a high-level interface to a LEGO MINDSTORMS EV3
  * robot, which provides sound functionalities.
  *
@@ -29,49 +29,49 @@ import com.google.appinventor.components.runtime.util.Ev3Constants;
                    iconName = "images//legoMindstormsEv3.png") */
 /* @SimpleObject
  */public class Ev3Sound extends LegoMindstormsEv3Base {
-  /**
-   * Creates a new Ev3Sound component.
-   */
-  public Ev3Sound(ComponentContainer container) {
-    super(container, "Ev3Sound");
-  }
-
-  /**
-   * Make the robot play a tone.
-   */
-  /* @SimpleFunction(description = "Make the robot play a tone.") */
-  public void PlayTone(int volume, int frequency, int milliseconds) {
-    String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
-
-    if (volume < 0 || volume > 100 || frequency < 250 || frequency > 10000 || milliseconds < 0 || milliseconds > 0xffff) {
-      form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
-      return;
+    /**
+     * Creates a new Ev3Sound component.
+     */
+    public Ev3Sound(ComponentContainer container) {
+        super(container, "Ev3Sound");
     }
 
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.SOUND,
-                                                         true,
-                                                         0,
-                                                         0,
-                                                         "cccc",
-                                                         (byte) Ev3Constants.SoundSubcode.TONE,
-                                                         (byte) volume,
-                                                         (short) frequency,
-                                                         (short) milliseconds);
-    sendCommand(functionName, command, true);
-  }
+    /**
+     * Make the robot play a tone.
+     */
+    /* @SimpleFunction(description = "Make the robot play a tone.") */
+    public void PlayTone(int volume, int frequency, int milliseconds) {
+        String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
 
-  /**
-   * Stop any sound on the robot.
-   */
-  /* @SimpleFunction(description = "Stop any sound on the robot.") */
-  public void StopSound() {
-    String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
-    byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.SOUND,
-                                                         false,
-                                                         0,
-                                                         0,
-                                                         "c",
-                                                         Ev3Constants.SoundSubcode.BREAK);
-    sendCommand(functionName, command, false);
-  }
+        if (volume < 0 || volume > 100 || frequency < 250 || frequency > 10000 || milliseconds < 0 || milliseconds > 0xffff) {
+            form.dispatchErrorOccurredEvent(this, functionName, ErrorMessages.ERROR_EV3_ILLEGAL_ARGUMENT, functionName);
+            return;
+        }
+
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.SOUND,
+                true,
+                0,
+                0,
+                "cccc",
+                (byte) Ev3Constants.SoundSubcode.TONE,
+                (byte) volume,
+                (short) frequency,
+                (short) milliseconds);
+        sendCommand(functionName, command, true);
+    }
+
+    /**
+     * Stop any sound on the robot.
+     */
+    /* @SimpleFunction(description = "Stop any sound on the robot.") */
+    public void StopSound() {
+        String functionName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        byte[] command = Ev3BinaryParser.encodeDirectCommand(Ev3Constants.Opcode.SOUND,
+                false,
+                0,
+                0,
+                "c",
+                Ev3Constants.SoundSubcode.BREAK);
+        sendCommand(functionName, command, false);
+    }
 }

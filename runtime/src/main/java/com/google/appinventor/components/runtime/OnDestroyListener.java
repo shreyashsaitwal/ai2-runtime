@@ -13,5 +13,5 @@ package com.google.appinventor.components.runtime;
  * @author lizlooney@google.com (Liz Looney)
  */
 public interface OnDestroyListener {
-  public void onDestroy();
+    public void onDestroy();
 }

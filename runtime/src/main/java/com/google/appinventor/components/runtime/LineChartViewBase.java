@@ -19,21 +19,21 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
  * @see com.google.appinventor.components.runtime.ChartView
  */
 public abstract class LineChartViewBase<V extends LineChartViewBase<V>> extends PointChartView<
-    Entry, ILineDataSet, LineData, LineChart, V> {
-  /**
-   * Creates a new Line Chart Base View with the specified Chart component
-   * instance as the parent of the View.
-   *
-   * @param chartComponent  Chart component to link View to
-   */
-  protected LineChartViewBase(Chart chartComponent) {
-    super(chartComponent);
+        Entry, ILineDataSet, LineData, LineChart, V> {
+    /**
+     * Creates a new Line Chart Base View with the specified Chart component
+     * instance as the parent of the View.
+     *
+     * @param chartComponent Chart component to link View to
+     */
+    protected LineChartViewBase(Chart chartComponent) {
+        super(chartComponent);
 
-    chart = new LineChart(this.form);
+        chart = new LineChart(this.form);
 
-    data = new LineData();
-    chart.setData(data);
+        data = new LineData();
+        chart.setData(data);
 
-    initializeDefaultSettings();
-  }
+        initializeDefaultSettings();
+    }
 }

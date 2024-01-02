@@ -10,30 +10,30 @@ package com.google.appinventor.components.runtime;
  * Contains the necessary methods to link, unlink and
  * notify observers
  *
- * @param <K>  key (data identifier)
- * @param <V>  value (returned data type)
+ * @param <K> key (data identifier)
+ * @param <V> value (returned data type)
  */
-public interface ObservableDataSource<K,V> extends DataSource<K,V> {
-  /**
-   * Adds a new Chart Data observer to the Data Source.
-   *
-   * @param dataComponent  Chart Data object to add as an observer
-   */
-  void addDataObserver(DataSourceChangeListener dataComponent);
+public interface ObservableDataSource<K, V> extends DataSource<K, V> {
+    /**
+     * Adds a new Chart Data observer to the Data Source.
+     *
+     * @param dataComponent Chart Data object to add as an observer
+     */
+    void addDataObserver(DataSourceChangeListener dataComponent);
 
-  /**
-   * Removes the specified Chart Data observer from the observers list,
-   * if it exists.
-   *
-   * @param dataComponent  Chart Data object to remove
-   */
-  void removeDataObserver(DataSourceChangeListener dataComponent);
+    /**
+     * Removes the specified Chart Data observer from the observers list,
+     * if it exists.
+     *
+     * @param dataComponent Chart Data object to remove
+     */
+    void removeDataObserver(DataSourceChangeListener dataComponent);
 
-  /**
-   * Notifies the observers of a value change.
-   *
-   * @param key  key of the value that changed
-   * @param newValue  new value
-   */
-  void notifyDataObservers(K key, Object newValue);
+    /**
+     * Notifies the observers of a value change.
+     *
+     * @param key      key of the value that changed
+     * @param newValue new value
+     */
+    void notifyDataObservers(K key, Object newValue);
 }

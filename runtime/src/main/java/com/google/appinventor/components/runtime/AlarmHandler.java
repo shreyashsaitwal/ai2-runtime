@@ -12,5 +12,5 @@ package com.google.appinventor.components.runtime;
  */
 
 public interface AlarmHandler {
-  public void alarm();
+    public void alarm();
 }

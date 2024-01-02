@@ -38,7 +38,7 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  * A non-visible component that enables communication with [Twitter](https://twitter.com). Once a
  * user has logged into their Twitter account (and the authorization has been confirmed successful
  * by the {@link #IsAuthorized()} event), many more operations are available:
- *
+ * <p>
  * - Searching Twitter for tweets or labels ({@link #SearchTwitter(String)})
  * - Sending a Tweet ({@link #Tweet(String)})
  * - Sending a Tweet with an Image ({@link #TweetWithImage(String, String)})
@@ -49,7 +49,7 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
  * - Getting a list of users following the logged-in user ({@link #RequestFollowers()})
  * - Getting the most recent messages of users followed by the logged-in user ({@link #RequestFriendTimeline()})
  * - Getting the most recent mentions of the logged-in user ({@link #RequestMentions()})
- *
+ * <p>
  * You must obtain a Consumer Key and Consumer Secret for Twitter authorization specific to your
  * app from http://twitter.com/oauth_clients/new
  *
@@ -96,388 +96,383 @@ import com.google.appinventor.components.runtime.util.ErrorMessages;
     })
 }) */
 public final class Twitter extends AndroidNonvisibleComponent implements
-    ActivityResultListener, Component {
-  private static final String ACCESS_TOKEN_TAG = "TwitterOauthAccessToken";
-  private static final String ACCESS_SECRET_TAG = "TwitterOauthAccessSecret";
-  private static final String MAX_CHARACTERS = "160";
-  private static final String URL_HOST = "twitter";
-  private static final String CALLBACK_URL = Form.APPINVENTOR_URL_SCHEME
-      + "://" + URL_HOST;
-  private static final String WEBVIEW_ACTIVITY_CLASS = WebViewActivity.class
-      .getName();
+        ActivityResultListener, Component {
+    private static final String ACCESS_TOKEN_TAG = "TwitterOauthAccessToken";
+    private static final String ACCESS_SECRET_TAG = "TwitterOauthAccessSecret";
+    private static final String MAX_CHARACTERS = "160";
+    private static final String URL_HOST = "twitter";
+    private static final String CALLBACK_URL = Form.APPINVENTOR_URL_SCHEME
+            + "://" + URL_HOST;
+    private static final String WEBVIEW_ACTIVITY_CLASS = WebViewActivity.class
+            .getName();
+    /**
+     * The maximum number of mentions returned by the following methods:
+     *
+     * <table>
+     * <tr>
+     * <td>component</td>
+     * <td>twitter4j library</td>
+     * <td>twitter API</td>
+     * </tr>
+     * <tr>
+     * <td>RequestMentions</td>
+     * <td>getMentions</td>
+     * <td>statuses/mentions</td>
+     * </tr>
+     * <tr>
+     * <td>RequestDirectMessages</td>
+     * <td>getDirectMessages</td>
+     * <td>direct_messages</td>
+     * </tr>
+     * </table>
+     */
+    private static final String MAX_MENTIONS_RETURNED = "20";
+    private final List<String> mentions;
+    private final List<String> followers;
+    private final List<List<String>> timeline;
+    private final List<String> directMessages;
+    private final List<String> searchResults;
+    private final SharedPreferences sharedPreferences;
+    private final int requestCode;
+    private final ComponentContainer container;
+    private final Handler handler;
+    // the following fields should only be accessed from the UI thread
+    private String consumerKey = "";
+    private String consumerSecret = "";
+    private String TwitPic_API_Key = "";
+    // the following final fields are not synchronized -- twitter4j is thread
+    // safe as of 2.2.6
+    private twitter4j.Twitter twitter;
+    private RequestToken requestToken;
+    private AccessToken accessToken;
 
-  // the following fields should only be accessed from the UI thread
-  private String consumerKey = "";
-  private String consumerSecret = "";
-  private String TwitPic_API_Key = "";
-  private final List<String> mentions;
-  private final List<String> followers;
-  private final List<List<String>> timeline;
-  private final List<String> directMessages;
-  private final List<String> searchResults;
+    // TODO(sharon): twitter4j apparently has an asynchronous interface
+    // (AsynchTwitter).
+    // We should consider whether it has any advantages over AsynchUtil.
+    private String userName = "";
 
-  // the following final fields are not synchronized -- twitter4j is thread
-  // safe as of 2.2.6
-  private twitter4j.Twitter twitter;
-  private RequestToken requestToken;
-  private AccessToken accessToken;
-  private String userName = "";
-  private final SharedPreferences sharedPreferences;
-  private final int requestCode;
-  private final ComponentContainer container;
-  private final Handler handler;
+    public Twitter(ComponentContainer container) {
 
-  // TODO(sharon): twitter4j apparently has an asynchronous interface
-  // (AsynchTwitter).
-  // We should consider whether it has any advantages over AsynchUtil.
+        super(container.$form());
+        this.container = container;
+        handler = new Handler();
 
-  /**
-   * The maximum number of mentions returned by the following methods:
-   *
-   * <table>
-   * <tr>
-   * <td>component</td>
-   * <td>twitter4j library</td>
-   * <td>twitter API</td>
-   * </tr>
-   * <tr>
-   * <td>RequestMentions</td>
-   * <td>getMentions</td>
-   * <td>statuses/mentions</td>
-   * </tr>
-   * <tr>
-   * <td>RequestDirectMessages</td>
-   * <td>getDirectMessages</td>
-   * <td>direct_messages</td>
-   * </tr>
-   * </table>
-   */
-  private static final String MAX_MENTIONS_RETURNED = "20";
+        mentions = new ArrayList<String>();
+        followers = new ArrayList<String>();
+        timeline = new ArrayList<List<String>>();
+        directMessages = new ArrayList<String>();
+        searchResults = new ArrayList<String>();
 
-  public Twitter(ComponentContainer container) {
-    
-    super(container.$form());
-    this.container = container;
-    handler = new Handler();
+        sharedPreferences = container.$context().getSharedPreferences("Twitter",
+                Context.MODE_PRIVATE);
+        accessToken = retrieveAccessToken();
 
-    mentions = new ArrayList<String>();
-    followers = new ArrayList<String>();
-    timeline = new ArrayList<List<String>>();
-    directMessages = new ArrayList<String>();
-    searchResults = new ArrayList<String>();
+        requestCode = form.registerForActivityResult(this);
+    }
 
-    sharedPreferences = container.$context().getSharedPreferences("Twitter",
-        Context.MODE_PRIVATE);
-    accessToken = retrieveAccessToken();
-
-    requestCode = form.registerForActivityResult(this);
-  }
-
-  /**
-   * Logs in to Twitter with a username and password.
-   */
-  // @Deprecated
-  // [lyn, 2015/12/30] Removed @Deprecated annotation for this method, which was deprecated in AI1
-  // by setting userVisible = false. The @Deprecated annotation should only be used for
-  // events/methods/properties deprecated in AI2. The problem with using it for methods deprecated
-  // in AI1 is that the names of such methods no longer exist in OdeMessages.java, but the
-  // AI2 bad blocks mechanism (which uses the @Deprecated annotation) requires the method names
-  // to exist and be translatable so that they can appear in a block marked bad.
+    /**
+     * Logs in to Twitter with a username and password.
+     */
+    // @Deprecated
+    // [lyn, 2015/12/30] Removed @Deprecated annotation for this method, which was deprecated in AI1
+    // by setting userVisible = false. The @Deprecated annotation should only be used for
+    // events/methods/properties deprecated in AI2. The problem with using it for methods deprecated
+    // in AI1 is that the names of such methods no longer exist in OdeMessages.java, but the
+    // AI2 bad blocks mechanism (which uses the @Deprecated annotation) requires the method names
+    // to exist and be translatable so that they can appear in a block marked bad.
   /* @SimpleFunction(userVisible = false, description = "Twitter's API no longer supports login via username and "
       + "password. Use the Authorize call instead.") */
-  public void Login(String username, String password) {
-    form.dispatchErrorOccurredEvent(this, "Login",
-        ErrorMessages.ERROR_TWITTER_UNSUPPORTED_LOGIN_FUNCTION);
-  }
+    public void Login(String username, String password) {
+        form.dispatchErrorOccurredEvent(this, "Login",
+                ErrorMessages.ERROR_TWITTER_UNSUPPORTED_LOGIN_FUNCTION);
+    }
 
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "The user name of the authorized user. Empty if "
-      + "there is no authorized user.") */
-  public String Username() {
-    return userName;
-  }
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "The user name of the authorized user. Empty if "
+        + "there is no authorized user.") */
+    public String Username() {
+        return userName;
+    }
 
-  /**
-   * ConsumerKey property getter method.
-   */
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
-  public String ConsumerKey() {
-    return consumerKey;
-  }
+    /**
+     * ConsumerKey property getter method.
+     */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+    public String ConsumerKey() {
+        return consumerKey;
+    }
 
-  /**
-   * The consumer key to be used when authorizing with Twitter via OAuth.
-   *
-   * @param consumerKey
-   *          the key for use in Twitter OAuth
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "The the consumer key to be used when authorizing with Twitter via OAuth.") */
-  public void ConsumerKey(String consumerKey) {
-    this.consumerKey = consumerKey;
-  }
+    /**
+     * The consumer key to be used when authorizing with Twitter via OAuth.
+     *
+     * @param consumerKey the key for use in Twitter OAuth
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "The the consumer key to be used when authorizing with Twitter via OAuth.") */
+    public void ConsumerKey(String consumerKey) {
+        this.consumerKey = consumerKey;
+    }
 
-  /**
-   * ConsumerSecret property getter method.
-   */
-  /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
-  public String ConsumerSecret() {
-    return consumerSecret;
-  }
+    /**
+     * ConsumerSecret property getter method.
+     */
+    /* @SimpleProperty(category = PropertyCategory.BEHAVIOR) */
+    public String ConsumerSecret() {
+        return consumerSecret;
+    }
 
-  /**
-   * The consumer secret to be used when authorizing with Twitter via OAuth.
-   *
-   * @param consumerSecret
-   *          the secret for use in Twitter OAuth
-   */
-  /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
-  /* @SimpleProperty(description="The consumer secret to be used when authorizing with Twitter via OAuth") */
-  public void ConsumerSecret(String consumerSecret) {
-    this.consumerSecret = consumerSecret;
-  }
+    /**
+     * The consumer secret to be used when authorizing with Twitter via OAuth.
+     *
+     * @param consumerSecret the secret for use in Twitter OAuth
+     */
+    /* @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "") */
+    /* @SimpleProperty(description="The consumer secret to be used when authorizing with Twitter via OAuth") */
+    public void ConsumerSecret(String consumerSecret) {
+        this.consumerSecret = consumerSecret;
+    }
 
-  /**
-   * TwitPicAPIkey property getter method.
-   */
-  @Deprecated
+    /**
+     * TwitPicAPIkey property getter method.
+     */
+    @Deprecated
   /* @SimpleProperty( //// [lyn 2015//12//30] removed userVisible = false, which is superseded by @Deprecated
       category = PropertyCategory.BEHAVIOR) */
-  public String TwitPic_API_Key() {
-     return TwitPic_API_Key;
-  }
+    public String TwitPic_API_Key() {
+        return TwitPic_API_Key;
+    }
 
-  /**
-   * TwitPicAPIkey property setter method: sets the TwitPicAPIkey to be used
-   * for image uploading with twitter.
-   *
-   * @param TwitPic_API_Key
-   *          the API Key for image uploading, given by TwitPic
-   */
-  @Deprecated
-  // Hide the deprecated property from the Designer
-  //@DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
+    /**
+     * TwitPicAPIkey property setter method: sets the TwitPicAPIkey to be used
+     * for image uploading with twitter.
+     *
+     * @param TwitPic_API_Key the API Key for image uploading, given by TwitPic
+     */
+    @Deprecated
+    // Hide the deprecated property from the Designer
+    //@DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
   /* @SimpleProperty( //// [lyn 2015//12//30] removed userVisible = false, which is superseded by @Deprecated
       category = PropertyCategory.BEHAVIOR,
       description="The API Key for image uploading, provided by TwitPic.") */
-  public void TwitPic_API_Key(String TwitPic_API_Key) {
-    this.TwitPic_API_Key = TwitPic_API_Key;
-  }
+    public void TwitPic_API_Key(String TwitPic_API_Key) {
+        this.TwitPic_API_Key = TwitPic_API_Key;
+    }
 
-  /**
-   * This event is raised after the program calls {@link #Authorize()} if the authorization was
-   * successful. It is also called after a call to {@link #CheckAuthorized()} if we already have a
-   * valid access token. After this event has been raised, any other method for this component can
-   * be called.
-   */
+    /**
+     * This event is raised after the program calls {@link #Authorize()} if the authorization was
+     * successful. It is also called after a call to {@link #CheckAuthorized()} if we already have a
+     * valid access token. After this event has been raised, any other method for this component can
+     * be called.
+     */
   /* @SimpleEvent(description = "This event is raised after the program calls "
       + "<code>Authorize<//code> if the authorization was successful.  "
       + "It is also called after a call to <code>CheckAuthorized<//code> "
       + "if we already have a valid access token. "
       + "After this event has been raised, any other method for this "
       + "component can be called.") */
-  public void IsAuthorized() {
-    EventDispatcher.dispatchEvent(this, "IsAuthorized");
-  }
+    public void IsAuthorized() {
+        EventDispatcher.dispatchEvent(this, "IsAuthorized");
+    }
 
-  /**
-   * Authenticate to Twitter using OAuth
-   * @suppressdoc
-   */
+    /**
+     * Authenticate to Twitter using OAuth
+     *
+     * @suppressdoc
+     */
   /* @SimpleFunction(description = "Redirects user to login to Twitter via the Web browser using "
       + "the OAuth protocol if we don't already have authorization.") */
-  public void Authorize() {
-    if (consumerKey.length() == 0 || consumerSecret.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "Authorize",
-          ErrorMessages.ERROR_TWITTER_BLANK_CONSUMER_KEY_OR_SECRET);
-      return;
-    }
-    if (twitter == null) {
-      twitter = new TwitterFactory().getInstance();
-    }
-    final String myConsumerKey = consumerKey;
-    final String myConsumerSecret = consumerSecret;
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        if (checkAccessToken(myConsumerKey, myConsumerSecret)) {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              IsAuthorized();
-            }
-          });
-          return;
+    public void Authorize() {
+        if (consumerKey.length() == 0 || consumerSecret.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "Authorize",
+                    ErrorMessages.ERROR_TWITTER_BLANK_CONSUMER_KEY_OR_SECRET);
+            return;
         }
-        try {
-          // potentially time-consuming calls
-          RequestToken newRequestToken;
-          twitter.setOAuthConsumer(myConsumerKey, myConsumerSecret);
-          newRequestToken = twitter.getOAuthRequestToken(CALLBACK_URL);
-          String authURL = newRequestToken.getAuthorizationURL();
-          requestToken = newRequestToken; // request token will be
-          // needed to get access token
-          Intent browserIntent = new Intent(Intent.ACTION_MAIN, Uri
-              .parse(authURL));
-          browserIntent.setClassName(container.$context(),
-              WEBVIEW_ACTIVITY_CLASS);
-          container.$context().startActivityForResult(browserIntent,
-              requestCode);
-        } catch (TwitterException e) {
-          Log.i("Twitter", "Got exception: " + e.getMessage());
-          e.printStackTrace();
-          form.dispatchErrorOccurredEvent(Twitter.this, "Authorize",
-              ErrorMessages.ERROR_TWITTER_EXCEPTION, e.getMessage());
-          DeAuthorize(); // clean up
-        } catch (IllegalStateException ise){ //This should never happen cause it should return
-          // at the if (checkAccessToken...). We mark as an error but let continue
-          Log.e("Twitter", "OAuthConsumer was already set: launch IsAuthorized()");
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              IsAuthorized();
-            }
-          });
+        if (twitter == null) {
+            twitter = new TwitterFactory().getInstance();
         }
-      }
-    });
-  }
+        final String myConsumerKey = consumerKey;
+        final String myConsumerSecret = consumerSecret;
+        AsynchUtil.runAsynchronously(new Runnable() {
+            public void run() {
+                if (checkAccessToken(myConsumerKey, myConsumerSecret)) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            IsAuthorized();
+                        }
+                    });
+                    return;
+                }
+                try {
+                    // potentially time-consuming calls
+                    RequestToken newRequestToken;
+                    twitter.setOAuthConsumer(myConsumerKey, myConsumerSecret);
+                    newRequestToken = twitter.getOAuthRequestToken(CALLBACK_URL);
+                    String authURL = newRequestToken.getAuthorizationURL();
+                    requestToken = newRequestToken; // request token will be
+                    // needed to get access token
+                    Intent browserIntent = new Intent(Intent.ACTION_MAIN, Uri
+                            .parse(authURL));
+                    browserIntent.setClassName(container.$context(),
+                            WEBVIEW_ACTIVITY_CLASS);
+                    container.$context().startActivityForResult(browserIntent,
+                            requestCode);
+                } catch (TwitterException e) {
+                    Log.i("Twitter", "Got exception: " + e.getMessage());
+                    e.printStackTrace();
+                    form.dispatchErrorOccurredEvent(Twitter.this, "Authorize",
+                            ErrorMessages.ERROR_TWITTER_EXCEPTION, e.getMessage());
+                    DeAuthorize(); // clean up
+                } catch (IllegalStateException ise) { //This should never happen cause it should return
+                    // at the if (checkAccessToken...). We mark as an error but let continue
+                    Log.e("Twitter", "OAuthConsumer was already set: launch IsAuthorized()");
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            IsAuthorized();
+                        }
+                    });
+                }
+            }
+        });
+    }
 
-  /**
-   * Check whether we already have access, and if so, causes the {@link #IsAuthorized()} event
-   * handler to be called.
-   */
+    /**
+     * Check whether we already have access, and if so, causes the {@link #IsAuthorized()} event
+     * handler to be called.
+     */
   /* @SimpleFunction(description = "Checks whether we already have access, and if so, causes "
       + "IsAuthorized event handler to be called.") */
-  public void CheckAuthorized() {
-    final String myConsumerKey = consumerKey;
-    final String myConsumerSecret = consumerSecret;
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        if (checkAccessToken(myConsumerKey, myConsumerSecret)) {
-          handler.post(new Runnable() {
-            @Override
+    public void CheckAuthorized() {
+        final String myConsumerKey = consumerKey;
+        final String myConsumerSecret = consumerSecret;
+        AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
-              IsAuthorized();
+                if (checkAccessToken(myConsumerKey, myConsumerSecret)) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            IsAuthorized();
+                        }
+                    });
+                }
             }
-          });
-        }
-      }
-    });
-  }
+        });
+    }
 
-  /*
-   * Get result from starting WebView activity to authorize access
-   */
-  @Override
-  public void resultReturned(int requestCode, int resultCode, Intent data) {
-    Log.i("Twitter", "Got result " + resultCode);
-    if (data != null) {
-      Uri uri = data.getData();
-      if (uri != null) {
-        Log.i("Twitter", "Intent URI: " + uri.toString());
-        final String oauthVerifier = uri.getQueryParameter("oauth_verifier");
-        if (twitter == null) {
-          Log.e("Twitter", "twitter field is unexpectedly null");
-          form.dispatchErrorOccurredEvent(this, "Authorize",
-              ErrorMessages.ERROR_TWITTER_UNABLE_TO_GET_ACCESS_TOKEN,
-              "internal error: can't access Twitter library");
-          new RuntimeException().printStackTrace();
-        }
-        if (requestToken != null && oauthVerifier != null
-            && oauthVerifier.length() != 0) {
-          AsynchUtil.runAsynchronously(new Runnable() {
-            public void run() {
-              try {
-                AccessToken resultAccessToken;
-                resultAccessToken = twitter.getOAuthAccessToken(requestToken,
-                    oauthVerifier);
-                accessToken = resultAccessToken;
-                userName = accessToken.getScreenName();
-                saveAccessToken(resultAccessToken);
-                handler.post(new Runnable() {
-                  @Override
-                  public void run() {
-                    IsAuthorized();
-                  }
-                });
-              } catch (TwitterException e) {
-                Log.e("Twitter", "Got exception: " + e.getMessage());
-                e.printStackTrace();
-                form.dispatchErrorOccurredEvent(Twitter.this, "Authorize",
-                    ErrorMessages.ERROR_TWITTER_UNABLE_TO_GET_ACCESS_TOKEN,
-                    e.getMessage());
-                deAuthorize(); // clean up
-              }
+    /*
+     * Get result from starting WebView activity to authorize access
+     */
+    @Override
+    public void resultReturned(int requestCode, int resultCode, Intent data) {
+        Log.i("Twitter", "Got result " + resultCode);
+        if (data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                Log.i("Twitter", "Intent URI: " + uri.toString());
+                final String oauthVerifier = uri.getQueryParameter("oauth_verifier");
+                if (twitter == null) {
+                    Log.e("Twitter", "twitter field is unexpectedly null");
+                    form.dispatchErrorOccurredEvent(this, "Authorize",
+                            ErrorMessages.ERROR_TWITTER_UNABLE_TO_GET_ACCESS_TOKEN,
+                            "internal error: can't access Twitter library");
+                    new RuntimeException().printStackTrace();
+                }
+                if (requestToken != null && oauthVerifier != null
+                        && oauthVerifier.length() != 0) {
+                    AsynchUtil.runAsynchronously(new Runnable() {
+                        public void run() {
+                            try {
+                                AccessToken resultAccessToken;
+                                resultAccessToken = twitter.getOAuthAccessToken(requestToken,
+                                        oauthVerifier);
+                                accessToken = resultAccessToken;
+                                userName = accessToken.getScreenName();
+                                saveAccessToken(resultAccessToken);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        IsAuthorized();
+                                    }
+                                });
+                            } catch (TwitterException e) {
+                                Log.e("Twitter", "Got exception: " + e.getMessage());
+                                e.printStackTrace();
+                                form.dispatchErrorOccurredEvent(Twitter.this, "Authorize",
+                                        ErrorMessages.ERROR_TWITTER_UNABLE_TO_GET_ACCESS_TOKEN,
+                                        e.getMessage());
+                                deAuthorize(); // clean up
+                            }
+                        }
+                    });
+                } else {
+                    form.dispatchErrorOccurredEvent(this, "Authorize",
+                            ErrorMessages.ERROR_TWITTER_AUTHORIZATION_FAILED);
+                    deAuthorize(); // clean up
+                }
+            } else {
+                Log.e("Twitter", "uri returned from WebView activity was unexpectedly null");
+                deAuthorize(); // clean up so we can call Authorize again
             }
-          });
         } else {
-          form.dispatchErrorOccurredEvent(this, "Authorize",
-              ErrorMessages.ERROR_TWITTER_AUTHORIZATION_FAILED);
-          deAuthorize(); // clean up
+            Log.e("Twitter", "intent returned from WebView activity was unexpectedly null");
+            deAuthorize(); // clean up so we can call Authorize again
         }
-      } else {
-        Log.e("Twitter", "uri returned from WebView activity was unexpectedly null");
-        deAuthorize(); // clean up so we can call Authorize again
-      }
-    } else {
-      Log.e("Twitter", "intent returned from WebView activity was unexpectedly null");
-      deAuthorize(); // clean up so we can call Authorize again
     }
-  }
 
-  private void saveAccessToken(AccessToken accessToken) {
-    final SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
-    if (accessToken == null) {
-      sharedPrefsEditor.remove(ACCESS_TOKEN_TAG);
-      sharedPrefsEditor.remove(ACCESS_SECRET_TAG);
-    } else {
-      sharedPrefsEditor.putString(ACCESS_TOKEN_TAG, accessToken.getToken());
-      sharedPrefsEditor.putString(ACCESS_SECRET_TAG,
-          accessToken.getTokenSecret());
+    private void saveAccessToken(AccessToken accessToken) {
+        final SharedPreferences.Editor sharedPrefsEditor = sharedPreferences.edit();
+        if (accessToken == null) {
+            sharedPrefsEditor.remove(ACCESS_TOKEN_TAG);
+            sharedPrefsEditor.remove(ACCESS_SECRET_TAG);
+        } else {
+            sharedPrefsEditor.putString(ACCESS_TOKEN_TAG, accessToken.getToken());
+            sharedPrefsEditor.putString(ACCESS_SECRET_TAG,
+                    accessToken.getTokenSecret());
+        }
+        sharedPrefsEditor.commit();
     }
-    sharedPrefsEditor.commit();
-  }
 
-  private AccessToken retrieveAccessToken() {
-    String token = sharedPreferences.getString(ACCESS_TOKEN_TAG, "");
-    String secret = sharedPreferences.getString(ACCESS_SECRET_TAG, "");
-    if (token.length() == 0 || secret.length() == 0) {
-      return null;
+    private AccessToken retrieveAccessToken() {
+        String token = sharedPreferences.getString(ACCESS_TOKEN_TAG, "");
+        String secret = sharedPreferences.getString(ACCESS_SECRET_TAG, "");
+        if (token.length() == 0 || secret.length() == 0) {
+            return null;
+        }
+        return new AccessToken(token, secret);
     }
-    return new AccessToken(token, secret);
-  }
 
-  /**
-   * Removes Twitter authorization from this running app instance.
-   */
-  /* @SimpleFunction(description = "Removes Twitter authorization from this running app instance") */
-  public void DeAuthorize() {
-    deAuthorize();
-  }
-
-  private void deAuthorize() {
-    final twitter4j.Twitter oldTwitter;
-    requestToken = null;
-    accessToken = null;
-    userName = "";
-    oldTwitter = twitter;
-    twitter = null; // setting twitter to null gives us a quick check
-    // that we don't have an authorized version around.
-    saveAccessToken(accessToken);
-
-    // clear the access token from the old twitter instance, just in case
-    // someone stashed it away.
-    if (oldTwitter != null) {
-      oldTwitter.setOAuthAccessToken(null);
+    /**
+     * Removes Twitter authorization from this running app instance.
+     */
+    /* @SimpleFunction(description = "Removes Twitter authorization from this running app instance") */
+    public void DeAuthorize() {
+        deAuthorize();
     }
-  }
 
-  /**
-   * This sends a tweet as the logged-in user with the specified Text, which will be trimmed if it
-   * exceeds 160 characters.
-   *
-   *   __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
-   * been raised, indicating that the user has successfully logged in to Twitter.
-   */
+    private void deAuthorize() {
+        final twitter4j.Twitter oldTwitter;
+        requestToken = null;
+        accessToken = null;
+        userName = "";
+        oldTwitter = twitter;
+        twitter = null; // setting twitter to null gives us a quick check
+        // that we don't have an authorized version around.
+        saveAccessToken(accessToken);
+
+        // clear the access token from the old twitter instance, just in case
+        // someone stashed it away.
+        if (oldTwitter != null) {
+            oldTwitter.setOAuthAccessToken(null);
+        }
+    }
+
+    /**
+     * This sends a tweet as the logged-in user with the specified Text, which will be trimmed if it
+     * exceeds 160 characters.
+     * <p>
+     * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
+     * been raised, indicating that the user has successfully logged in to Twitter.
+     */
   /* @SimpleFunction(description = "This sends a tweet as the logged-in user with the "
       + "specified Text, which will be trimmed if it exceeds "
       + MAX_CHARACTERS
@@ -485,39 +480,39 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "<p><u>Requirements<//u>: This should only be called after the "
       + "<code>IsAuthorized<//code> event has been raised, indicating that the "
       + "user has successfully logged in to Twitter.<//p>") */
-  public void Tweet(final String status) {
+    public void Tweet(final String status) {
 
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "Tweet",
-          ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, "Need to login?");
-      return;
-    }
-    // TODO(sharon): note that if the user calls DeAuthorize immediately
-    // after
-    // Tweet it is possible that the DeAuthorize call can slip in
-    // and invalidate the authorization credentials for myTwitter, causing
-    // the call below to fail. If we want to prevent this we could consider
-    // using an ExecutorService object to serialize calls to Twitter.
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        try {
-          twitter.updateStatus(status);
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "Tweet",
-              ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, e.getMessage());
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "Tweet",
+                    ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, "Need to login?");
+            return;
         }
-      }
-    });
-  }
+        // TODO(sharon): note that if the user calls DeAuthorize immediately
+        // after
+        // Tweet it is possible that the DeAuthorize call can slip in
+        // and invalidate the authorization credentials for myTwitter, causing
+        // the call below to fail. If we want to prevent this we could consider
+        // using an ExecutorService object to serialize calls to Twitter.
+        AsynchUtil.runAsynchronously(new Runnable() {
+            public void run() {
+                try {
+                    twitter.updateStatus(status);
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "Tweet",
+                            ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, e.getMessage());
+                }
+            }
+        });
+    }
 
-  /**
-   * This sends a tweet as the logged-in user with the specified Text and a path to the image to be
-   * uploaded, which will be trimmed if it exceeds 160 characters. If an image is not found or
-   * invalid, the update will not be sent.
-   *
-   *   __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
-   * been raised, indicating that the user has successfully logged in to Twitter.
-   */
+    /**
+     * This sends a tweet as the logged-in user with the specified Text and a path to the image to be
+     * uploaded, which will be trimmed if it exceeds 160 characters. If an image is not found or
+     * invalid, the update will not be sent.
+     * <p>
+     * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
+     * been raised, indicating that the user has successfully logged in to Twitter.
+     */
   /* @SimpleFunction(description = "This sends a tweet as the logged-in user with the "
       + "specified Text and a path to the image to be uploaded, which will be trimmed if it "
       + "exceeds " + MAX_CHARACTERS + " characters. "
@@ -525,48 +520,47 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "<p><u>Requirements<//u>: This should only be called after the "
       + "<code>IsAuthorized<//code> event has been raised, indicating that the "
       + "user has successfully logged in to Twitter.<//p>" ) */
-  public void TweetWithImage(final String status, final String imagePath) {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "TweetWithImage",
-          ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, "Need to login?");
-      return;
+    public void TweetWithImage(final String status, final String imagePath) {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "TweetWithImage",
+                    ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, "Need to login?");
+            return;
+        }
+
+        AsynchUtil.runAsynchronously(new Runnable() {
+            public void run() {
+                try {
+                    String cleanImagePath = imagePath;
+                    // Clean up the file path if necessary
+                    if (cleanImagePath.startsWith("file://")) {
+                        cleanImagePath = imagePath.replace("file://", "");
+                    }
+                    File imageFilePath = new File(cleanImagePath);
+                    if (imageFilePath.exists()) {
+                        StatusUpdate theTweet = new StatusUpdate(status);
+                        theTweet.setMedia(imageFilePath);
+                        twitter.updateStatus(theTweet);
+                    } else {
+                        form.dispatchErrorOccurredEvent(Twitter.this, "TweetWithImage",
+                                ErrorMessages.ERROR_TWITTER_INVALID_IMAGE_PATH);
+                    }
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "TweetWithImage",
+                            ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, e.getMessage());
+                }
+            }
+        });
+
     }
 
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        try {
-          String cleanImagePath = imagePath;
-          // Clean up the file path if necessary
-          if (cleanImagePath.startsWith("file://")) {
-            cleanImagePath = imagePath.replace("file://", "");
-          }
-          File imageFilePath = new File(cleanImagePath);
-          if (imageFilePath.exists()) {
-            StatusUpdate theTweet = new StatusUpdate(status);
-            theTweet.setMedia(imageFilePath);
-            twitter.updateStatus(theTweet);
-          }
-          else {
-            form.dispatchErrorOccurredEvent(Twitter.this, "TweetWithImage",
-                ErrorMessages.ERROR_TWITTER_INVALID_IMAGE_PATH);
-          }
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "TweetWithImage",
-              ErrorMessages.ERROR_TWITTER_SET_STATUS_FAILED, e.getMessage());
-        }
-      }
-    });
-
-  }
-
-  /**
-   * Requests the 20 most recent mentions of the logged-in user. When the mentions have been
-   * retrieved, the system will raise the {@link #MentionsReceived(List)} event and set the
-   * {@link #Mentions()} property to the list of mentions.
-   *
-   *   __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
-   * been raised, indicating that the user has successfully logged in to Twitter.
-   */
+    /**
+     * Requests the 20 most recent mentions of the logged-in user. When the mentions have been
+     * retrieved, the system will raise the {@link #MentionsReceived(List)} event and set the
+     * {@link #Mentions()} property to the list of mentions.
+     * <p>
+     * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
+     * been raised, indicating that the user has successfully logged in to Twitter.
+     */
   /* @SimpleFunction(description = "Requests the " + MAX_MENTIONS_RETURNED
       + " most "
       + "recent mentions of the logged-in user.  When the mentions have been "
@@ -576,63 +570,63 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "<p><u>Requirements<//u>: This should only be called after the "
       + "<code>IsAuthorized<//code> event has been raised, indicating that the "
       + "user has successfully logged in to Twitter.<//p>") */
-  public void RequestMentions() {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "RequestMentions",
-          ErrorMessages.ERROR_TWITTER_REQUEST_MENTIONS_FAILED, "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      List<Status> replies = Collections.emptyList();
-
-      public void run() {
-        try {
-          replies = twitter.getMentionsTimeline();
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "RequestMentions",
-              ErrorMessages.ERROR_TWITTER_REQUEST_MENTIONS_FAILED,
-              e.getMessage());
-        } finally {
-          handler.post(new Runnable() {
-            public void run() {
-              mentions.clear();
-              for (Status status : replies) {
-                mentions.add(status.getUser().getScreenName() + " "
-                    + status.getText());
-              }
-              MentionsReceived(mentions);
-            }
-          });
+    public void RequestMentions() {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "RequestMentions",
+                    ErrorMessages.ERROR_TWITTER_REQUEST_MENTIONS_FAILED, "Need to login?");
+            return;
         }
-      }
-    });
-  }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            List<Status> replies = Collections.emptyList();
 
-  /**
-   * This event is raised when the mentions of the logged-in user requested through
-   * {@link #RequestMentions()} have been retrieved. A list of the mentions can then be found in
-   * the `mentions`{:.variable.block} parameter or the {@link #Mentions()} property.
-   */
+            public void run() {
+                try {
+                    replies = twitter.getMentionsTimeline();
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "RequestMentions",
+                            ErrorMessages.ERROR_TWITTER_REQUEST_MENTIONS_FAILED,
+                            e.getMessage());
+                } finally {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            mentions.clear();
+                            for (Status status : replies) {
+                                mentions.add(status.getUser().getScreenName() + " "
+                                        + status.getText());
+                            }
+                            MentionsReceived(mentions);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * This event is raised when the mentions of the logged-in user requested through
+     * {@link #RequestMentions()} have been retrieved. A list of the mentions can then be found in
+     * the `mentions`{:.variable.block} parameter or the {@link #Mentions()} property.
+     */
   /* @SimpleEvent(description = "This event is raised when the mentions of the logged-in user "
       + "requested through <code>RequestMentions<//code> have been retrieved.  "
       + "A list of the mentions can then be found in the <code>mentions<//code> "
       + "parameter or the <code>Mentions<//code> property.") */
-  public void MentionsReceived(final List<String> mentions) {
-    EventDispatcher.dispatchEvent(this, "MentionsReceived", mentions);
-  }
+    public void MentionsReceived(final List<String> mentions) {
+        EventDispatcher.dispatchEvent(this, "MentionsReceived", mentions);
+    }
 
-  /**
-   * This property contains a list of mentions of the logged-in user. Initially, the list is empty.
-   * To set it, the program must:
-   * 
-   *   1. Call the {@link #Authorize()} method.
-   *   2. Wait for the {@link #IsAuthorized()} event.
-   *   3. Call the {@link #RequestMentions()} method.
-   *   4. Wait for the {@link #MentionsReceived(List)} event.
-   * 
-   *   The value of this property will then be set to the list of mentions (and will maintain its
-   * value until any subsequent calls to {@link #RequestMentions()}).
-   */
+    /**
+     * This property contains a list of mentions of the logged-in user. Initially, the list is empty.
+     * To set it, the program must:
+     * <p>
+     * 1. Call the {@link #Authorize()} method.
+     * 2. Wait for the {@link #IsAuthorized()} event.
+     * 3. Call the {@link #RequestMentions()} method.
+     * 4. Wait for the {@link #MentionsReceived(List)} event.
+     * <p>
+     * The value of this property will then be set to the list of mentions (and will maintain its
+     * value until any subsequent calls to {@link #RequestMentions()}).
+     */
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains a list of mentions of the "
       + "logged-in user.  Initially, the list is empty.  To set it, the "
       + "program must: <ol> "
@@ -643,76 +637,77 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "The value of this property will then be set to the list of mentions "
       + "(and will maintain its value until any subsequent calls to "
       + "<code>RequestMentions<//code>).") */
-  public List<String> Mentions() {
-    return mentions;
-  }
-
-  /**
-   * Gets who is following you.
-   */
-  /* @SimpleFunction
-   */public void RequestFollowers() {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "RequestFollowers",
-          ErrorMessages.ERROR_TWITTER_REQUEST_FOLLOWERS_FAILED,
-          "Need to login?");
-      return;
+    public List<String> Mentions() {
+        return mentions;
     }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      List<User> friends = new ArrayList<User>();
 
-      public void run() {
-        try {
-          IDs followerIDs = twitter.getFollowersIDs(-1);
-          for (long id : followerIDs.getIDs()) {
-            // convert from the IDs returned to the User
-            friends.add(twitter.showUser(id));
-          }
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "RequestFollowers",
-              ErrorMessages.ERROR_TWITTER_REQUEST_FOLLOWERS_FAILED,
-              e.getMessage());
-        } finally {
-          handler.post(new Runnable() {
-            public void run() {
-              followers.clear();
-              for (User user : friends) {
-                followers.add(user.getName());
-              }
-              FollowersReceived(followers);
-            }
-          });
+    /**
+     * Gets who is following you.
+     */
+    /* @SimpleFunction
+     */
+    public void RequestFollowers() {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "RequestFollowers",
+                    ErrorMessages.ERROR_TWITTER_REQUEST_FOLLOWERS_FAILED,
+                    "Need to login?");
+            return;
         }
-      }
-    });
-  }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            List<User> friends = new ArrayList<User>();
 
-  /**
-   * This event is raised when all of the followers of the logged-in user requested through
-   * {@link #RequestFollowers()} have been retrieved. A list of the followers can then be found in
-   * the `followers`{:.variable.block} parameter or the {@link #Followers()} property.
-   */
+            public void run() {
+                try {
+                    IDs followerIDs = twitter.getFollowersIDs(-1);
+                    for (long id : followerIDs.getIDs()) {
+                        // convert from the IDs returned to the User
+                        friends.add(twitter.showUser(id));
+                    }
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "RequestFollowers",
+                            ErrorMessages.ERROR_TWITTER_REQUEST_FOLLOWERS_FAILED,
+                            e.getMessage());
+                } finally {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            followers.clear();
+                            for (User user : friends) {
+                                followers.add(user.getName());
+                            }
+                            FollowersReceived(followers);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * This event is raised when all of the followers of the logged-in user requested through
+     * {@link #RequestFollowers()} have been retrieved. A list of the followers can then be found in
+     * the `followers`{:.variable.block} parameter or the {@link #Followers()} property.
+     */
   /* @SimpleEvent(description = "This event is raised when all of the followers of the "
       + "logged-in user requested through <code>RequestFollowers<//code> have "
       + "been retrieved. A list of the followers can then be found in the "
       + "<code>followers<//code> parameter or the <code>Followers<//code> "
       + "property.") */
-  public void FollowersReceived(final List<String> followers2) {
-    EventDispatcher.dispatchEvent(this, "FollowersReceived", followers2);
-  }
+    public void FollowersReceived(final List<String> followers2) {
+        EventDispatcher.dispatchEvent(this, "FollowersReceived", followers2);
+    }
 
-  /**
-   * This property contains a list of the followers of the logged-in user. Initially, the list is
-   * empty. To set it, the program must:
-   *
-   *   1. Call the {@link #Authorize()} method.
-   *   2. Wait for the {@link #IsAuthorized()} event.
-   *   3. Call the {@link #RequestFollowers()} method.
-   *   4. Wait for the {@link #FollowersReceived(List)} event.
-   *
-   *   The value of this property will then be set to the list of followers (and maintain its value
-   * until any subsequent call to {@link #RequestFollowers()}).
-   */
+    /**
+     * This property contains a list of the followers of the logged-in user. Initially, the list is
+     * empty. To set it, the program must:
+     * <p>
+     * 1. Call the {@link #Authorize()} method.
+     * 2. Wait for the {@link #IsAuthorized()} event.
+     * 3. Call the {@link #RequestFollowers()} method.
+     * 4. Wait for the {@link #FollowersReceived(List)} event.
+     * <p>
+     * The value of this property will then be set to the list of followers (and maintain its value
+     * until any subsequent call to {@link #RequestFollowers()}).
+     */
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains a list of the followers of the "
       + "logged-in user.  Initially, the list is empty.  To set it, the "
       + "program must: <ol> "
@@ -723,18 +718,18 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "The value of this property will then be set to the list of "
       + "followers (and maintain its value until any subsequent call to "
       + "<code>RequestFollowers<//code>).") */
-  public List<String> Followers() {
-    return followers;
-  }
+    public List<String> Followers() {
+        return followers;
+    }
 
-  /**
-   * Requests the 20 most recent direct messages sent to the logged-in user. When the messages have
-   * been retrieved, the system will raise the {@link #DirectMessagesReceived(List)} event and set
-   * the {@link #DirectMessages()} property to the list of messages.
-   *
-   *   __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
-   * been raised, indicating that the user has successfully logged in to Twitter.
-   */
+    /**
+     * Requests the 20 most recent direct messages sent to the logged-in user. When the messages have
+     * been retrieved, the system will raise the {@link #DirectMessagesReceived(List)} event and set
+     * the {@link #DirectMessages()} property to the list of messages.
+     * <p>
+     * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
+     * been raised, indicating that the user has successfully logged in to Twitter.
+     */
   /* @SimpleFunction(description = "Requests the " + MAX_MENTIONS_RETURNED
       + " most "
       + "recent direct messages sent to the logged-in user.  When the "
@@ -744,69 +739,69 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "<p><u>Requirements<//u>: This should only be called after the "
       + "<code>IsAuthorized<//code> event has been raised, indicating that the "
       + "user has successfully logged in to Twitter.<//p>") */
-  public void RequestDirectMessages() {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "RequestDirectMessages",
-          ErrorMessages.ERROR_TWITTER_REQUEST_DIRECT_MESSAGES_FAILED,
-          "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      List<DirectMessage> messages = Collections.emptyList();
+    public void RequestDirectMessages() {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "RequestDirectMessages",
+                    ErrorMessages.ERROR_TWITTER_REQUEST_DIRECT_MESSAGES_FAILED,
+                    "Need to login?");
+            return;
+        }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            List<DirectMessage> messages = Collections.emptyList();
 
-      @Override
-      public void run() {
-        try {
-          messages = twitter.getDirectMessages();
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this,
-              "RequestDirectMessages",
-              ErrorMessages.ERROR_TWITTER_REQUEST_DIRECT_MESSAGES_FAILED,
-              e.getMessage());
-        } finally {
-          handler.post(new Runnable() {
             @Override
             public void run() {
-              directMessages.clear();
-              for (DirectMessage message : messages) {
-                directMessages.add(message.getSenderScreenName() + " "
-                    + message.getText());
-              }
-              DirectMessagesReceived(directMessages);
+                try {
+                    messages = twitter.getDirectMessages();
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this,
+                            "RequestDirectMessages",
+                            ErrorMessages.ERROR_TWITTER_REQUEST_DIRECT_MESSAGES_FAILED,
+                            e.getMessage());
+                } finally {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            directMessages.clear();
+                            for (DirectMessage message : messages) {
+                                directMessages.add(message.getSenderScreenName() + " "
+                                        + message.getText());
+                            }
+                            DirectMessagesReceived(directMessages);
+                        }
+                    });
+                }
             }
-          });
-        }
-      }
 
-    });
-  }
+        });
+    }
 
-  /**
-   * This event is raised when the recent messages requested through
-   * {@link #RequestDirectMessages()} have been retrieved. A list of the messages can then be found
-   * in the `messages`{:.variable.block} parameter or the {@link #DirectMessages()} property.
-   */
+    /**
+     * This event is raised when the recent messages requested through
+     * {@link #RequestDirectMessages()} have been retrieved. A list of the messages can then be found
+     * in the `messages`{:.variable.block} parameter or the {@link #DirectMessages()} property.
+     */
   /* @SimpleEvent(description = "This event is raised when the recent messages "
       + "requested through <code>RequestDirectMessages<//code> have "
       + "been retrieved. A list of the messages can then be found in the "
       + "<code>messages<//code> parameter or the <code>Messages<//code> "
       + "property.") */
-  public void DirectMessagesReceived(final List<String> messages) {
-    EventDispatcher.dispatchEvent(this, "DirectMessagesReceived", messages);
-  }
+    public void DirectMessagesReceived(final List<String> messages) {
+        EventDispatcher.dispatchEvent(this, "DirectMessagesReceived", messages);
+    }
 
-  /**
-   * This property contains a list of the most recent messages mentioning the logged-in user.
-   * Initially, the list is empty. To set it, the program must:
-   *
-   *   1. Call the {@link #Authorize()} method.
-   *   2. Wait for the {@link #IsAuthorized()} event.
-   *   3. Call the {@link #RequestDirectMessages()} method.
-   *   4, Wait for the {@link #DirectMessagesReceived(List)} event.
-   *
-   *   The value of this property will then be set to the list of direct messages retrieved (and
-   * maintain that value until any subsequent call to {@link #RequestDirectMessages()}).
-   */
+    /**
+     * This property contains a list of the most recent messages mentioning the logged-in user.
+     * Initially, the list is empty. To set it, the program must:
+     * <p>
+     * 1. Call the {@link #Authorize()} method.
+     * 2. Wait for the {@link #IsAuthorized()} event.
+     * 3. Call the {@link #RequestDirectMessages()} method.
+     * 4, Wait for the {@link #DirectMessagesReceived(List)} event.
+     * <p>
+     * The value of this property will then be set to the list of direct messages retrieved (and
+     * maintain that value until any subsequent call to {@link #RequestDirectMessages()}).
+     */
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains a list of the most recent "
       + "messages mentioning the logged-in user.  Initially, the list is "
       + "empty.  To set it, the program must: <ol> "
@@ -818,17 +813,17 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "The value of this property will then be set to the list of direct "
       + "messages retrieved (and maintain that value until any subsequent "
       + "call to <code>RequestDirectMessages<//code>).") */
-  public List<String> DirectMessages() {
-    return directMessages;
-  }
+    public List<String> DirectMessages() {
+        return directMessages;
+    }
 
-  /**
-   * This sends a direct (private) message to the specified user. The message will be trimmed if it
-   * exceeds 160 characters.
-   *
-   *   __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
-   * been raised, indicating that the user has successfully logged in to Twitter.
-   */
+    /**
+     * This sends a direct (private) message to the specified user. The message will be trimmed if it
+     * exceeds 160 characters.
+     * <p>
+     * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
+     * been raised, indicating that the user has successfully logged in to Twitter.
+     */
   /* @SimpleFunction(description = "This sends a direct (private) message to the specified "
       + "user.  The message will be trimmed if it exceeds "
       + MAX_CHARACTERS
@@ -836,136 +831,139 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "<p><u>Requirements<//u>: This should only be called after the "
       + "<code>IsAuthorized<//code> event has been raised, indicating that the "
       + "user has successfully logged in to Twitter.<//p>") */
-  public void DirectMessage(final String user, final String message) {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "DirectMessage",
-          ErrorMessages.ERROR_TWITTER_DIRECT_MESSAGE_FAILED, "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        try {
-          twitter.sendDirectMessage(user, message);
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "DirectMessage",
-              ErrorMessages.ERROR_TWITTER_DIRECT_MESSAGE_FAILED, e.getMessage());
+    public void DirectMessage(final String user, final String message) {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "DirectMessage",
+                    ErrorMessages.ERROR_TWITTER_DIRECT_MESSAGE_FAILED, "Need to login?");
+            return;
         }
-      }
-    });
-  }
-
-  /**
-   * Starts following a user.
-   */
-  /* @SimpleFunction
-   */public void Follow(final String user) {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "Follow",
-          ErrorMessages.ERROR_TWITTER_FOLLOW_FAILED, "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        try {
-          twitter.createFriendship(user);
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "Follow",
-              ErrorMessages.ERROR_TWITTER_FOLLOW_FAILED, e.getMessage());
-        }
-      }
-    });
-  }
-
-  /**
-   * Stops following a user.
-   */
-  /* @SimpleFunction
-   */public void StopFollowing(final String user) {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "StopFollowing",
-          ErrorMessages.ERROR_TWITTER_STOP_FOLLOWING_FAILED, "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      public void run() {
-        try {
-          twitter.destroyFriendship(user);
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "StopFollowing",
-              ErrorMessages.ERROR_TWITTER_STOP_FOLLOWING_FAILED, e.getMessage());
-        }
-      }
-    });
-  }
-
-  /**
-   * Gets the most recent 20 messages in the user's timeline.
-   */
-  /* @SimpleFunction
-   */public void RequestFriendTimeline() {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "RequestFriendTimeline",
-          ErrorMessages.ERROR_TWITTER_REQUEST_FRIEND_TIMELINE_FAILED,
-          "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      List<Status> messages = Collections.emptyList();
-
-      public void run() {
-        try {
-          messages = twitter.getHomeTimeline();
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this,
-              "RequestFriendTimeline",
-              ErrorMessages.ERROR_TWITTER_REQUEST_FRIEND_TIMELINE_FAILED,
-              e.getMessage());
-        } finally {
-          handler.post(new Runnable() {
+        AsynchUtil.runAsynchronously(new Runnable() {
             public void run() {
-              timeline.clear();
-              for (Status message : messages) {
-                List<String> status = new ArrayList<String>();
-                status.add(message.getUser().getScreenName());
-                status.add(message.getText());
-                timeline.add(status);
-              }
-              FriendTimelineReceived(timeline);
+                try {
+                    twitter.sendDirectMessage(user, message);
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "DirectMessage",
+                            ErrorMessages.ERROR_TWITTER_DIRECT_MESSAGE_FAILED, e.getMessage());
+                }
             }
-          });
-        }
-      }
-    });
-  }
+        });
+    }
 
-  /**
-   * This event is raised when the messages requested through {@link #RequestFriendTimeline()} have
-   * been retrieved. The `timeline`{:.variable.block} parameter and the {@link #FriendTimeline()}
-   * property will contain a list of lists, where each sub-list contains a status update of the
-   * form (username message).
-   */
+    /**
+     * Starts following a user.
+     */
+    /* @SimpleFunction
+     */
+    public void Follow(final String user) {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "Follow",
+                    ErrorMessages.ERROR_TWITTER_FOLLOW_FAILED, "Need to login?");
+            return;
+        }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            public void run() {
+                try {
+                    twitter.createFriendship(user);
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "Follow",
+                            ErrorMessages.ERROR_TWITTER_FOLLOW_FAILED, e.getMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     * Stops following a user.
+     */
+    /* @SimpleFunction
+     */
+    public void StopFollowing(final String user) {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "StopFollowing",
+                    ErrorMessages.ERROR_TWITTER_STOP_FOLLOWING_FAILED, "Need to login?");
+            return;
+        }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            public void run() {
+                try {
+                    twitter.destroyFriendship(user);
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "StopFollowing",
+                            ErrorMessages.ERROR_TWITTER_STOP_FOLLOWING_FAILED, e.getMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     * Gets the most recent 20 messages in the user's timeline.
+     */
+    /* @SimpleFunction
+     */
+    public void RequestFriendTimeline() {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "RequestFriendTimeline",
+                    ErrorMessages.ERROR_TWITTER_REQUEST_FRIEND_TIMELINE_FAILED,
+                    "Need to login?");
+            return;
+        }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            List<Status> messages = Collections.emptyList();
+
+            public void run() {
+                try {
+                    messages = twitter.getHomeTimeline();
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this,
+                            "RequestFriendTimeline",
+                            ErrorMessages.ERROR_TWITTER_REQUEST_FRIEND_TIMELINE_FAILED,
+                            e.getMessage());
+                } finally {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            timeline.clear();
+                            for (Status message : messages) {
+                                List<String> status = new ArrayList<String>();
+                                status.add(message.getUser().getScreenName());
+                                status.add(message.getText());
+                                timeline.add(status);
+                            }
+                            FriendTimelineReceived(timeline);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * This event is raised when the messages requested through {@link #RequestFriendTimeline()} have
+     * been retrieved. The `timeline`{:.variable.block} parameter and the {@link #FriendTimeline()}
+     * property will contain a list of lists, where each sub-list contains a status update of the
+     * form (username message).
+     */
   /* @SimpleEvent(description = "This event is raised when the messages "
       + "requested through <code>RequestFriendTimeline<//code> have "
       + "been retrieved. The <code>timeline<//code> parameter and the "
       + "<code>Timeline<//code> property will contain a list of lists, where "
       + "each sub-list contains a status update of the form (username message)") */
-  public void FriendTimelineReceived(final List<List<String>> timeline) {
-    EventDispatcher.dispatchEvent(this, "FriendTimelineReceived", timeline);
-  }
+    public void FriendTimelineReceived(final List<List<String>> timeline) {
+        EventDispatcher.dispatchEvent(this, "FriendTimelineReceived", timeline);
+    }
 
-  /**
-   * This property contains the 20 most recent messages of users being followed. Initially, the
-   * list is empty. To set it, the program must:
-   * 
-   *   1. Call the {@link #Authorize()} method.
-   *   2. Wait for the {@link #IsAuthorized()} event.
-   *   3. Specify users to follow with one or more calls to the {@link #Follow(String)} method.
-   *   4. Call the {@link #RequestFriendTimeline()}  method.
-   *   5. Wait for the {@link #FriendTimelineReceived(List)} event.
-   *
-   *   The value of this property will then be set to the list of messages (and maintain its value
-   * until any subsequent call to {@link #RequestFriendTimeline()}.
-   */
+    /**
+     * This property contains the 20 most recent messages of users being followed. Initially, the
+     * list is empty. To set it, the program must:
+     * <p>
+     * 1. Call the {@link #Authorize()} method.
+     * 2. Wait for the {@link #IsAuthorized()} event.
+     * 3. Specify users to follow with one or more calls to the {@link #Follow(String)} method.
+     * 4. Call the {@link #RequestFriendTimeline()}  method.
+     * 5. Wait for the {@link #FriendTimelineReceived(List)} event.
+     * <p>
+     * The value of this property will then be set to the list of messages (and maintain its value
+     * until any subsequent call to {@link #RequestFriendTimeline()}.
+     */
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property contains the 20 most recent messages of "
       + "users being followed.  Initially, the list is empty.  To set it, "
       + "the program must: <ol> "
@@ -979,74 +977,74 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "The value of this property will then be set to the list of messages "
       + "(and maintain its value until any subsequent call to "
       + "<code>RequestFriendTimeline<//code>.") */
-  public List<List<String>> FriendTimeline() {
-    return timeline;
-  }
+    public List<List<String>> FriendTimeline() {
+        return timeline;
+    }
 
-  /**
-   * This searches Twitter for the given String query.
-   *
-   *   __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
-   * been raised, indicating that the user has successfully logged in to Twitter.
-   */
+    /**
+     * This searches Twitter for the given String query.
+     * <p>
+     * __Requirements__: This should only be called after the {@link #IsAuthorized()} event has
+     * been raised, indicating that the user has successfully logged in to Twitter.
+     */
   /* @SimpleFunction(description = "This searches Twitter for the given String query."
       + "<p><u>Requirements<//u>: This should only be called after the "
       + "<code>IsAuthorized<//code> event has been raised, indicating that the "
       + "user has successfully logged in to Twitter.<//p>") */
-  public void SearchTwitter(final String query) {
-    if (twitter == null || userName.length() == 0) {
-      form.dispatchErrorOccurredEvent(this, "SearchTwitter",
-          ErrorMessages.ERROR_TWITTER_SEARCH_FAILED, "Need to login?");
-      return;
-    }
-    AsynchUtil.runAsynchronously(new Runnable() {
-      List<Status> tweets = Collections.emptyList();
-
-      public void run() {
-        try {
-          tweets = twitter.search(new Query(query)).getTweets();
-        } catch (TwitterException e) {
-          form.dispatchErrorOccurredEvent(Twitter.this, "SearchTwitter",
-              ErrorMessages.ERROR_TWITTER_SEARCH_FAILED, e.getMessage());
-        } finally {
-          handler.post(new Runnable() {
-            public void run() {
-              searchResults.clear();
-              for (Status tweet : tweets) {
-                searchResults.add(tweet.getUser().getName() + " " + tweet.getText());
-              }
-              SearchSuccessful(searchResults);
-            }
-          });
+    public void SearchTwitter(final String query) {
+        if (twitter == null || userName.length() == 0) {
+            form.dispatchErrorOccurredEvent(this, "SearchTwitter",
+                    ErrorMessages.ERROR_TWITTER_SEARCH_FAILED, "Need to login?");
+            return;
         }
-      }
-    });
-  }
+        AsynchUtil.runAsynchronously(new Runnable() {
+            List<Status> tweets = Collections.emptyList();
 
-  /**
-   * This event is raised when the results of the search requested through
-   * {@link #SearchTwitter(String)} have been retrieved. A list of the results can then be found in
-   * the `results`{:.variable.block} parameter or the {@link #SearchResults()} property.
-   */
+            public void run() {
+                try {
+                    tweets = twitter.search(new Query(query)).getTweets();
+                } catch (TwitterException e) {
+                    form.dispatchErrorOccurredEvent(Twitter.this, "SearchTwitter",
+                            ErrorMessages.ERROR_TWITTER_SEARCH_FAILED, e.getMessage());
+                } finally {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            searchResults.clear();
+                            for (Status tweet : tweets) {
+                                searchResults.add(tweet.getUser().getName() + " " + tweet.getText());
+                            }
+                            SearchSuccessful(searchResults);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * This event is raised when the results of the search requested through
+     * {@link #SearchTwitter(String)} have been retrieved. A list of the results can then be found in
+     * the `results`{:.variable.block} parameter or the {@link #SearchResults()} property.
+     */
   /* @SimpleEvent(description = "This event is raised when the results of the search "
       + "requested through <code>SearchSuccessful<//code> have "
       + "been retrieved. A list of the results can then be found in the "
       + "<code>results<//code> parameter or the <code>Results<//code> "
       + "property.") */
-  public void SearchSuccessful(final List<String> searchResults) {
-    EventDispatcher.dispatchEvent(this, "SearchSuccessful", searchResults);
-  }
+    public void SearchSuccessful(final List<String> searchResults) {
+        EventDispatcher.dispatchEvent(this, "SearchSuccessful", searchResults);
+    }
 
-  /**
-   * This property, which is initially empty, is set to a list of search results after the program:
-   *
-   *   1. Calls the {@link #SearchTwitter(String)} method.
-   *   2. Waits for the {@link #SearchSuccessful(List)} event.
-   *
-   *   The value of the property will then be the same as the parameter to
-   * {@link #SearchSuccessful(List)}. Note that it is not necessary to call the {@link #Authorize()}
-   * method before calling {@link #SearchTwitter(String)}.
-   */
+    /**
+     * This property, which is initially empty, is set to a list of search results after the program:
+     * <p>
+     * 1. Calls the {@link #SearchTwitter(String)} method.
+     * 2. Waits for the {@link #SearchSuccessful(List)} event.
+     * <p>
+     * The value of the property will then be the same as the parameter to
+     * {@link #SearchSuccessful(List)}. Note that it is not necessary to call the {@link #Authorize()}
+     * method before calling {@link #SearchTwitter(String)}.
+     */
   /* @SimpleProperty(category = PropertyCategory.BEHAVIOR, description = "This property, which is initially empty, is set to a "
       + "list of search results after the program: <ol>"
       + "<li>Calls the <code>SearchTwitter<//code> method.<//li> "
@@ -1055,43 +1053,42 @@ public final class Twitter extends AndroidNonvisibleComponent implements
       + "<code>SearchSuccessful<//code>.  Note that it is not necessary to "
       + "call the <code>Authorize<//code> method before calling "
       + "<code>SearchTwitter<//code>.") */
-  public List<String> SearchResults() {
-    return searchResults;
-  }
+    public List<String> SearchResults() {
+        return searchResults;
+    }
 
-  /**
-   * Check whether accessToken is stored in preferences. If there is one, set it.
-   * If it was already set (for instance calling Authorize twice in a row),
-   * it will throw an IllegalStateException that, in this case, can be ignored.
-   * @return true if accessToken is valid and set (user authorized), false otherwise.
-   */
-  private boolean checkAccessToken(String myConsumerKey, String myConsumerSecret) {
-    accessToken = retrieveAccessToken();
-    if (accessToken == null) {
-      return false;
-    }
-    else {
-      if (twitter == null) {
-        twitter = new TwitterFactory().getInstance();
-      }
-      try {
-        twitter.setOAuthConsumer(consumerKey, consumerSecret);
-        twitter.setOAuthAccessToken(accessToken);
-      }
-      catch (IllegalStateException ies) {
-        //ignore: it means that the consumer data was already set
-      }
-      if (userName.trim().length() == 0) {
-        User user;
-        try {
-          user = twitter.verifyCredentials();
-          userName = user.getScreenName();
-        } catch (TwitterException e) {// something went wrong (networks or bad credentials <-- DeAuthorize
-          deAuthorize();
-          return false;
+    /**
+     * Check whether accessToken is stored in preferences. If there is one, set it.
+     * If it was already set (for instance calling Authorize twice in a row),
+     * it will throw an IllegalStateException that, in this case, can be ignored.
+     *
+     * @return true if accessToken is valid and set (user authorized), false otherwise.
+     */
+    private boolean checkAccessToken(String myConsumerKey, String myConsumerSecret) {
+        accessToken = retrieveAccessToken();
+        if (accessToken == null) {
+            return false;
+        } else {
+            if (twitter == null) {
+                twitter = new TwitterFactory().getInstance();
+            }
+            try {
+                twitter.setOAuthConsumer(consumerKey, consumerSecret);
+                twitter.setOAuthAccessToken(accessToken);
+            } catch (IllegalStateException ies) {
+                //ignore: it means that the consumer data was already set
+            }
+            if (userName.trim().length() == 0) {
+                User user;
+                try {
+                    user = twitter.verifyCredentials();
+                    userName = user.getScreenName();
+                } catch (TwitterException e) {// something went wrong (networks or bad credentials <-- DeAuthorize
+                    deAuthorize();
+                    return false;
+                }
+            }
+            return true;
         }
-      }
-      return true;
     }
-  }
 }
